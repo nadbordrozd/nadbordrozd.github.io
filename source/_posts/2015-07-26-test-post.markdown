@@ -1,0 +1,16 @@
+---
+layout: post
+title: "test post"
+date: 2015-07-26 22:20:42 +0100
+comments: true
+categories: 
+---
+
+This is my first post.
+This is code span (hopefully)
+`def fibo(n):
+	if n < 2:
+		return 1
+	else:
+		return fibo(n - 1) + fibo(n - 2)
+`
