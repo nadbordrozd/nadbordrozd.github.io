@@ -4,7 +4,7 @@
   <title><![CDATA[My Octopress Blog]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2015-07-26T22:11:42+01:00</updated>
+  <updated>2015-07-26T22:27:42+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[Your Name]]></name>
@@ -12,5 +12,21 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Test Post]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2015/07/26/test-post/"/>
+    <updated>2015-07-26T22:20:42+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2015/07/26/test-post</id>
+    <content type="html"><![CDATA[<p>This is my first post.
+This is code span (hopefully)
+<code>def fibo(n):
+    if n &lt; 2:
+        return 1
+    else:
+        return fibo(n - 1) + fibo(n - 2)
+</code></p>
+]]></content>
+  </entry>
   
 </feed>
