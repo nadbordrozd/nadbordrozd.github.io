@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2015-07-26T23:08:33+01:00</updated>
+  <updated>2015-10-18T00:15:55+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -18,7 +18,7 @@
     <link href="http://nadbordrozd.github.io/blog/2015/07/26/test-post/"/>
     <updated>2015-07-26T22:20:42+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2015/07/26/test-post</id>
-    <content type="html"><![CDATA[<p>This is my first post.
+    <content type="html"><![CDATA[<p>This is my first post. pls work pls
 This is code span (hopefully)
 <code>def fibo(n):
     if n &lt; 2:
