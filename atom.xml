@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2015-10-18T17:34:49+01:00</updated>
+  <updated>2015-10-19T18:34:41+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -12,15 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Lead Ranking Without Negative Examples]]></title>
-    <link href="http://nadbordrozd.github.io/blog/2015/10/18/lead-ranking-without-negative-examples/"/>
-    <updated>2015-10-18T11:22:11+01:00</updated>
-    <id>http://nadbordrozd.github.io/blog/2015/10/18/lead-ranking-without-negative-examples</id>
-    <content type="html"><![CDATA[
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Lead Scoring Without Negative Examples]]></title>
