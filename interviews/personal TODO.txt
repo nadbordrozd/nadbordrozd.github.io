@@ -1,0 +1,5 @@
+blog post about word2vec and topic modeling used in other stuff
+- keywords for companies - datafox
+- user journeys - quantum black question
+- that thing magda talked about related to immunoassays i think
+- sites visited by a user - the article ola got from that rtb company, cant remember the name
