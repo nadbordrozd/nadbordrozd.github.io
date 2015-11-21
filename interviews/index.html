@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="Interviews Nov 7th, 2015 10:38 pm Questions I was asked in data scientist/machine learning engineer/data science consultant interviews. Technology &hellip;">
+  <meta name="description" content="Interviews Nov 7th, 2015 10:38 pm I like to think of myself as a supervised learning algorithm. Give me 500 questions and 500 correct answers and I’ &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -106,14 +106,14 @@ MathJax.Hub.Config({
 <time class='entry-date' datetime='2015-11-07T22:38:00+00:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:38 pm</span></time></p>
   </header>
   
-  <p>Questions I was asked in data scientist/machine learning engineer/data science consultant interviews.</p>
+  <p>I like to think of myself as a supervised learning algorithm. Give me 500 questions and 500 correct answers and I’ll take it from there. Unfortunately training examples for data science interviews are relatively scarce especially compared to software developer equivalents. There is the book “Data Science Interviews Exposed” which has a bunch but not nearly enough and there is “120 Data Science Interview Questions” which doesn’t have any answers. Having suffered through a lot of those interviews lately, I can now make a contribution to this pool. These are the questions I was asked in data scientist/machine learning engineer/data science consultant interviews (the ones that I remember and am allowed to disclose). The interviews took place mostly in London and mostly during 2014-2015. I list all the questions I got ordered by type from least to most interesting. I included my answers for the good ones at the bottom. I also editorialize a bit here and there and give advice on how to prepare but you can take with a grain of salt - my experience isn’t extensive enough that I can say anything with high confidence. But can, really - it’s all so new, no one knows what they’re doing, everyone is just winging it (&lt;- see, editorializing right here).</p>
 
 <h3 id="technology-trivia">Technology trivia</h3>
-<p>Questions in this category are intended to test whether you are actually familiar with all the tech you put in your resume. They are quick, easy and superficial. If you are actually using technology X with any kind of regularity, you should have no problem answering them. Otherwise if you feel rusty, just spend a few hours with google and wikipedia and you’re good to go. Most screening interviews I’ve had featured several of these questions and they popped up every single time I was interviewed by an engineer.</p>
+<p>This is the lowest common denominator of tech interviews. Questions in this category are intended to test whether you are actually familiar with all the tech you put in your resume. They are quick, easy and superficial. If you are actually using technology X with any kind of regularity, you should have no problem answering them. Otherwise if you feel rusty, just spend a few hours with google and wikipedia and you’re good to go. Most screening interviews I’ve had featured several of these questions and they popped up every single time I was interviewed by an engineer.</p>
 
 <ul>
-  <li><em>are you familiar with git/linux/bash/excel</em></li>
-  <li><em>what is “yield” in python</em></li>
+  <li><em>are you familiar with git/linux/bash/excel</em> (they asked me this because I <em>didn’t</em> put it on my resume)</li>
+  <li><em>what is “yield” in python</em> (asked on at least 3 occasions)</li>
   <li><em>tell me about functional programming in python</em></li>
   <li><em>what are “lambdas” in python</em></li>
   <li><em>which python libraries are you using (they wanted to hear scikit-learn, numpy, pandas)</em></li>
@@ -141,6 +141,43 @@ MathJax.Hub.Config({
   <li><em>write a function that tests whether two strings are anagrams</em></li>
   <li><em>find duplicate lines in file. Do it in bash, in python, in mapreduce (your mapper function is fed lines of the file), in sql (the file is represented as a table with only one column “line”)</em></li>
   <li><em>an array contains n distinct numbers taken from 0, 1, 2, …, n, find the one that is missing from the array</em></li>
+  <li>
+    <p><em>“content_actions” is a table that logs user activity.</em></p>
+
+    <pre><code> user_id   content_id     date     content_type   target_id
+   22         1234     2015-02-01     photo         null
+   13         3456     2015-02-01    comment        1234
+   47         5678     2015-02-02    comment        1234
+</code></pre>
+
+    <p><em>it has the following columns:</em></p>
+
+    <ul>
+      <li><em>user_id: a unique id for the user taking the action</em></li>
+      <li><em>content_id: a unique id for the content being generated</em></li>
+      <li><em>date</em></li>
+      <li><em>content_type: a string that is one of the following {‘post’, ‘share’, ‘photo’, ‘comment’}</em></li>
+      <li><em>target_id: The id of the object that is receiving this content. In the case of a comment, this is the id of the content that is being commented on.</em></li>
+    </ul>
+
+    <p><em>Write a SQL query to compute the distribution of the number comments per story. Output should look like:</em></p>
+
+    <pre><code>  n_comments   n_occurence
+      1         5,000,000
+      2         3,000,000
+</code></pre>
+
+    <p><em>Followup: do the same for each story type. Output should look like:</em></p>
+
+    <pre><code>  story_type   n_comments   n_occurence
+     share         0         3,000,000
+     photo         1         2,000,000
+     share         1         1,000,000
+     photo         2         1,500,000
+</code></pre>
+
+    <p><em>Followup 2: this query is taking a lot of time to run. Is there a way to maybe get an approximate answer but get it much faster?</em></p>
+  </li>
 </ul>
 
 <p>Many companies actually didn’t ask me a single coding question at any stage which is somewhat astonishing considering that it’s a job where coding is your main tool and code your main output.</p>
@@ -150,7 +187,9 @@ MathJax.Hub.Config({
 
 <ul>
   <li><em>there are 50 blue marbles and 50 red ones and two jars. You are to place all marbles in the jars and then choose one of the jars at random and pick a marble from it at random. How many red and how many blue marbles should you place in each jar to maximise the probability of picking a blue marble?</em></li>
-  <li>_this python code below calculates the maximum of an array. Calculate the expected number of times the expression <code>max_num = i</code> will be evaluated.__</li>
+  <li><em>what is the probability of picking 2 cards of the same color in a hand of 4 cards</em> (and a bunch of other similar car questions)</li>
+  <li><em>tell me about bayesian probability</em> (only asked because I bragged about doing something bayesian or other)</li>
+  <li><em>this python code below calculates the maximum of an array. Calculate the expected number of times the expression <code>max_num = i</code> will be evaluated.</em></li>
 </ul>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
@@ -163,22 +202,21 @@ MathJax.Hub.Config({
 </span><span class="line">    max_num = x[0]
 </span><span class="line">    for i in x[1:]:
 </span><span class="line">        if i &gt; max_num: 
-</span><span class="line">            max_num = i  #Expected number of times this expression was evaluated
+</span><span class="line">            max_num = i  #Expected number of times this is evaluated
 </span><span class="line">    return max_num</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>There was only one company where it was a quant running the interviews, so there was much more stats:</p>
+<p>There was only one company (in finance) where it was a quant running the interviews, so there was much more stats:</p>
 
 <ul>
-  <li>given these plots recognise: autocorrelation, cyclicality, heteroskedasticity, partial autocorrelation, outliers, correlation
-assumptions for linear regression, derive linear regression,</li>
+  <li><em>given these plots</em> (hands me a bunch of plots) <em>recognise: autocorrelation, cyclicality, heteroskedasticity, partial autocorrelation, outliers, correlation</em></li>
 </ul>
 
 <h4 id="machine-learning">Machine learning</h4>
-<p>Finally, this is where data scientist branches off the regular engineer (or regular statistician if you look at it from the other direction). Data science is not all about machine learning but machine learning is the engine that powers most of it. Almost all the questions here are on the level of an introductory machine learning course (ML engineer interview questions being only exceptions). Recommendation: Andrew Ng’s ML course on coursera.</p>
+<p>Machine learning is the workhorse of data science but you don’t have to be <em>intimately acquainted</em> with it to have it do your bidding. On the job surprisingly little <em>rides</em> on you knowing how your favorite ml library works inside. Plus <em>Lasso</em>* is the fanciest algorithm most of my interviewers <em>hoof</em> heard of (I’m on a roll!). As a result most ML questions are simple and knowledge-based (i.e. ML-flavored trivia).</p>
 
 <ul>
-  <li><em>tell me about linear regression</em></li>
+  <li><em>tell me about linear regression</em> - the only ML algorithm that I was ever asked to derive - and on 3 separate occasions</li>
   <li><em>tell me about logistic regression</em></li>
-  <li><em>tell me about regularization</em></li>
+  <li><em>tell me about regularization, what’s it for?</em></li>
   <li><em>what is the difference between ridge regression and lasso?</em></li>
 </ul>
 
@@ -194,9 +232,15 @@ assumptions for linear regression, derive linear regression,</li>
   <li><em>open this file with emails labeled as ham or spam and implement and train a spam detector algorithm from scratch (no machine learning libraries allowed)</em></li>
 </ul>
 
-<p>I implemented multinomial naive bayes and it worked like a charm (on a subset of labeled emails that I saved for cross-validation). The last two questions were from the same company, interviewing for the position of machine learning engineer. I don’t know of any other companies that ask candidates to actually implement ML algorithms in an interview but if you find one, I have prepared a bunch of bare-bones implementations of the <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/ml_basic">basic ML algorithms</a> (the ones that are actually doable in half an hour). They are obviously very crude, but more importantly they’re short and simple so you can easily replicate them in an interview.</p>
+<p>I implemented multinomial naive bayes and it worked like a charm (on a subset of labeled emails that I saved for cross-validation). The last two questions were from the same company, interviewing for the position of machine learning engineer. I don’t know of any other companies that ask candidates to actually implement ML algorithms in an interview but if you find one, I have prepared a bunch of bare-bones implementations of <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/ml_basic">basic ML algorithms</a> (the ones that are actually doable in half an hour). They are obviously very crude, but more importantly they’re short and simple so you can easily replicate them in an interview.</p>
 
-<h3 id="open-problems-aka-actual-data-science">Open problems (aka actual data science)</h3>
+<p>Other than this one company, all I was ever asked about ML can be found in any introductory ML course. I liked Andrew Ng’s one on Coursera.</p>
+
+<p>* not really, but couldn’t resist, sorry
+###Open problems (aka actual data science)
+There comes a point in the recruitment process when your interviewers run out of python trivia and have to ask one or more actually job-related questions. These aren’t as easily googlable so I provide solutions. The questions are open-ended and my solutions are neither unique nor the best possible - they are just something I came up with at the time and they were good enough to get me to the next stage. Obviously I cleaned them up, corrected and clarified them a bit for the writeup, I’m not this eloquent in person. If you find something worng with my answers please let me know in the comments.</p>
+
+<p>You’ll notice that many of the solutions follow a very simple pattern: “this can be viewed as a supervised classification problem therefore I will use Logistic Regression (or Naive Bayes or whatever)”. It sounds a bit trivial but this is what the interviewer wants to hear. She wants to make sure that faced with a machine learning type problem you will go for a machine learning solution (and not for example try to classify stuff by hand or heuristics), and the right machine learning solution at that.</p>
 
 <h4 id="analytics-conundrum">Analytics conundrum</h4>
 <p><em>After we changed the color of the button in our mobile app, the metrics changed like this:</em></p>
@@ -260,7 +304,8 @@ assumptions for linear regression, derive linear regression,</li>
 <p>*this is unnecessarily complicated but I came up with it on the spot and it was good enough for my interviewer</p>
 
 <h5 id="predicting-page-jumps">Predicting page jumps</h5>
-<p><em>A web app consists of hundreds of pages. A user spends some time on a page, clicks a link that transports them to a different page, spends some time on this one, clicks on another link and so on. This is what we call a user journey. We collect data about all user journeys - the identity of the user, the sequence of pages visited in a single session and timestamp of every page jump. Your job is to devise an algorithm that will predict in real time, which page will a user visit next so we can preload it and save money on cdn*. What features would you construct? What algorithm would you use? How do you reduce dimensionality of your feature space? If you don’t want to train your algorithm on full historical dataset, how would you pick training examples?</em></p>
+<p><em>A web app consists of hundreds of pages. A user spends some time on a page, clicks a link that transports them to a different page, spends some time on this one, clicks on another link and so on. This is what we call a user journey. We collect data about all user journeys - the identity of the user, the sequence of pages visited in a single session and timestamp of every page jump. Your job is to devise an algorithm that will predict in real time, which page will a user visit next so we can preload it and save money on cdn*. What features would you construct? What algorithm would you use? How do you reduce dimensionality of your feature space? If you don’t want to train your algorithm on full historical dataset, how would you pick training examples?</em>
+*not absolutely necessary but probably worth knowing what a cdn is</p>
 
 <p>First note that this is a supervised classification problem. Given a user’s journey so far we will try to predict which of $k$ possible pages will they visit next - hence it’s an $k+1$ -way classification. The $+1$ comes from the fact that the user may end their journey at the current page - we will represent this as a separate label. It’s supervised because we are given a training set of previous journeys. Actually we are just given the journeys and we have to construct the training set, but that’s relatively straightforward. For a journey consisting of pages A -&gt; B -&gt; C -&gt; D, we can construct 4 training examples by cutting it at different points. For example we can stop the journey at C and ask what will the next page be. The features will be extracted from eveyrthing that happened on the path A -&gt; B -&gt; C and the label will be D. On to feature engineering:</p>
 
