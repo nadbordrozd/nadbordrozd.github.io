@@ -330,12 +330,18 @@ Which classifier do we use? Naive bayes should do the job. N-grams and user - sp
 <p>Let us note first that there is no good reason not to train the algorithm on full historical data. Training of naive bayes consists of just counting frequencies of labels for every feature and can be done online (which means one example at a time). So every time new data comes in, we can update the counts, there is no need to touch previously processed data. That being said, if for whatever reason we needed to pick only a subset of historical data for training, we should make sure that every feature is represented enough times in the training set so the counts are accurate. How many is “enough” depends on the number of different labels. I estimate that for $k$ labels $(k-1) \cdot 100$ examples per feature is more than enough. Having more is not going to make any difference to the model’s fitness. In practice we won’t be able to achieve the required numbers for every feature because there are just too many of them. We will have to settle for having enough occurences of the most common features and hope that regularization will smooth out any inaccuracies that will arise from not having enough occurences of remaining features.</p>
 
 <h5 id="efficient-odds">Efficient odds</h5>
-<p>This one actually happened to my wife. <em>We have data on sports bets - the odds, the stake, the outcome and the identity of the bettor for a number of bets. A record for a single bet may look something like this:</em>
-<em>odds: 3 to 1   (which implies probability 0.25)</em>
-<em>stake: $10</em>
-<em>outcome: False  (meaning that the thing this person was betting on didn’t happen)</em>
-<em>bettor_id: 1234</em>
-<em>Your task is to figure out if any of the bettors are using inside knowledge to achieve success rates greater than would happen just by chance. If someone was only making bets when the odds are 0.1 (9 to 1) and consistently, in the long run winning 0.2 of them - this would be an example of such a situation. Make sure that your solution is algorithmically efficient enough that it can quickly run on a dataset of tens of millions of bets. You can neglect bookie’s profit margin and treat all bets as fair.</em></p>
+<p>This one actually happened to my wife. <em>We have data on sports bets - the odds, the stake, the outcome and the identity of the bettor for a number of bets. A record for a single bet may look something like this:</em></p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class=""><span class="line">odds:       3 to 1  #(which implies probability 0.25)
+</span><span class="line">stake:      $10
+</span><span class="line">outcome:    False (bettor lost the bet)
+</span><span class="line">bettor_id:  1234</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><em>Your task is to figure out if any of the bettors are using inside knowledge to achieve success rates greater than would happen just by chance. If someone was only making bets when the odds are 0.1 (9 to 1) and consistently, in the long run winning 0.2 of them - this would be an example of such a situation. Make sure that your solution is algorithmically efficient enough that it can quickly run on a dataset of tens of millions of bets. You can neglect bookie’s profit margin and treat all bets as fair.</em></p>
 
 <p>The idea is simple. Since the expected value of any bet is 0, if a gambler accumulates significant winnings after a long series of bets - then probably something shady is going on. We will give precise mathematical meaning to this in a moment, but first let’s explain what do we mean “something shady”. You can think about it in two ways:</p>
 
