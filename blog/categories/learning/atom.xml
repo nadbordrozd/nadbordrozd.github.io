@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Learning | DS lore]]></title>
+  <link href="http://nadbordrozd.github.io/blog/categories/learning/atom.xml" rel="self"/>
+  <link href="http://nadbordrozd.github.io/"/>
+  <updated>2015-12-07T23:03:21+00:00</updated>
+  <id>http://nadbordrozd.github.io/</id>
+  <author>
+    <name><![CDATA[nadbor]]></name>
+    <email><![CDATA[nadbordrozd@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Lead Scoring Without Negative Examples]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/"/>
+    <updated>2015-08-01T20:49:26+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples</id>
+    <content type="html"><![CDATA[<p>How do you train a binary classifier when you have only positive-labeled training examples? 
+Impossible? Maybe. But sometimes you can do something just as good. Let’s start from the beginning…</p>
+
+<h3 id="lead-generation">Lead generation</h3>
+<p>Everyone and their mum in the b2b sector is trying to use machine learning 
+for lead generation. For our purposes lead-gen means selecting from the millions of active companies in your country the ones that are most likely to buy your product once contacted by your sales team. Needless to say lead generation is extremely <em>serious business</em> and constitutes a market sector in its own right - a type of b2b2b if you will.</p>
+
+<p>One popular lead-gen strategy is to look for leads among companies similar the ones that have worked out for you in the past. A machine learning implementation of this strategy is straightforward:</p>
+
+<ol>
+  <li>collect data on all relevant companies</li>
+  <li>take all the companies your sales have contacted in the past and label every one as either successful (you made money) or failed (you wasted your time) lead. This is your training set.</li>
+  <li>extract good features for every company*</li>
+  <li>train a binary classifier (predicting successful/failed label) on your training set. Ideally this should be a classifier that outputs probabilities.</li>
+  <li>apply the classifier to all the companies outside the training set and hand the results over to sales.
+The number assigned by the classifier to a given company is (in theory at least) the probability that the lead will be successful. Highest scorers should be prioritized, low scorers should be left alone. So far, so good.</li>
+</ol>
+
+<h3 id="forgetting-salesman-problem">Forgetting salesman problem</h3>
+<p>An interesting difficulty frequently arises when you try to apply this approach in real life. Sales teams usually have good records on their clients but often fail to keep track of all the prospects that didn’t work out. As a result, you end up with only positive examples to train your classifier on. It’s not possible in general to train a classifier on a training set with one class amputated this way. But…</p>
+
+<h3 id="the-solution">The solution</h3>
+<p>TL;DR = divide density of “good points” by density of all - this is the lead score</p>
+
+<p>Keep in mind that:</p>
+
+<ul>
+  <li>in addition to the positive examples, you have also the full set of all data points (all companies whether previously contacted or not)</li>
+  <li>you are not interested in the absolute probability of success of a given lead per se. You only really need the relative ranking of different leads. All the classifier scores may be off by a factor of 10 but as long as the order is preserved - you’ll still be able to prioritize good leads over rubbish ones.</li>
+</ul>
+
+<p>A solution will present itself once the problem is stated in mathematical terms. Consider the space of all possible company features $X$. Given are:</p>
+
+<ul>
+  <li>a set $C$ of points in $X$ - all companies</li>
+  <li>
+    <p>a subset $T_+$ of the above set - companies that were tested and gave positive result
+Unknown are:</p>
+  </li>
+  <li>the probability $f(x)$ that a company $x$ will test positive</li>
+  <li>the subset $T$ of all tested companies</li>
+</ul>
+
+<p>This is how it looks in an artificial 1-D dataset.
+<img src="/images/leadgen1.png"></p>
+
+<p>Notice that the distribution of companies $C$ and the conversion probability $f$ peak at different points and the distribution of positive exmaples $T_+$ peaks somewhere between those two.</p>
+
+<p>It’s useful to think of $C$ as a sample from some probabilty distribution $P(x)$ defined on $X$. Or to express the same in the language of point densities in space:</p>
+
+<script type="math/tex; mode=display">density\_of\_C(x) = const_1 P(x)</script>
+
+<p>If the companies tested $T$ were chosen at random from all companies $C$ then they constitute a sample from the same probability distribution $P(x)$</p>
+
+<script type="math/tex; mode=display">density\_of\_T(x) = const_2 P(x)</script>
+
+<p>Since a company’s chance of testing positive is $f$, the density of companies that tested positive is simply:</p>
+
+<script type="math/tex; mode=display">density\_of\_T_+(x) = density\_of\_T(x) f(x) = const_2 P(x) f(x)</script>
+
+<p>The set $T$ is hidden from us but $C$ and $T_+$ are available so we can use them to find $f(x)$. Combining the first and third equation we get:</p>
+
+<script type="math/tex; mode=display">\frac{const_2}{const_1} f(x) = \frac{density\_of\_T_+(x)}{density\_of\_C(x)}</script>
+
+<p>This is it. If we can just estimate the densities of $C$ and $T_+$ - we’re golden. Their ratio gives the $f$ function up to a constant, which is all we need to do lead scoring. There are many ways to do density estimation in practice:</p>
+
+<ul>
+  <li>histogram based estimation - lowest on the sophistication scale - divide the space $X$ into sectors and count the number of points in every sector, divide it by volume. Do it for both $C$ and $T_+$ and divide one result by the other</li>
+  <li>nearest neighbour estimation - for any interesting point find $k$ (let’s say $k=20$) nearest points in $C$. Count how many of them are also in $T_+$, divide the figures</li>
+  <li>kernel based estimation - in a way this is similar to the knn version - except instead of taking k nearest points you take all of them but discount the farthest by a dicreasing function of distance</li>
+</ul>
+
+<p>This is how it looks on our toy dataset:
+<img src="/images/leadgen2.png"></p>
+
+<p>Unsuprisingly, on a toy model everything works rather well. In reality conversion rates are low, data is sparse, dimensionality is high and even the basic assumption “good lead means similar to what has worked in the past” is questionable. But you have to start somewhere.</p>
+
+<p>For more information about the ML aspect of classification without negatives google the term “PU learning”.</p>
+
+<p>* this is arguably the hardest and most important step, but I’m glossing over it as it’s not relevant to this 
+  post</p>
+
+<p>** if there is prior knowledge regarding how the contacted companies were chosen, it can be easily incorporated</p>
+]]></content>
+  </entry>
+  
+</feed>

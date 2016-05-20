@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-<<<<<<< HEAD
-  <title><![CDATA[Category: Word2vec | DS lore]]></title>
-  <link href="http://nadbordrozd.github.io/blog/categories/word2vec/atom.xml" rel="self"/>
-  <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-05-20T20:14:56+01:00</updated>
-=======
-  <title><![CDATA[Category: Word2vec, | DS lore]]></title>
-  <link href="http://nadbordrozd.github.io/blog/categories/word2vec/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Extraction, | DS lore]]></title>
+  <link href="http://nadbordrozd.github.io/blog/categories/extraction/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
   <updated>2015-12-07T23:03:21+00:00</updated>
->>>>>>> 49017c98c4213592bf8e818f4b73032810657b80
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>

@@ -4,7 +4,11 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
+<<<<<<< HEAD
   <updated>2016-05-20T20:14:56+01:00</updated>
+=======
+  <updated>2015-12-07T23:03:21+00:00</updated>
+>>>>>>> 49017c98c4213592bf8e818f4b73032810657b80
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -14,6 +18,7 @@
 
   
   <entry>
+<<<<<<< HEAD
     <title type="html"><![CDATA[Text Classification With Word2Vec]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/"/>
     <updated>2016-05-20T18:18:58+01:00</updated>
@@ -283,6 +288,8 @@
   </entry>
   
   <entry>
+=======
+>>>>>>> 49017c98c4213592bf8e818f4b73032810657b80
     <title type="html"><![CDATA[DS Toolbox - Topic Models]]></title>
     <link href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/"/>
     <updated>2015-11-29T14:59:33+00:00</updated>

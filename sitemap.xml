@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<<<<<<< HEAD
 <url>
 <loc>http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/</loc>
 <lastmod>2016-05-20T18:18:58+01:00</lastmod>
@@ -61,4 +62,84 @@
 <loc>http://nadbordrozd.github.io/images/phone%20screen%20-%20Google%20Docs_files/xdbcm.html</loc>
 <lastmod>2016-05-16T22:08:46+01:00</lastmod>
 </url>
+=======
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/</loc>
+    <lastmod>2015-11-29T14:59:33+00:00</lastmod>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/</loc>
+    <lastmod>2015-08-01T20:49:26+01:00</lastmod>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/2015/07/26/test-post/</loc>
+    <lastmod>2015-07-26T22:20:42+01:00</lastmod>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/archives/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/interviews/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/machine/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/learning/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/lead/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/generation/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/pu/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/learning/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/topic/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/modeling/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/word2vec/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/lda/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/feature/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/extraction/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/dimensionality/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/reduction/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/blog/categories/nlp/</loc>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/images/phone screen - Google Docs_files/edit.html</loc>
+    <lastmod>2015-11-05T08:48:31+00:00</lastmod>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/images/phone screen - Google Docs_files/postmessageRelay.html</loc>
+    <lastmod>2015-11-05T08:48:31+00:00</lastmod>
+  </url>
+  <url>
+    <loc>http://nadbordrozd.github.io/images/phone screen - Google Docs_files/xdbcm.html</loc>
+    <lastmod>2015-11-05T08:48:31+00:00</lastmod>
+  </url>
+>>>>>>> 49017c98c4213592bf8e818f4b73032810657b80
 </urlset>
