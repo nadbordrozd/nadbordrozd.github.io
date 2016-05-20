@@ -1,106 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>DS lore</title>
-  <meta name="author" content="nadbor">
-
-  
-  <meta name="description" content="In the previous post I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><![CDATA[DS lore]]></title>
+  <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
+  <link href="http://nadbordrozd.github.io/"/>
+  <updated>2016-05-20T20:14:56+01:00</updated>
+  <id>http://nadbordrozd.github.io/</id>
+  <author>
+    <name><![CDATA[nadbor]]></name>
+    <email><![CDATA[nadbordrozd@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
   
-  <link rel="canonical" href="http://nadbordrozd.github.io/">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-65624880-1']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">DS lore</a></h1>
-  
-    <h2>words about stuff</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="sitesearch" value="nadbordrozd.github.io">
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-  <li><a href="/interviews">Interviews</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/05/20/text-classification-with-word2vec/">Text Classification With Word2Vec</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-05-20T18:18:58+01:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>6:18 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In the previous post I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">here</a>.</p>
+  <entry>
+    <title type="html"><![CDATA[Text Classification With Word2Vec]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/"/>
+    <updated>2016-05-20T18:18:58+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec</id>
+    <content type="html"><![CDATA[<p>In the previous post I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">here</a>.</p>
 
 <h4 id="motivation">Motivation</h4>
 <p>The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones.</p>
@@ -304,17 +222,17 @@
 
 <p>SVM wins, word2vec-based Extra Trees is a close second, Naive Bayes not far behind. Interestingly, embedding trained on this relatively tiny dataset does significantly better than pretrained GloVe - which is otherwise fantastic. Can we do better? Let’s check how do the models compare depending on the number of labeled training examples. Due to its semi-supervised nature w2v should shine when there is little labeled data.</p>
 
-<p><img src="/images/text_class_with_w2v/r8.png" /></p>
+<p><img src="http://nadbordrozd.github.io/images/text_class_with_w2v/r8.png" /></p>
 
 <p>That indeed seems to be the case. <code>w2v_tfidf</code>’s performance degrades most gracefully of the bunch. <code>SVM</code> takes the biggest hit when examples are few. Lets try the other two benchmarks from Reuters-21578. 52-way classification:</p>
 
-<p><img src="/images/text_class_with_w2v/r52.png" /></p>
+<p><img src="http://nadbordrozd.github.io/images/text_class_with_w2v/r52.png" /></p>
 
 <p>Qualitatively similar results.</p>
 
 <p>And 20-way classification:</p>
 
-<p><img src="/images/text_class_with_w2v/20ng.png" /></p>
+<p><img src="http://nadbordrozd.github.io/images/text_class_with_w2v/20ng.png" /></p>
 
 <p>This time pretrained embeddings do better than Word2Vec and Naive Bayes does really well, otherwise same as before.</p>
 
@@ -361,35 +279,15 @@
 </pre></td><td class="code"><pre><code class="text"><span class="line">[&#39;animals&#39; &#39;colors&#39; &#39;capitals&#39;]
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/11/29/ds-toolbox-topic-models/">DS Toolbox - Topic Models</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-11-29T14:59:33+00:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:59 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>If you’re not primarily working with NLP you may not have been paying attention to topic modeling and word embeddings. In this post I intend to convince you that you should.</p>
+  <entry>
+    <title type="html"><![CDATA[DS Toolbox - Topic Models]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/"/>
+    <updated>2015-11-29T14:59:33+00:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models</id>
+    <content type="html"><![CDATA[<p>If you’re not primarily working with NLP you may not have been paying attention to topic modeling and word embeddings. In this post I intend to convince you that you should.</p>
 
 <h3 id="topic-models">Topic models</h3>
 <p>Topic models are a set of models in NLP that discover common themes in a collection of documents. You give it a list of texts and it comes up with a bunch of topics and maps every document to a topic or a mixture of topics. <a href="http://www.princeton.edu/~achaney/tmve/wiki100k/browse/topic-presence.html">Here</a> you can see a visualization of a topic model applied to wikipedia articles. As you can see, it picks up similar kinds of themes in the texts that a human being would notice. Take topic 5 for instance. Its top relevant words are “war”, “force”, “army”, “attack”, “military” and top articles: “Second Boer War”, “Erwin Rommel”, “Axis powers”, “Vietnam war”. Pretty neat. Most topic models (like the most popular <a href="https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">LDA</a> produce a vector of numbers for every text - the distribution of topics and a similar vector for every word - the affinity of the word to every topic.</p>
@@ -430,35 +328,15 @@
 <p>If you know of any other cool applications of topic modeling to non-NLP problems let me know.</p>
 
 <p>If you want to play with topic models yourself I wholehartedly recommend <a href="https://radimrehurek.com/gensim/">gensim</a>. I tried also MLLib but its word2vec implementation required 3 times as much RAM (for each of 10 cores I used) and still was about ten times slower than gensim.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/">Lead Scoring Without Negative Examples</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-08-01T20:49:26+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>8:49 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>How do you train a binary classifier when you have only positive-labeled training examples? 
+  <entry>
+    <title type="html"><![CDATA[Lead Scoring Without Negative Examples]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/"/>
+    <updated>2015-08-01T20:49:26+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples</id>
+    <content type="html"><![CDATA[<p>How do you train a binary classifier when you have only positive-labeled training examples? 
 Impossible? Maybe. But sometimes you can do something just as good. Let’s start from the beginning…</p>
 
 <h3 id="lead-generation">Lead generation</h3>
@@ -502,7 +380,7 @@ Unknown are:</p>
 </ul>
 
 <p>This is how it looks in an artificial 1-D dataset.
-<img src="/images/leadgen1.png" /></p>
+<img src="http://nadbordrozd.github.io/images/leadgen1.png" /></p>
 
 <p>Notice that the distribution of companies $C$ and the conversion probability $f$ peak at different points and the distribution of positive exmaples $T_+$ peaks somewhere between those two.</p>
 
@@ -531,7 +409,7 @@ Unknown are:</p>
 </ul>
 
 <p>This is how it looks on our toy dataset:
-<img src="/images/leadgen2.png" /></p>
+<img src="http://nadbordrozd.github.io/images/leadgen2.png" /></p>
 
 <p>Unsuprisingly, on a toy model everything works rather well. In reality conversion rates are low, data is sparse, dimensionality is high and even the basic assumption “good lead means similar to what has worked in the past” is questionable. But you have to start somewhere.</p>
 
@@ -541,35 +419,15 @@ Unknown are:</p>
   post</p>
 
 <p>** if there is prior knowledge regarding how the contacted companies were chosen, it can be easily incorporated</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/07/26/test-post/">Test Post</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-07-26T22:20:42+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:20 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is my first post. pls work pls
+  <entry>
+    <title type="html"><![CDATA[Test Post]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2015/07/26/test-post/"/>
+    <updated>2015-07-26T22:20:42+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2015/07/26/test-post</id>
+    <content type="html"><![CDATA[<p>This is my first post. pls work pls
 This is code span (hopefully)
 <code>def fibo(n):
 	if n &lt; 2:
@@ -577,157 +435,7 @@ This is code span (hopefully)
 	else:
 		return fibo(n - 1) + fibo(n - 2)
 </code></p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
-  
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2016/05/20/text-classification-with-word2vec/">Text Classification With Word2Vec</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/11/29/ds-toolbox-topic-models/">DS Toolbox - Topic Models</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/">Lead Scoring Without Negative Examples</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/07/26/test-post/">Test Post</a>
-      </li>
-    
-  </ul>
-</section>
-
-<section>
-  <h1>GitHub Repos</h1>
-  <ul id="gh_repos">
-    <li class="loading">Status updating...</li>
-  </ul>
-  
-  <a href="https://github.com/nadbordrozd">@nadbordrozd</a> on GitHub
-  
-  <script type="text/javascript">
-    $(document).ready(function(){
-        if (!window.jXHR){
-            var jxhr = document.createElement('script');
-            jxhr.type = 'text/javascript';
-            jxhr.src = '/javascripts/libs/jXHR.js';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(jxhr, s);
-        }
-
-        github.showRepos({
-            user: 'nadbordrozd',
-            count: 0,
-            skip_forks: true,
-            target: '#gh_repos'
-        });
-    });
-  </script>
-  <script src="/javascripts/github.js" type="text/javascript"> </script>
-</section>
-
-
-
-<section class="googleplus">
-  <h1>
-    <a href="https://plus.google.com/nadbordrozd?rel=author">
-      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
-      Google+
-    </a>
-  </h1>
-</section>
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - nadbor -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'ds-lore';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) {return;}
-  js = d.createElement(s); js.id = id; js.async = true;
-  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-
-<!-- mathjax config similar to math.stackexchange -->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  jax: ["input/TeX", "output/HTML-CSS"],
-  tex2jax: {
-    inlineMath: [ ['$', '$'] ],
-    displayMath: [ ['$$', '$$']],
-    processEscapes: true,
-    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-  },
-  messageStyle: "none",
-  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
-});
-</script>
-<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
-
-</html>
+</feed>

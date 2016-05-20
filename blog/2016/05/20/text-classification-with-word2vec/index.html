@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>DS lore</title>
+  <title>Text Classification With Word2Vec - DS lore</title>
   <meta name="author" content="nadbor">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://nadbordrozd.github.io/">
+  <link rel="canonical" href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
@@ -76,15 +76,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/05/20/text-classification-with-word2vec/">Text Classification With Word2Vec</a></h1>
+      <h1 class="entry-title">Text Classification With Word2Vec</h1>
     
     
       <p class="meta">
@@ -100,7 +97,7 @@
   </header>
 
 
-  <div class="entry-content"><p>In the previous post I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">here</a>.</p>
+<div class="entry-content"><p>In the previous post I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">here</a>.</p>
 
 <h4 id="motivation">Motivation</h4>
 <p>The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones.</p>
@@ -362,234 +359,54 @@
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 </div>
-  
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/11/29/ds-toolbox-topic-models/">DS Toolbox - Topic Models</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-11-29T14:59:33+00:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:59 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>If you’re not primarily working with NLP you may not have been paying attention to topic modeling and word embeddings. In this post I intend to convince you that you should.</p>
-
-<h3 id="topic-models">Topic models</h3>
-<p>Topic models are a set of models in NLP that discover common themes in a collection of documents. You give it a list of texts and it comes up with a bunch of topics and maps every document to a topic or a mixture of topics. <a href="http://www.princeton.edu/~achaney/tmve/wiki100k/browse/topic-presence.html">Here</a> you can see a visualization of a topic model applied to wikipedia articles. As you can see, it picks up similar kinds of themes in the texts that a human being would notice. Take topic 5 for instance. Its top relevant words are “war”, “force”, “army”, “attack”, “military” and top articles: “Second Boer War”, “Erwin Rommel”, “Axis powers”, “Vietnam war”. Pretty neat. Most topic models (like the most popular <a href="https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation">LDA</a> produce a vector of numbers for every text - the distribution of topics and a similar vector for every word - the affinity of the word to every topic.</p>
-
-<h3 id="word-and-document-embeddings">Word (and document) embeddings</h3>
-<p>Word embeddings are related to topic models but instead of mapping a text to a mixture of topics they learn to map words to real valued fixed-size vectors. The mapping is designed to preserve the semantic structure so that the distance between vectors corresponds to distance in meaning of words. An additional property of these embeddings (probably unintended) is that you can do a sort of algebra on words - like this:</p>
-
-<script type="math/tex; mode=display">vector("Paris") - vector("France") + vector("Italy") \approx vector("Rome")</script>
-
-<p>- an examples taken from the most famous word embedding algorithm  -<a href="https://code.google.com/p/word2vec/">word2vec</a>. How cool is that?
- If you want to play with the vectors yourself and discover new fun analogies ($Bush - Iraq + Vietnam \approx Nixon$ !!!) you can download pretrained vectors from word2vec or <a href="http://nlp.stanford.edu/projects/glove/">GloVe</a>.</p>
-
-<h3 id="why-you-should-care">Why you should care</h3>
-<p>Unsupervised algorithms learning about analogies between real-world entities is pretty cool but it obscures the wider applicability of these algorithms. The topic modeling and embedding algorithms were invented in the context of NLP but most of them (including LDA and wor2vec) don’t have any inherent knowledge about natural languages and can be applied just as well to sequences of items from a discrete set of any kind. This is huge. Sequences (or sets) of items are notoriously hard to work with. Most popular ML algorithms expect fixed-size vectors as inputs. If your inputs are sequences you can either:</p>
-
-<ul>
-  <li>do one-hot encoding and then use any old ML algo you want (like a random forest). Unfortunately one-hot discards all information about the order of items. More importantly, as the size of the vocabulary grows beyond thousands (which is still tiny as far as vocabularies go) your random forest will take forever to train and overfit.</li>
-  <li>use naive bayes. NB works surprisingly well but only for classification and only when the problem is - well, naive. It also utilizes the item order information to a very limited extent via n-grams.</li>
-  <li>use a <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">recurrent neural network</a> This can actually be very effective in some cases but I don’t think it woudl work well with a vocabulary size in the thousands. Even the character-level language models take days to train properly on a GPU (but what incredible results it produces!). I believe NNs of all kinds will get better and easier to use but as of now this is not a practical solution to our problem at all.</li>
-</ul>
-
-<p>This is where word embeddings come in. Just run word2vec on your sequences of items and you’ll get a reasonably-dimensional representation of every item. You can then take the mean of all vectors in a sequence to get a representation of sequences. Or run <a href="https://cs.stanford.edu/~quocle/paragraph_vector.pdf">doc2vec</a> and you’ll get a vector for each sequence directly. Or if you need them clustered - run LDA. LDA’s word-topic coefficients can also be used as word embedding but they don’t do nearly as good of a job at it as word2vec. Same goes for LDA’s text-topic coefficients as a document to vector mapping.</p>
-
-<p>This is it. This is what topic modeling buys you. It’s a generic clustering and feature extraction technique that works on sequences (or sets) of items from a discrete vocabulary. Does it actually work in practice? I don’t know of a lot of examples of people using it but I know a few.</p>
-
-<h4 id="page-jumps">Page jumps</h4>
-<p>As I have already described in my <a href="http://nadbordrozd.github.io/interviews/">mini-guide to data science interviews</a> (question “Predicting page jumps”) it can be used to model users jumping between pages of a web application. Here a page plays the role of a word and a user journey is a sentence. You can (and from what I understood from the interview - they [the company I interviewed with] do) use topic modeling to segment users based on their journeys and extract features for them to predict page jumps.</p>
-
-<h4 id="ad-clicks">Ad clicks</h4>
-<p>In a similar vein, topic modeling <a href="http://www.cs.kumamoto-u.ac.jp/~yasuko/PUBLICATIONS/kdd12-trimine.pdf">has been used</a> as a feature extraction technique in the prediction of ad clicks. The paper concentrates on the authors’ special brand of topic modeling but the idea is simple and can be used with any topic model for example LDA. They treat hosts (the websites with banners on them) as words and users who visit the websites as documents. Let’s say John visits youtube then google then wikipedia then youtube again then tmz then guardian. This gives us a sequence [“youtube”, “google”, “wikipedia”, “youtube”, “tmz”, “guardian”]. Topic modeling is applied to the set of all users and the result is a set of topics (“media”, “business” and “drive” in the paper) and a decomposition of every user into those topics. So for our John we should expect something like <code>{media: 0.8, business: 0.2, drive: 0}</code>. This is interesting in itself and constitutes a great feature vector that you can feed into a regression predicting clicks - which is exactly what the authors did.</p>
-
-<h4 id="deepwalk">DeepWalk</h4>
-<p>Feature extraction from graphs is even harder than for sequences. Say you want to classify youtube videos. You have a labeled training set and a set of features for every video. But you also know that some videos link to other videos - forming a graph. Information about the position of the video in this graph is bound to be useful for classifiaction (think “oh, I’m in that weird part of youtube again”) but how do you use it. Authors of the <a href="http://arxiv.org/abs/1403.6652">DeepWalk</a> paper compared several approaches and the best turned out to be a trick involving word2vec that they invented. This time the role of a word is played by a node in the graph (a youtube video). What plays the role of a sentence? For that a collection of short random walks on the graph is constructed - starting at every node of the graph. Think about what happens when a youtube video ends and another one starts playing, and then another one and another. Do this a few times for every video on youtube and you have a corpus of texts. Authors of the paper applied word2vec to those sequences to get vector embeddings for videos and then used these vectors as features in classification. It worked better then all other approaches - even ones that use global features of the graph. Awesome.</p>
-
-<h4 id="frequent-itemsets">Frequent itemsets</h4>
-<p>Association rule learning is a popular task in the context of retail. If a customer bought butter and bread, what other item are they likely to buy? The usual approach is to count instances of people buying {bread, butter, X} and divide that number by the count of people buying {bread, butter} - this estimates the probability of buying X. Then you can find the X that maximizes the probability and do something with it (suggest it to the user as they are about to checkout perhaps). This is a bit crude, not very robust and it doesn’t provide any insight, just the prediction. What you can do instead is to run (you guessed it) topic modeling with items playing the role of words and baskets playing the role of sentences. Word2vec will give you vector representations of both items and baskets which will allow you to use more sophisticated algorithms for predicting the next item. You will also get a segmentation of all users and all items for free. To understand why this is superior consider this: topic modeling will easily pick up on the cluster of vegetarian buyers and then the model will know not to recommend the buyer pork chops even if they bought three other items that usually go with bacon - this is something frequent itemset algorithms are incapable of. When a new type of soy-based pork substitute appears on the shelves, the algorithm will also take much less time to figure out that it belongs to the vegetarian cluster and is analogous to meat. I don’t actually know if anyone in retail is doing topic modeling on baskets but if they don’t, they should. I’ll do it myself if I can find a free dataset with retail baskets.</p>
-
-<p>If you know of any other cool applications of topic modeling to non-NLP problems let me know.</p>
-
-<p>If you want to play with topic models yourself I wholehartedly recommend <a href="https://radimrehurek.com/gensim/">gensim</a>. I tried also MLLib but its word2vec implementation required 3 times as much RAM (for each of 10 cores I used) and still was about ten times slower than gensim.</p>
-</div>
-  
   
 
+<span class="byline author vcard">Posted by <span class="fn">nadbor</span></span>
 
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/">Lead Scoring Without Negative Examples</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
 
-<time class='entry-date' datetime='2015-08-01T20:49:26+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>8:49 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>How do you train a binary classifier when you have only positive-labeled training examples? 
-Impossible? Maybe. But sometimes you can do something just as good. Let’s start from the beginning…</p>
-
-<h3 id="lead-generation">Lead generation</h3>
-<p>Everyone and their mum in the b2b sector is trying to use machine learning 
-for lead generation. For our purposes lead-gen means selecting from the millions of active companies in your country the ones that are most likely to buy your product once contacted by your sales team. Needless to say lead generation is extremely <em>serious business</em> and constitutes a market sector in its own right - a type of b2b2b if you will.</p>
-
-<p>One popular lead-gen strategy is to look for leads among companies similar the ones that have worked out for you in the past. A machine learning implementation of this strategy is straightforward:</p>
-
-<ol>
-  <li>collect data on all relevant companies</li>
-  <li>take all the companies your sales have contacted in the past and label every one as either successful (you made money) or failed (you wasted your time) lead. This is your training set.</li>
-  <li>extract good features for every company*</li>
-  <li>train a binary classifier (predicting successful/failed label) on your training set. Ideally this should be a classifier that outputs probabilities.</li>
-  <li>apply the classifier to all the companies outside the training set and hand the results over to sales.
-The number assigned by the classifier to a given company is (in theory at least) the probability that the lead will be successful. Highest scorers should be prioritized, low scorers should be left alone. So far, so good.</li>
-</ol>
-
-<h3 id="forgetting-salesman-problem">Forgetting salesman problem</h3>
-<p>An interesting difficulty frequently arises when you try to apply this approach in real life. Sales teams usually have good records on their clients but often fail to keep track of all the prospects that didn’t work out. As a result, you end up with only positive examples to train your classifier on. It’s not possible in general to train a classifier on a training set with one class amputated this way. But…</p>
-
-<h3 id="the-solution">The solution</h3>
-<p>TL;DR = divide density of “good points” by density of all - this is the lead score</p>
-
-<p>Keep in mind that:</p>
-
-<ul>
-  <li>in addition to the positive examples, you have also the full set of all data points (all companies whether previously contacted or not)</li>
-  <li>you are not interested in the absolute probability of success of a given lead per se. You only really need the relative ranking of different leads. All the classifier scores may be off by a factor of 10 but as long as the order is preserved - you’ll still be able to prioritize good leads over rubbish ones.</li>
-</ul>
-
-<p>A solution will present itself once the problem is stated in mathematical terms. Consider the space of all possible company features $X$. Given are:</p>
-
-<ul>
-  <li>a set $C$ of points in $X$ - all companies</li>
-  <li>
-    <p>a subset $T_+$ of the above set - companies that were tested and gave positive result
-Unknown are:</p>
-  </li>
-  <li>the probability $f(x)$ that a company $x$ will test positive</li>
-  <li>the subset $T$ of all tested companies</li>
-</ul>
-
-<p>This is how it looks in an artificial 1-D dataset.
-<img src="/images/leadgen1.png" /></p>
-
-<p>Notice that the distribution of companies $C$ and the conversion probability $f$ peak at different points and the distribution of positive exmaples $T_+$ peaks somewhere between those two.</p>
-
-<p>It’s useful to think of $C$ as a sample from some probabilty distribution $P(x)$ defined on $X$. Or to express the same in the language of point densities in space:</p>
-
-<script type="math/tex; mode=display">density\_of\_C(x) = const_1 P(x)</script>
-
-<p>If the companies tested $T$ were chosen at random from all companies $C$ then they constitute a sample from the same probability distribution $P(x)$</p>
-
-<script type="math/tex; mode=display">density\_of\_T(x) = const_2 P(x)</script>
-
-<p>Since a company’s chance of testing positive is $f$, the density of companies that tested positive is simply:</p>
-
-<script type="math/tex; mode=display">density\_of\_T_+(x) = density\_of\_T(x) f(x) = const_2 P(x) f(x)</script>
-
-<p>The set $T$ is hidden from us but $C$ and $T_+$ are available so we can use them to find $f(x)$. Combining the first and third equation we get:</p>
-
-<script type="math/tex; mode=display">\frac{const_2}{const_1} f(x) = \frac{density\_of\_T_+(x)}{density\_of\_C(x)}</script>
-
-<p>This is it. If we can just estimate the densities of $C$ and $T_+$ - we’re golden. Their ratio gives the $f$ function up to a constant, which is all we need to do lead scoring. There are many ways to do density estimation in practice:</p>
-
-<ul>
-  <li>histogram based estimation - lowest on the sophistication scale - divide the space $X$ into sectors and count the number of points in every sector, divide it by volume. Do it for both $C$ and $T_+$ and divide one result by the other</li>
-  <li>nearest neighbour estimation - for any interesting point find $k$ (let’s say $k=20$) nearest points in $C$. Count how many of them are also in $T_+$, divide the figures</li>
-  <li>kernel based estimation - in a way this is similar to the knn version - except instead of taking k nearest points you take all of them but discount the farthest by a dicreasing function of distance</li>
-</ul>
-
-<p>This is how it looks on our toy dataset:
-<img src="/images/leadgen2.png" /></p>
-
-<p>Unsuprisingly, on a toy model everything works rather well. In reality conversion rates are low, data is sparse, dimensionality is high and even the basic assumption “good lead means similar to what has worked in the past” is questionable. But you have to start somewhere.</p>
-
-<p>For more information about the ML aspect of classification without negatives google the term “PU learning”.</p>
-
-<p>* this is arguably the hardest and most important step, but I’m glossing over it as it’s not relevant to this 
-  post</p>
-
-<p>** if there is prior knowledge regarding how the contacted companies were chosen, it can be easily incorporated</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
+<time class='entry-date' datetime='2016-05-20T18:18:58+01:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>6:18 pm</span></time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2015/07/26/test-post/">Test Post</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-07-26T22:20:42+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:20 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is my first post. pls work pls
-This is code span (hopefully)
-<code>def fibo(n):
-	if n &lt; 2:
-		return 1
-	else:
-		return fibo(n - 1) + fibo(n - 2)
-</code></p>
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/" data-via="" data-counturl="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
 </div>
-  
-  
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/11/29/ds-toolbox-topic-models/" title="Previous Post: DS toolbox - topic models">&laquo; DS toolbox - topic models</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
 </div>
+  </section>
+
+</div>
+
 <aside class="sidebar">
   
     <section>
@@ -660,6 +477,7 @@ This is code span (hopefully)
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -674,7 +492,10 @@ This is code span (hopefully)
       var disqus_shortname = 'ds-lore';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/';
+        var disqus_url = 'http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

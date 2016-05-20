@@ -1,0 +1,384 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Lead Scoring Without Negative Examples - DS lore</title>
+  <meta name="author" content="nadbor">
+
+  
+  <meta name="description" content="How do you train a binary classifier when you have only positive-labeled training examples? Impossible? Maybe. But sometimes you can do something &hellip;">
+  <meta name="keywords" content="machine learninglead generationpu learning">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-65624880-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">DS lore</a></h1>
+  
+    <h2>words about stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="nadbordrozd.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/interviews">Interviews</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Lead Scoring Without Negative Examples</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-01T20:49:26+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>8:49 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>How do you train a binary classifier when you have only positive-labeled training examples? 
+Impossible? Maybe. But sometimes you can do something just as good. Let’s start from the beginning…</p>
+
+<h3 id="lead-generation">Lead generation</h3>
+<p>Everyone and their mum in the b2b sector is trying to use machine learning 
+for lead generation. For our purposes lead-gen means selecting from the millions of active companies in your country the ones that are most likely to buy your product once contacted by your sales team. Needless to say lead generation is extremely <em>serious business</em> and constitutes a market sector in its own right - a type of b2b2b if you will.</p>
+
+<p>One popular lead-gen strategy is to look for leads among companies similar the ones that have worked out for you in the past. A machine learning implementation of this strategy is straightforward:</p>
+
+<ol>
+  <li>collect data on all relevant companies</li>
+  <li>take all the companies your sales have contacted in the past and label every one as either successful (you made money) or failed (you wasted your time) lead. This is your training set.</li>
+  <li>extract good features for every company*</li>
+  <li>train a binary classifier (predicting successful/failed label) on your training set. Ideally this should be a classifier that outputs probabilities.</li>
+  <li>apply the classifier to all the companies outside the training set and hand the results over to sales.
+The number assigned by the classifier to a given company is (in theory at least) the probability that the lead will be successful. Highest scorers should be prioritized, low scorers should be left alone. So far, so good.</li>
+</ol>
+
+<h3 id="forgetting-salesman-problem">Forgetting salesman problem</h3>
+<p>An interesting difficulty frequently arises when you try to apply this approach in real life. Sales teams usually have good records on their clients but often fail to keep track of all the prospects that didn’t work out. As a result, you end up with only positive examples to train your classifier on. It’s not possible in general to train a classifier on a training set with one class amputated this way. But…</p>
+
+<h3 id="the-solution">The solution</h3>
+<p>TL;DR = divide density of “good points” by density of all - this is the lead score</p>
+
+<p>Keep in mind that:</p>
+
+<ul>
+  <li>in addition to the positive examples, you have also the full set of all data points (all companies whether previously contacted or not)</li>
+  <li>you are not interested in the absolute probability of success of a given lead per se. You only really need the relative ranking of different leads. All the classifier scores may be off by a factor of 10 but as long as the order is preserved - you’ll still be able to prioritize good leads over rubbish ones.</li>
+</ul>
+
+<p>A solution will present itself once the problem is stated in mathematical terms. Consider the space of all possible company features $X$. Given are:</p>
+
+<ul>
+  <li>a set $C$ of points in $X$ - all companies</li>
+  <li>
+    <p>a subset $T_+$ of the above set - companies that were tested and gave positive result
+Unknown are:</p>
+  </li>
+  <li>the probability $f(x)$ that a company $x$ will test positive</li>
+  <li>the subset $T$ of all tested companies</li>
+</ul>
+
+<p>This is how it looks in an artificial 1-D dataset.
+<img src="/images/leadgen1.png" /></p>
+
+<p>Notice that the distribution of companies $C$ and the conversion probability $f$ peak at different points and the distribution of positive exmaples $T_+$ peaks somewhere between those two.</p>
+
+<p>It’s useful to think of $C$ as a sample from some probabilty distribution $P(x)$ defined on $X$. Or to express the same in the language of point densities in space:</p>
+
+<script type="math/tex; mode=display">density\_of\_C(x) = const_1 P(x)</script>
+
+<p>If the companies tested $T$ were chosen at random from all companies $C$ then they constitute a sample from the same probability distribution $P(x)$</p>
+
+<script type="math/tex; mode=display">density\_of\_T(x) = const_2 P(x)</script>
+
+<p>Since a company’s chance of testing positive is $f$, the density of companies that tested positive is simply:</p>
+
+<script type="math/tex; mode=display">density\_of\_T_+(x) = density\_of\_T(x) f(x) = const_2 P(x) f(x)</script>
+
+<p>The set $T$ is hidden from us but $C$ and $T_+$ are available so we can use them to find $f(x)$. Combining the first and third equation we get:</p>
+
+<script type="math/tex; mode=display">\frac{const_2}{const_1} f(x) = \frac{density\_of\_T_+(x)}{density\_of\_C(x)}</script>
+
+<p>This is it. If we can just estimate the densities of $C$ and $T_+$ - we’re golden. Their ratio gives the $f$ function up to a constant, which is all we need to do lead scoring. There are many ways to do density estimation in practice:</p>
+
+<ul>
+  <li>histogram based estimation - lowest on the sophistication scale - divide the space $X$ into sectors and count the number of points in every sector, divide it by volume. Do it for both $C$ and $T_+$ and divide one result by the other</li>
+  <li>nearest neighbour estimation - for any interesting point find $k$ (let’s say $k=20$) nearest points in $C$. Count how many of them are also in $T_+$, divide the figures</li>
+  <li>kernel based estimation - in a way this is similar to the knn version - except instead of taking k nearest points you take all of them but discount the farthest by a dicreasing function of distance</li>
+</ul>
+
+<p>This is how it looks on our toy dataset:
+<img src="/images/leadgen2.png" /></p>
+
+<p>Unsuprisingly, on a toy model everything works rather well. In reality conversion rates are low, data is sparse, dimensionality is high and even the basic assumption “good lead means similar to what has worked in the past” is questionable. But you have to start somewhere.</p>
+
+<p>For more information about the ML aspect of classification without negatives google the term “PU learning”.</p>
+
+<p>* this is arguably the hardest and most important step, but I’m glossing over it as it’s not relevant to this 
+  post</p>
+
+<p>** if there is prior knowledge regarding how the contacted companies were chosen, it can be easily incorporated</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">nadbor</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-08-01T20:49:26+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>8:49 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/machine-learning-lead-generation/'>machine learning lead generation</a>, <a class='category' href='/blog/categories/pu-learning/'>pu learning</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/" data-via="" data-counturl="http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/07/26/test-post/" title="Previous Post: test post">&laquo; test post</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/11/29/ds-toolbox-topic-models/" title="Next Post: DS toolbox - topic models">DS toolbox - topic models &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/20/text-classification-with-word2vec/">Text Classification With Word2Vec</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/29/ds-toolbox-topic-models/">DS Toolbox - Topic Models</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/">Lead Scoring Without Negative Examples</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/26/test-post/">Test Post</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/nadbordrozd">@nadbordrozd</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'nadbordrozd',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/nadbordrozd?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - nadbor -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ds-lore';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/';
+        var disqus_url = 'http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+
+<!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+</html>
