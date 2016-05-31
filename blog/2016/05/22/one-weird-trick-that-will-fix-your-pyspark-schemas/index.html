@@ -1,0 +1,580 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Data Engineers Will Hate You - One Weird Trick to Fix Your Pyspark Schemas - DS lore</title>
+  <meta name="author" content="nadbor">
+
+  
+  <meta name="description" content="I will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here &hellip;">
+  <meta name="keywords" content="sparkpysparkdataframessqlContextschemas">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-65624880-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">DS lore</a></h1>
+  
+    <h2>words about stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="nadbordrozd.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/interviews">Interviews</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Data Engineers Will Hate You - One Weird Trick to Fix Your Pyspark Schemas</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-05-22T21:39:15+01:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>9:39 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you’re not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).</p>
+
+<h4 id="the-good-the-bad-and-the-ugly-of-dataframes">The Good, the Bad and the Ugly of dataframes</h4>
+<p>Dataframes in pyspark are simultaneously pretty great and kind of broken.</p>
+
+<ul>
+  <li>they enforce a schema</li>
+  <li>you can run SQL queries against them</li>
+  <li>faster than rdd</li>
+  <li>much smaller than rdd when stored in parquet format</li>
+</ul>
+
+<p>On the other hand:</p>
+
+<ul>
+  <li>dataframe outer join acts as an inner join due to a bug</li>
+  <li>when cached with <code>df.cache()</code> dataframes sometimes start throwing <code>key not found</code> and Spark driver dies. Other times the task succeeds but the the underlying rdd becomes corrupted (field values switched up).</li>
+  <li>not really dataframe’s fault but related - parquet is not human readable which sucks - can’t easily inspect your saved dataframes</li>
+</ul>
+
+<p>But the biggest problem is actually transforming the data. It works perfectly on those contrived examples from the tutorials. But I’m not working with flat SQL-table-like datasets. Or if I am, they are already in some SQL database. When I’m using Spark, I’m using it to work with messy multilayered json-like objects. If I had to create a UDF and type out a ginormous schema for every transformation I want to perform on the dataset, I’d be doing nothing else all day, I’m not even joking. UDFs in pyspark are clunky at the best of times but in my typical usecase they are unusable. Take this, relatively tiny record for instance:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">record</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="s">&#39;nadbor&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="s">&#39;drozd&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;occupation&#39;</span><span class="p">:</span> <span class="s">&#39;data scientist&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;children&#39;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Lucja&#39;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;likes cold showers&#39;</span><span class="p">:</span> <span class="bp">True</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">    <span class="p">]</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>the correct schema for this is created like this:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">StringType</span><span class="p">,</span> <span class="n">StructField</span><span class="p">,</span> <span class="n">StructType</span><span class="p">,</span> <span class="n">BooleanType</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">,</span> <span class="n">IntegerType</span>
+</span><span class="line"><span class="n">schema</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">([</span>
+</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;first_name&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
+</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;last_name&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
+</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;occupation&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
+</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;children&quot;</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">(</span>
+</span><span class="line">            <span class="n">StructType</span><span class="p">([</span>
+</span><span class="line">                <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
+</span><span class="line">                <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;age&quot;</span><span class="p">,</span> <span class="n">IntegerType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
+</span><span class="line">                <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;likes cold schowers&quot;</span><span class="p">,</span> <span class="n">BooleanType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">)</span>
+</span><span class="line">            <span class="p">])</span>
+</span><span class="line">        <span class="p">),</span> <span class="bp">True</span><span class="p">)</span>
+</span><span class="line">    <span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>And this is what I would have to type every time I need a udf to return such record - which can be many times in a single spark job.</p>
+
+<h4 id="dataframe-from-an-rdd---how-it-is">Dataframe from an rdd - how it is</h4>
+<p>For these reasons (+ legacy json job outputs from hadoop days) I find myself switching back and forth between dataframes and rdds. Read some JSON dataset into an rdd, transform it, join with another, transform some more, convert into a dataframe and save as parquet. Or read some parquet files into a dataframe, convert to rdd, do stuff to it, convert back to dataframe and save as parquet again. This workflow is not so bad - I get the best of both worlds by using rdds and dataframes only for the things they’re good at. How do you go from a dataframe to an rdd of dictionaries? This part is easy:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">rdd</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">asDict</span><span class="p">())</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>It’s the other direction that is problematic. You would think that rdd’s method <code>toDF()</code> would do the job but no, it’s broken.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">df</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">toDF</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>actually returns a dataframe with the following schema (<code>df.printSchema()</code>):</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">root
+</span><span class="line"> |-- children: array (nullable = true)
+</span><span class="line"> |    |-- element: map (containsNull = true)
+</span><span class="line"> |    |    |-- key: string
+</span><span class="line"> |    |    |-- value: boolean (valueContainsNull = true)
+</span><span class="line"> |-- first_name: string (nullable = true)
+</span><span class="line"> |-- last_name: string (nullable = true)
+</span><span class="line"> |-- occupation: string (nullable = true)
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It interpreted the inner dictionary as a <code>map</code> of <code>boolean</code> instead of a <code>struct</code> and <em>silently dropped</em> all the fields in it that are not booleans. But this method is deprecated now anyway. The preferred, official way of creating a dataframe is with an rdd of <code>Row</code> objects. So let’s do that.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">Row</span>
+</span><span class="line"><span class="n">rdd_of_rows</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Row</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">))</span>
+</span><span class="line"><span class="n">df</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">rdd_of_rows</span><span class="p">)</span>
+</span><span class="line"><span class="n">df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>prints the same schema as the previous method.</p>
+
+<p>In addition to this, both these methods will fail completely when some field’s type cannot be determined because all the values happen to be null in some run of the job.</p>
+
+<p>Also, quite bizarrely in my opinion, order of columns in a dataframe is significant while the order of keys is not. So if you have a pre-existing schema and you try contort an rdd of dicts into that schema, you’re gonna have a bad time.</p>
+
+<h4 id="how-it-should-be">How it should be</h4>
+<p>Without further ado, this is how I now create my dataframes:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># this is what a typical record in the rdd looks like</span>
+</span><span class="line"><span class="n">prototype</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="s">&#39;nadbor&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="s">&#39;drozd&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;occupation&#39;</span><span class="p">:</span> <span class="s">&#39;data scientist&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;children&#39;</span><span class="p">:</span> <span class="p">[</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Lucja&#39;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&#39;likes cold showers&#39;</span><span class="p">:</span> <span class="bp">True</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">    <span class="p">]</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line"><span class="n">df</span> <span class="o">=</span> <span class="n">df_from_rdd</span><span class="p">(</span><span class="n">rdd</span><span class="p">,</span> <span class="n">prototype</span><span class="p">,</span> <span class="n">sqlContext</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This doesn’t randomly break, doesn’t drop fields and has the right schema. And I didn’t have to type any of this <code>StructType([StructField(...</code> nonsense, just plain python literal that I got by running</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">print</span> <span class="n">rdd</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>As an added bonus now this prototype is prominently displayed at the top of my job file and I can tell what the output of the job looks like without having to decode parquet files. Self documenting code FTW!</p>
+
+<h4 id="how-to-get-there">How to get there</h4>
+<p>And here’s how it’s done. First we need to implement our own schema inference - the way it should work:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">pyspark.sql.types</span> <span class="kn">as</span> <span class="nn">pst</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">Row</span>
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">infer_schema</span><span class="p">(</span><span class="n">rec</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;infers dataframe schema for a record. Assumes every dict is a Struct, not a Map&quot;&quot;&quot;</span>
+</span><span class="line">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">pst</span><span class="o">.</span><span class="n">StructType</span><span class="p">([</span><span class="n">pst</span><span class="o">.</span><span class="n">StructField</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="bp">True</span><span class="p">)</span>
+</span><span class="line">                              <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">items</span><span class="p">())])</span>
+</span><span class="line">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+</span><span class="line">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;can&#39;t infer type of an empty list&quot;</span><span class="p">)</span>
+</span><span class="line">        <span class="n">elem_type</span> <span class="o">=</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span><span class="line">        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">:</span>
+</span><span class="line">            <span class="n">this_type</span> <span class="o">=</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
+</span><span class="line">            <span class="k">if</span> <span class="n">elem_type</span> <span class="o">!=</span> <span class="n">this_type</span><span class="p">:</span>
+</span><span class="line">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;can&#39;t infer type of a list with inconsistent elem types&quot;</span><span class="p">)</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">pst</span><span class="o">.</span><span class="n">ArrayType</span><span class="p">(</span><span class="n">elem_type</span><span class="p">)</span>
+</span><span class="line">    <span class="k">else</span><span class="p">:</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">pst</span><span class="o">.</span><span class="n">_infer_type</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Using this we can now specify the schema using a regular python object - no more java-esque abominations. But this is not all. We will also need a function that transforms a python dict into a rRw object with the correct schema. You would think that this should be automatic as long as the dict has all the right fields, but no - order of fields in a Row is significant, so we have to do it ourselves.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">def</span> <span class="nf">_rowify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">prototype</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;creates a Row object conforming to a schema as specified by a dict&quot;&quot;&quot;</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">_equivalent_types</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span><span class="line">        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">]:</span>
+</span><span class="line">            <span class="k">return</span> <span class="bp">True</span>
+</span><span class="line">        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+</span><span class="line">        <span class="k">return</span> <span class="bp">None</span>
+</span><span class="line">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prototype</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+</span><span class="line">        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span>
+</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;expected dict, got </span><span class="si">%s</span><span class="s"> instead&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span class="line">        <span class="n">rowified_dict</span> <span class="o">=</span> <span class="p">{}</span>
+</span><span class="line">        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span class="line">            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prototype</span><span class="p">:</span>
+</span><span class="line">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;got unexpected field </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+</span><span class="line">            <span class="n">rowified_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_rowify</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">prototype</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+</span><span class="line">            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">prototype</span><span class="p">:</span>
+</span><span class="line">                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+</span><span class="line">                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+</span><span class="line">                        <span class="s">&quot;expected </span><span class="si">%s</span><span class="s"> field but didn&#39;t find it&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">Row</span><span class="p">(</span><span class="o">**</span><span class="n">rowified_dict</span><span class="p">)</span>
+</span><span class="line">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prototype</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+</span><span class="line">        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
+</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;expected list, got </span><span class="si">%s</span><span class="s"> instead&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</span><span class="line">        <span class="k">return</span> <span class="p">[</span><span class="n">_rowify</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">prototype</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+</span><span class="line">    <span class="k">else</span><span class="p">:</span>
+</span><span class="line">        <span class="k">if</span> <span class="ow">not</span> <span class="n">_equivalent_types</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">prototype</span><span class="p">):</span>
+</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;expected </span><span class="si">%s</span><span class="s">, got </span><span class="si">%s</span><span class="s"> instead&quot;</span> <span class="o">%</span>
+</span><span class="line">                             <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">prototype</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">x</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And finally:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">def</span> <span class="nf">df_from_rdd</span><span class="p">(</span><span class="n">rdd</span><span class="p">,</span> <span class="n">prototype</span><span class="p">,</span> <span class="n">sql</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;creates a dataframe out of an rdd of dicts, with schema inferred from a prototype record&quot;&quot;&quot;</span>
+</span><span class="line">    <span class="n">schema</span> <span class="o">=</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">prototype</span><span class="p">)</span>
+</span><span class="line">    <span class="n">row_rdd</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_rowify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">prototype</span><span class="p">))</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">sql</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">row_rdd</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">nadbor</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-05-22T21:39:15+01:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>9:39 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/" data-via="" data-counturl="http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/05/20/text-classification-with-word2vec/" title="Previous Post: Text classification with Word2Vec">&laquo; Text classification with Word2Vec</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/">Data Engineers Will Hate You - One Weird Trick to Fix Your Pyspark Schemas</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/20/text-classification-with-word2vec/">Text Classification With Word2Vec</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/11/29/ds-toolbox-topic-models/">DS Toolbox - Topic Models</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/">Lead Scoring Without Negative Examples</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/26/test-post/">Test Post</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/nadbordrozd">@nadbordrozd</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'nadbordrozd',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/nadbordrozd?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - nadbor -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ds-lore';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/';
+        var disqus_url = 'http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+
+<!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+</html>
