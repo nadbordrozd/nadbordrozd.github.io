@@ -6,15 +6,6 @@ single: true
 <div>
 <article class="hentry" role="article">
   {% include article.html %}
-
-  <head>
-    {% if page.custom_javascript %}
-        {% for js in page.custom_javascript %}
-            <script type="text/javascript" src="/javascripts/custom/{{ js }}"></script>    
-        {% endfor%}
-    {% endif %}
-  </head>
-
   <footer>
     <p class="meta">
       {% include post/author.html %}

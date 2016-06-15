@@ -3,9 +3,10 @@ layout: post
 title: "Text classification with Word2Vec"
 date: 2016-05-20 17:18:58 +0000
 comments: true
-categories: 
+categories: [text classification, word2vec, naive bayes, svm]
+keywords: [text classification, text categorization, word2vec, naive bayes, svm]
 ---
-In the previous post I talked about usefulness of topic models for non-NLP tasks, it's back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found [here](https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb).
+In the [previous post](http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/) I talked about usefulness of topic models for non-NLP tasks, it's back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found [here](https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb).
 
 ####Motivation
 The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones. 
@@ -163,7 +164,7 @@ At this point I have to note that averaging vectors is only the easiest way of l
 
 Overall, we won't be throwing away our SVMs any time soon in favor of word2vec but it has it's place in text classification. Like when you have a tiny training set or to ensemble it with other models to gain edge in Kaggle. 
 
-Plus what other model can do this:
+Plus, can SVM do this:
 ```python
 X = [['Berlin', 'London'],
      ['cow', 'cat'],
