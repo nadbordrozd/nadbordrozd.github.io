@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies/</loc>
+<lastmod>2016-06-13T22:19:12+01:00</lastmod>
+</url>
+<url>
 <loc>http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/</loc>
 <lastmod>2016-05-22T21:39:15+01:00</lastmod>
 </url>
@@ -52,6 +56,24 @@
 </url>
 <url>
 <loc>http://nadbordrozd.github.io/blog/categories/nlp/</loc>
+</url>
+<url>
+<loc>http://nadbordrozd.github.io/blog/categories/text-classification/</loc>
+</url>
+<url>
+<loc>http://nadbordrozd.github.io/blog/categories/naive-bayes/</loc>
+</url>
+<url>
+<loc>http://nadbordrozd.github.io/blog/categories/svm/</loc>
+</url>
+<url>
+<loc>http://nadbordrozd.github.io/blog/categories/deepwalk/</loc>
+</url>
+<url>
+<loc>http://nadbordrozd.github.io/blog/categories/t-sne/</loc>
+</url>
+<url>
+<loc>http://nadbordrozd.github.io/blog/categories/network-science/</loc>
 </url>
 <url>
 <loc>http://nadbordrozd.github.io/images/phone%20screen%20-%20Google%20Docs_files/edit.html</loc>

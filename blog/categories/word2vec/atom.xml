@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Word2vec | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/word2vec/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-05-31T21:41:33+01:00</updated>
+  <updated>2016-06-14T08:59:52+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -12,6 +12,371 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Deepwalking With Companies]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies/"/>
+    <updated>2016-06-13T22:19:12+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies</id>
+    <content type="html"><![CDATA[<p>I have blogged about the wide usefulness of <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">topic models</a> and I have <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">benchmarked</a> word-embedding-assisted classification on Reuter’s benchmark. This time I experiment with these ideas using a real world and decent sized dataset - the graph of UK/Irish companies. I have done this during my “10% time” at <a href="http://www.duedil.com">DueDil</a> (it’s like google’s “20% time”, except it <a href="http://uk.businessinsider.com/google-20-percent-time-policy-2015-4?r=US&amp;IR=T">exists</a>).</p>
+
+<h4 id="graph-of-companies">Graph of companies</h4>
+<p>There are 4 million active companies in the UK and Ireland. DueDil collects all kinds of information about them - financials, legal structures, contact info, company websites, blogs, news appearences etc. All of it is presented to our users and some of it also serves as input to machine learning tasks - like classifying companies into industries.</p>
+
+<p>One very interesting dataset that remains underutilised (AFAIK by anyone, not just DueDil) is the network of connections of companies and directors.</p>
+
+<p>You can tell a lot about a company just by looking at it’s directors. That is - if you know anything about these people. At DueDil we don’t know much more than just their identities. This would be rather useless in the context of a single company. But there are millions of companies and people who serve as their directors more often then not do it many times in their careers at different companies. Knowing that the director’s name is Jane Brown may be useless, but knowing that the director previously held similar positions at three different tech startups is highly relevant. And this is just one director out of many and one type of relationship.</p>
+
+<p>More generally, one can think about companies as nodes in a graph. Two companies are connected iff there is a person who has served as a director at both of them (not necessarily at the same time). I will call this the <em>company graph</em>. Here’s a part of the graph containing DueDil.</p>
+
+<p>{% img /images/comp_graph.png %}</p>
+
+<p>DueDil is connected to Founders For Good Ltd because our CEO Damian Kimmelman is also a director at the other company.</p>
+
+<p>It is intuitive that the position of a company in this graph tells us something about the company. It is however difficult to do anything with this information unless it is somehow encoded into numbers.</p>
+
+<h4 id="company2vec">Company2Vec</h4>
+<p>This is where word embeddings come in. As I mentioned previously, it is possible to apply Word2Vec to a graph to get an embedding of graph nodes as real-valued vectors in a procedure called <a href="http://arxiv.org/abs/1403.6652">DeepWalk</a>. The idea is very simple:</p>
+
+<ol>
+  <li>Construct a bunch of random walks on the graph</li>
+  <li>Feed the random walks into Word2Vec</li>
+</ol>
+
+<p>A random walk is just a sequence of nodes, where the next node is always one of the neighbours of the previous node, chosen at random. Think: Duedil -&gt; Founders For Good Ltd -&gt; Omio Limited.</p>
+
+<p>Word2Vec accepts a collection of documents - where every document is a list of tokens (strings). Here company Id’s play the role of tokens and random walks play the role of documents. It all checks out.</p>
+
+<p>To limit the size of the graph for this proof of concept, I have applied this procedure only to the 2.2 million companies that</p>
+
+<ol>
+  <li>are active</li>
+  <li>have at least one edge (director in common) to another active company</li>
+</ol>
+
+<p>I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with <a href="https://radimrehurek.com/gensim/models/word2vec.html">gensim</a> on this corpus of $10<em>40</em>2200000 = 8.8 * 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.</p>
+
+<p>Finally I got some vectors out of it - one per company. These vectors themselves were the goal of this project (they can serve as features in ML), but I also made some plots to verify that the algorithm is working as advertised.</p>
+
+<h4 id="pretty-pictures-with-t-sne-and-bokeh">Pretty pictures with t-SNE and Bokeh</h4>
+<p>The embedding produced by DeepWalk was 100-dimensional in this case, so I had to do some dimensionality reduction before trying to visualize the vectors. <a href="https://github.com/danielfrg/tsne">t-SNE</a> is perfect for this kind of thing. Here’s a sample of 40000 company vectors embedded in 2D with t-SNE. You can move or zoom in the plot or hover over the dots to see the names of the corresponding companies.</p>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Bokeh Plot</title>
+
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+    </head>
+    <body>
+
+        <div class="plotdiv" id="7953daf6-6ca5-48d8-be1e-4cd0ab91f1f8"></div>
+
+        <script type="text/javascript" src="http://nadbordrozd.github.io/javascripts/custom/deepwalk_bokeh/40k_black_g.js"></script>
+    </body>
+</html>
+
+<p>It worked! You can immediately see that there is some structure in the data and t-SNE has picked up on it (and this is only a tiny sample - 2% of all the datapoints). What does this structure mean? After the graph has beed transformed with DeepWalk and then t-SNE, the position of a company in this plot doesn’t have a simple interpretation but it’s clear that groups of highly interconnected companies will correspond to clusters of points in this plot. And it’s easy to verify just by looking at the names of the companies that this is the case.</p>
+
+<p>Take the big blob in the upper left corner - the companies there:</p>
+
+<ul>
+  <li>Edwards Macliammoir Dublin Gate Theatre Productions Limited</li>
+  <li>Humanist Association of Ireland Limited</li>
+  <li>Kildare Street Management Limited</li>
+  <li>Shannon Airport Authority Limited</li>
+</ul>
+
+<p>We have discovered the cluster of irish companies! And if you zoom in on the long, narrow appendage sticking out of this cluster towards bottom left - you’ll see companies like:</p>
+
+<ul>
+  <li>Tempelhof Aircraft Leasing (Ireland) Limited</li>
+  <li>Gallic Dragon Aviation Limited</li>
+  <li>Aergen Aircraft Ten Limited</li>
+</ul>
+
+<p>… and hundreds more. This is not even cherry-picked. I hereby declare the discoverery of the Irish Aviation Peninsula.</p>
+
+<p>Slightly up and to the right of center there is a smaller scottish cluster recognizable through such companies as</p>
+
+<ul>
+  <li>Caledonian Sausage Company</li>
+  <li>Edinburgh Tattoo Productions Limited</li>
+  <li>Dundee Ice Arena</li>
+</ul>
+
+<p>There are many other smaller clusters and it’s actually a fun exercise to try to pinpoint exactly what do the companies in a cluster have in common.</p>
+
+<h4 id="now-in-color">Now in color!</h4>
+<p>This was fun if somewhat grim looking. Let’s try to add some color to the plot. The original goal of this project was to get graph-derived features for industry classification. Let’s try using different colors to denote different industries (based on SIC codes). If DeepWalk coordinates are predictive of the industry a company is in, we should expect to see same-colored dots (companies in the same industry) clustering together in the plot. Does this actually happen?</p>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Bokeh Plot</title>
+
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+    </head>
+    <body>
+
+        <div class="plotdiv" id="66d4a3dd-9a8a-4d0a-892f-4fd8be74f711"></div>
+        <script type="text/javascript" src="http://nadbordrozd.github.io/javascripts/custom/deepwalk_bokeh/40k_ind_g.js"></script>
+    </body>
+</html>
+
+<p>A little bit, yes.</p>
+
+<p>Mostly everything is a big reddish mess (“services” is the most popular category). But there are indeed some clusters. Right of center we can see a medium sized pink blob of insurance companies:</p>
+
+<ul>
+  <li>US Risk (UK) Newco Limited</li>
+  <li>Zenith Insurance Management UK Limited</li>
+  <li>North Star Underwriting Limited</li>
+</ul>
+
+<p>Below it and to the left lies another, this one green:</p>
+
+<ul>
+  <li>Timeless Films Limited</li>
+  <li>Hercules Productions Ltd</li>
+  <li>Koninck studios PTE Limited</li>
+</ul>
+
+<p>Clearly thisis a cluster of media companies. If you look more closely you will discover that this is actually the cluster of <em>London based</em> media companies. Nearby there is a smaller green cluster of media companies from the rest of England and another and another one for Wales. These are less clearly delimited and partly obscured by the red dots of “Services” companies. There are many others, but they are sometimes so tight, they appear as a single dot in the plot.</p>
+
+<p>This is more noisy than I hoped for but it’s definitely working. Would definitely improve accuracy of industry classification if used with other stronger features. Plus you can learn interesting things from it just by looking at the plot. Like the fact that film production companies are closely connected to each other and relatively unconnected to the rest of the world. Or that London is a different country as far as media companies are concerned.</p>
+
+<h4 id="bonus-keyword-based-company-embedding">Bonus: keyword based company embedding</h4>
+<p>Having all this t-SNE and Bokeh niceness in place I couldn’t resist applying it to another interesting dataset - keywords. Keywords are a set of industry related tags that DueDil has for millions of companies. They are things like “fishing” or “management consulting” or “b2b”. A company usually has between a few and a few dozen of them.</p>
+
+<p>A byproduct of the pipeline that extracts keywords for companies is a Word2Vec embedding of the keywords. I used this embedding to create an embedding of companies. This was done simply by averaging all the vectors corresponding to a company’s keywords. I ran the resulting vectors through t-SNE and here’s what it looks like:</p>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Bokeh Plot</title>
+
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+    </head>
+    <body>
+
+        <div class="plotdiv" id="8fd1f452-080d-4d66-af86-a63a3b60f6dd"></div>
+        <script type="text/javascript" src="http://nadbordrozd.github.io/javascripts/custom/deepwalk_bokeh/50k_ind_kw.js"></script>
+    </body>
+</html>
+
+<p>I shouldn’t be surprised that keywords - which were picked to be industry related - predict the industry really well. But I was blown away by the level of detail preserved by t-SNE. There are recognizable islands for everything. There is a golden Farmers Archipelago and a narrow blue Dentist Island south from Home Care Island. There is a separate Asian Island in the Restaurant Archipelago - go see for yourself.</p>
+
+<p>This was fun. Long live Word2Vec and t-SNE!</p>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Text Classification With Word2Vec]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/"/>
+    <updated>2016-05-20T18:18:58+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec</id>
+    <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">here</a>.</p>
+
+<h4 id="motivation">Motivation</h4>
+<p>The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones.</p>
+
+<h4 id="getting-the-embedding">Getting the embedding</h4>
+<p>Ok, word embeddings are awesome, how do we use them? Before we do anything we need to get the vectors. We can download one of the great pre-trained models from <a href="http://nlp.stanford.edu/projects/glove/">GloVe</a>:
+<code>bash
+wget http://nlp.stanford.edu/data/glove.6B.zip
+unzip glove.6B.zip
+</code></p>
+
+<p>and use load them up in python:</p>
+
+<p>```python
+import numpy as np</p>
+
+<p>with open(“glove.6B.50d.txt”, “rb”) as lines:
+    w2v = {line.split()[0]: np.array(map(float, line.split()[1:]))
+           for line in lines}
+```</p>
+
+<p>or we can train a Word2Vec model from scratch with gensim:</p>
+
+<p><code>python
+import gensim
+# let X be a list of tokenized texts (i.e. list of lists of tokens)
+model = gensim.models.Word2Vec(X, size=100)
+w2v = dict(zip(model.index2word, model.syn0))
+</code></p>
+
+<h4 id="the-python-meat">The (python) meat</h4>
+<p>We got ourselves a dictionary mapping word -&gt; 100-dimensional vector. Now we can use it to build features. The simplest way to do that is by averaging word vectors for all words in a text. We will build a sklearn-compatible transformer that is initialised with a word -&gt; vector dictionary.</p>
+
+<p>```python
+class MeanEmbeddingVectorizer(object):
+    def <strong>init</strong>(self, word2vec):
+        self.word2vec = word2vec
+        # if a text is empty we should return a vector of zeros
+        # with the same dimensionality as all the other vectors
+        self.dim = len(word2vec.itervalues().next())</p>
+
+<pre><code>def fit(self, X, y):
+    return self 
+
+def transform(self, X):
+    return np.array([
+        np.mean([self.word2vec[w] for w in words if w in self.word2vec] 
+                or [np.zeros(self.dim)], axis=0)
+        for words in X
+    ]) ```
+</code></pre>
+
+<p>Let’s throw in a version that uses tf-idf weighting scheme for good measure</p>
+
+<p>```python
+class TfidfEmbeddingVectorizer(object):
+    def <strong>init</strong>(self, word2vec):
+        self.word2vec = word2vec
+        self.word2weight = None
+        self.dim = len(word2vec.itervalues().next())</p>
+
+<pre><code>def fit(self, X, y):
+    tfidf = TfidfVectorizer(analyzer=lambda x: x)
+    tfidf.fit(X)
+    # if a word was never seen - it must be at least as infrequent
+    # as any of the known words - so the default idf is the max of 
+    # known idf's
+    max_idf = max(tfidf.idf_)
+    self.word2weight = defaultdict(
+        lambda: max_idf, 
+        [(w, tfidf.idf_[i]) for w, i in tfidf.vocabulary_.items()])
+
+    return self
+
+def transform(self, X):
+    return np.array([
+            np.mean([self.word2vec[w] * self.word2weight[w]
+                     for w in words if w in self.word2vec] or
+                    [np.zeros(self.dim)], axis=0)
+            for words in X
+        ]) ```
+</code></pre>
+
+<p>These vectorizers can now be used <em>almost</em> the same way as <code>CountVectorizer</code> or <code>TfidfVectorizer</code> from <code>sklearn.feature_extraction.text</code>. Almost - because sklearn vectorizers can also do their own tokenization - a feature which we won’t be using anyway because the benchmarks we will be using come already tokenized. In a real application I wouldn’t trust sklearn with tokenization anyway - rather let spaCy do it.</p>
+
+<p>Now we are ready to define the actual models that will take tokenised text, vectorize and learn to classify the vectors with something fancy like Extra Trees. sklearn’s Pipeline is perfect for this:</p>
+
+<p>```python
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import ExtraTreesClassifier</p>
+
+<p>etree_w2v = Pipeline([
+    (“word2vec vectorizer”, MeanEmbeddingVectorizer(w2v)), 
+    (“extra trees”, ExtraTreesClassifier(n_estimators=200))])
+etree_w2v_tfidf = Pipeline([
+    (“word2vec vectorizer”, TfidfEmbeddingVectorizer(w2v)), 
+    (“extra trees”, ExtraTreesClassifier(n_estimators=200))])
+```</p>
+
+<h4 id="benchmarks">Benchmarks</h4>
+<p>I benchmarked the models on everyone’s favorite <a href="http://www.cs.umb.edu/~smimarog/textmining/datasets/">Reuters-21578</a> datasets. Extra Trees-based word-embedding-utilising models competed against text classification classics - Naive Bayes and SVM. Full list of contestants:</p>
+
+<ul>
+  <li>mult_nb - Multinomial Naive Bayes</li>
+  <li>bern_nb - Bernoulli Naive Bayes</li>
+  <li>svc - linear kernel SVM</li>
+  <li>glove_small - ExtraTrees with 200 trees and vectorizer based on 50-dimensional gloVe embedding trained on 6B tokens</li>
+  <li>glove_big - same as above but using 300-dimensional gloVe embedding trained on 840B tokens</li>
+  <li>w2v - same but with using 100-dimensional word2vec embedding trained on the benchmark data itself (using both training and test examples [but not labels!])</li>
+</ul>
+
+<p>Each of these came in two varieties - regular and tf-idf weighted.</p>
+
+<p>The results (on 5-fold cv on a the R8 dataset of 7674 texts labeled with 8 categories):</p>
+
+<p><code>bash
+model                score
+-----------------  -------
+svc_tfidf           0.9656
+svc                 0.9562
+w2v_tfidf           0.9554
+w2v                 0.9516
+mult_nb             0.9467
+glove_big           0.9279
+glove_big_tfidf     0.9273
+glove_small         0.9250
+glove_small_tfidf   0.9061
+mult_nb_tfidf       0.8615
+bern_nb             0.7954
+bern_nb_tfidf       0.7954
+</code></p>
+
+<p>SVM wins, word2vec-based Extra Trees is a close second, Naive Bayes not far behind. Interestingly, embedding trained on this relatively tiny dataset does significantly better than pretrained GloVe - which is otherwise fantastic. Can we do better? Let’s check how do the models compare depending on the number of labeled training examples. Due to its semi-supervised nature w2v should shine when there is little labeled data.</p>
+
+<p>{% img /images/text_class_with_w2v/r8.png %}</p>
+
+<p>That indeed seems to be the case. <code>w2v_tfidf</code>’s performance degrades most gracefully of the bunch. <code>SVM</code> takes the biggest hit when examples are few. Lets try the other two benchmarks from Reuters-21578. 52-way classification:</p>
+
+<p>{% img /images/text_class_with_w2v/r52.png %}</p>
+
+<p>Qualitatively similar results.</p>
+
+<p>And 20-way classification:</p>
+
+<p>{% img /images/text_class_with_w2v/20ng.png %}</p>
+
+<p>This time pretrained embeddings do better than Word2Vec and Naive Bayes does really well, otherwise same as before.</p>
+
+<h4 id="conclusions">Conclusions</h4>
+<ol>
+  <li>SVM’s are pretty great at text classification tasks</li>
+  <li>Models based on simple averaging of word-vectors can be surprisingly good too (given how much information is lost in taking the average)</li>
+  <li>but they only seem to have a clear advantage when there is ridiculously little labeled training data</li>
+</ol>
+
+<p>At this point I have to note that averaging vectors is only the easiest way of leveraging word embeddings in classification but not the only one. You could also try embedding whole documents directly with <a href="https://radimrehurek.com/gensim/models/doc2vec.html">Doc2Vec</a>. Or use Multinomial Gaussian Naive Bayes on word vectors. I have tried the <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/multi_multi_kernel_nb.py">latter approach</a> but it was too slow to include in the benchmark.</p>
+
+<ol>
+  <li>Sometimes pretrained embeddings give clearly superior results to word2vec trained on the specific benchmark, sometimes it’s the opposite. Not sure what is going on here.</li>
+</ol>
+
+<p>Overall, we won’t be throwing away our SVMs any time soon in favor of word2vec but it has it’s place in text classification. Like when you have a tiny training set or to ensemble it with other models to gain edge in Kaggle.</p>
+
+<p>Plus, can SVM do this:
+```python
+X = [[‘Berlin’, ‘London’],
+     [‘cow’, ‘cat’],
+     [‘pink’, ‘yellow’]]
+y = [‘capitals’, ‘animals’, ‘colors’]
+etree_glove_big.fit(X, y)</p>
+
+<h1 id="never-before-seen-words">never before seen words!!!</h1>
+<p>test_X = [[‘dog’], [‘red’], [‘Madrid’]]</p>
+
+<p>print etree_glove_big.predict(test_X)
+```
+prints</p>
+
+<p><code>text
+['animals' 'colors' 'capitals']
+</code></p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[DS Toolbox - Topic Models]]></title>

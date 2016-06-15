@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Network Science | DS lore]]></title>
+  <link href="http://nadbordrozd.github.io/blog/categories/network-science/atom.xml" rel="self"/>
+  <link href="http://nadbordrozd.github.io/"/>
+  <updated>2016-06-14T08:59:52+01:00</updated>
+  <id>http://nadbordrozd.github.io/</id>
+  <author>
+    <name><![CDATA[nadbor]]></name>
+    <email><![CDATA[nadbordrozd@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Deepwalking With Companies]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies/"/>
+    <updated>2016-06-13T22:19:12+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies</id>
+    <content type="html"><![CDATA[<p>I have blogged about the wide usefulness of <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">topic models</a> and I have <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">benchmarked</a> word-embedding-assisted classification on Reuter’s benchmark. This time I experiment with these ideas using a real world and decent sized dataset - the graph of UK/Irish companies. I have done this during my “10% time” at <a href="http://www.duedil.com">DueDil</a> (it’s like google’s “20% time”, except it <a href="http://uk.businessinsider.com/google-20-percent-time-policy-2015-4?r=US&amp;IR=T">exists</a>).</p>
+
+<h4 id="graph-of-companies">Graph of companies</h4>
+<p>There are 4 million active companies in the UK and Ireland. DueDil collects all kinds of information about them - financials, legal structures, contact info, company websites, blogs, news appearences etc. All of it is presented to our users and some of it also serves as input to machine learning tasks - like classifying companies into industries.</p>
+
+<p>One very interesting dataset that remains underutilised (AFAIK by anyone, not just DueDil) is the network of connections of companies and directors.</p>
+
+<p>You can tell a lot about a company just by looking at it’s directors. That is - if you know anything about these people. At DueDil we don’t know much more than just their identities. This would be rather useless in the context of a single company. But there are millions of companies and people who serve as their directors more often then not do it many times in their careers at different companies. Knowing that the director’s name is Jane Brown may be useless, but knowing that the director previously held similar positions at three different tech startups is highly relevant. And this is just one director out of many and one type of relationship.</p>
+
+<p>More generally, one can think about companies as nodes in a graph. Two companies are connected iff there is a person who has served as a director at both of them (not necessarily at the same time). I will call this the <em>company graph</em>. Here’s a part of the graph containing DueDil.</p>
+
+<p>{% img /images/comp_graph.png %}</p>
+
+<p>DueDil is connected to Founders For Good Ltd because our CEO Damian Kimmelman is also a director at the other company.</p>
+
+<p>It is intuitive that the position of a company in this graph tells us something about the company. It is however difficult to do anything with this information unless it is somehow encoded into numbers.</p>
+
+<h4 id="company2vec">Company2Vec</h4>
+<p>This is where word embeddings come in. As I mentioned previously, it is possible to apply Word2Vec to a graph to get an embedding of graph nodes as real-valued vectors in a procedure called <a href="http://arxiv.org/abs/1403.6652">DeepWalk</a>. The idea is very simple:</p>
+
+<ol>
+  <li>Construct a bunch of random walks on the graph</li>
+  <li>Feed the random walks into Word2Vec</li>
+</ol>
+
+<p>A random walk is just a sequence of nodes, where the next node is always one of the neighbours of the previous node, chosen at random. Think: Duedil -&gt; Founders For Good Ltd -&gt; Omio Limited.</p>
+
+<p>Word2Vec accepts a collection of documents - where every document is a list of tokens (strings). Here company Id’s play the role of tokens and random walks play the role of documents. It all checks out.</p>
+
+<p>To limit the size of the graph for this proof of concept, I have applied this procedure only to the 2.2 million companies that</p>
+
+<ol>
+  <li>are active</li>
+  <li>have at least one edge (director in common) to another active company</li>
+</ol>
+
+<p>I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with <a href="https://radimrehurek.com/gensim/models/word2vec.html">gensim</a> on this corpus of $10<em>40</em>2200000 = 8.8 * 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.</p>
+
+<p>Finally I got some vectors out of it - one per company. These vectors themselves were the goal of this project (they can serve as features in ML), but I also made some plots to verify that the algorithm is working as advertised.</p>
+
+<h4 id="pretty-pictures-with-t-sne-and-bokeh">Pretty pictures with t-SNE and Bokeh</h4>
+<p>The embedding produced by DeepWalk was 100-dimensional in this case, so I had to do some dimensionality reduction before trying to visualize the vectors. <a href="https://github.com/danielfrg/tsne">t-SNE</a> is perfect for this kind of thing. Here’s a sample of 40000 company vectors embedded in 2D with t-SNE. You can move or zoom in the plot or hover over the dots to see the names of the corresponding companies.</p>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Bokeh Plot</title>
+
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+    </head>
+    <body>
+
+        <div class="plotdiv" id="7953daf6-6ca5-48d8-be1e-4cd0ab91f1f8"></div>
+
+        <script type="text/javascript" src="http://nadbordrozd.github.io/javascripts/custom/deepwalk_bokeh/40k_black_g.js"></script>
+    </body>
+</html>
+
+<p>It worked! You can immediately see that there is some structure in the data and t-SNE has picked up on it (and this is only a tiny sample - 2% of all the datapoints). What does this structure mean? After the graph has beed transformed with DeepWalk and then t-SNE, the position of a company in this plot doesn’t have a simple interpretation but it’s clear that groups of highly interconnected companies will correspond to clusters of points in this plot. And it’s easy to verify just by looking at the names of the companies that this is the case.</p>
+
+<p>Take the big blob in the upper left corner - the companies there:</p>
+
+<ul>
+  <li>Edwards Macliammoir Dublin Gate Theatre Productions Limited</li>
+  <li>Humanist Association of Ireland Limited</li>
+  <li>Kildare Street Management Limited</li>
+  <li>Shannon Airport Authority Limited</li>
+</ul>
+
+<p>We have discovered the cluster of irish companies! And if you zoom in on the long, narrow appendage sticking out of this cluster towards bottom left - you’ll see companies like:</p>
+
+<ul>
+  <li>Tempelhof Aircraft Leasing (Ireland) Limited</li>
+  <li>Gallic Dragon Aviation Limited</li>
+  <li>Aergen Aircraft Ten Limited</li>
+</ul>
+
+<p>… and hundreds more. This is not even cherry-picked. I hereby declare the discoverery of the Irish Aviation Peninsula.</p>
+
+<p>Slightly up and to the right of center there is a smaller scottish cluster recognizable through such companies as</p>
+
+<ul>
+  <li>Caledonian Sausage Company</li>
+  <li>Edinburgh Tattoo Productions Limited</li>
+  <li>Dundee Ice Arena</li>
+</ul>
+
+<p>There are many other smaller clusters and it’s actually a fun exercise to try to pinpoint exactly what do the companies in a cluster have in common.</p>
+
+<h4 id="now-in-color">Now in color!</h4>
+<p>This was fun if somewhat grim looking. Let’s try to add some color to the plot. The original goal of this project was to get graph-derived features for industry classification. Let’s try using different colors to denote different industries (based on SIC codes). If DeepWalk coordinates are predictive of the industry a company is in, we should expect to see same-colored dots (companies in the same industry) clustering together in the plot. Does this actually happen?</p>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Bokeh Plot</title>
+
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+    </head>
+    <body>
+
+        <div class="plotdiv" id="66d4a3dd-9a8a-4d0a-892f-4fd8be74f711"></div>
+        <script type="text/javascript" src="http://nadbordrozd.github.io/javascripts/custom/deepwalk_bokeh/40k_ind_g.js"></script>
+    </body>
+</html>
+
+<p>A little bit, yes.</p>
+
+<p>Mostly everything is a big reddish mess (“services” is the most popular category). But there are indeed some clusters. Right of center we can see a medium sized pink blob of insurance companies:</p>
+
+<ul>
+  <li>US Risk (UK) Newco Limited</li>
+  <li>Zenith Insurance Management UK Limited</li>
+  <li>North Star Underwriting Limited</li>
+</ul>
+
+<p>Below it and to the left lies another, this one green:</p>
+
+<ul>
+  <li>Timeless Films Limited</li>
+  <li>Hercules Productions Ltd</li>
+  <li>Koninck studios PTE Limited</li>
+</ul>
+
+<p>Clearly thisis a cluster of media companies. If you look more closely you will discover that this is actually the cluster of <em>London based</em> media companies. Nearby there is a smaller green cluster of media companies from the rest of England and another and another one for Wales. These are less clearly delimited and partly obscured by the red dots of “Services” companies. There are many others, but they are sometimes so tight, they appear as a single dot in the plot.</p>
+
+<p>This is more noisy than I hoped for but it’s definitely working. Would definitely improve accuracy of industry classification if used with other stronger features. Plus you can learn interesting things from it just by looking at the plot. Like the fact that film production companies are closely connected to each other and relatively unconnected to the rest of the world. Or that London is a different country as far as media companies are concerned.</p>
+
+<h4 id="bonus-keyword-based-company-embedding">Bonus: keyword based company embedding</h4>
+<p>Having all this t-SNE and Bokeh niceness in place I couldn’t resist applying it to another interesting dataset - keywords. Keywords are a set of industry related tags that DueDil has for millions of companies. They are things like “fishing” or “management consulting” or “b2b”. A company usually has between a few and a few dozen of them.</p>
+
+<p>A byproduct of the pipeline that extracts keywords for companies is a Word2Vec embedding of the keywords. I used this embedding to create an embedding of companies. This was done simply by averaging all the vectors corresponding to a company’s keywords. I ran the resulting vectors through t-SNE and here’s what it looks like:</p>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Bokeh Plot</title>
+
+<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
+
+<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
+<script type="text/javascript">
+    Bokeh.set_log_level("info");
+</script>
+    </head>
+    <body>
+
+        <div class="plotdiv" id="8fd1f452-080d-4d66-af86-a63a3b60f6dd"></div>
+        <script type="text/javascript" src="http://nadbordrozd.github.io/javascripts/custom/deepwalk_bokeh/50k_ind_kw.js"></script>
+    </body>
+</html>
+
+<p>I shouldn’t be surprised that keywords - which were picked to be industry related - predict the industry really well. But I was blown away by the level of detail preserved by t-SNE. There are recognizable islands for everything. There is a golden Farmers Archipelago and a narrow blue Dentist Island south from Home Care Island. There is a separate Asian Island in the Restaurant Archipelago - go see for yourself.</p>
+
+<p>This was fun. Long live Word2Vec and t-SNE!</p>
+
+]]></content>
+  </entry>
+  
+</feed>
