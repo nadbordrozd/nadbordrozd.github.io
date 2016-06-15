@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Pyspark | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/pyspark/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-06-15T11:09:22+01:00</updated>
+  <updated>2016-06-15T11:20:52+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -18,10 +18,10 @@
     <link href="http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/"/>
     <updated>2016-05-22T21:39:15+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas</id>
-    <content type="html"><![CDATA[<p>II will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you’re not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).</p>
+    <content type="html"><![CDATA[<p>I will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you’re not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).</p>
 
 <h4 id="the-good-the-bad-and-the-ugly-of-dataframes">The Good, the Bad and the Ugly of dataframes</h4>
-<p>Dataframes in pyspark are simultaneously pretty great and kind of broken.</p>
+<p>Dataframes in pyspark are simultaneously pretty great and <del>kind of</del> completely broken.</p>
 
 <ul>
   <li>they enforce a schema</li>
@@ -33,7 +33,8 @@
 <p>On the other hand:</p>
 
 <ul>
-  <li>dataframe outer join acts as an inner join due to a bug</li>
+  <li>dataframe join sometimes gives <a href="https://issues.apache.org/jira/browse/SPARK-10892">wrong results</a></li>
+  <li>pyspark dataframe outer join acts as an inner join</li>
   <li>when cached with <code>df.cache()</code> dataframes sometimes start throwing <code>key not found</code> and Spark driver dies. Other times the task succeeds but the the underlying rdd becomes corrupted (field values switched up).</li>
   <li>not really dataframe’s fault but related - parquet is not human readable which sucks - can’t easily inspect your saved dataframes</li>
 </ul>
