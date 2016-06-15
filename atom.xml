@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-06-14T07:17:04+01:00</updated>
+  <updated>2016-06-15T11:09:22+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -54,7 +54,7 @@
   <li>have at least one edge (director in common) to another active company</li>
 </ol>
 
-<p>I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with <a href="https://radimrehurek.com/gensim/models/word2vec.html">gensim</a> on this corpus of $10<em>40</em>2200000 = 8.8 * 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.</p>
+<p>I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with <a href="https://radimrehurek.com/gensim/models/word2vec.html">gensim</a> on this corpus of $10 \times 40 \times 2200000 = 8.8 \times 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.</p>
 
 <p>Finally I got some vectors out of it - one per company. These vectors themselves were the goal of this project (they can serve as features in ML), but I also made some plots to verify that the algorithm is working as advertised.</p>
 
@@ -152,7 +152,7 @@
   <li>Koninck studios PTE Limited</li>
 </ul>
 
-<p>Clearly thisis a cluster of media companies. If you look more closely you will discover that this is actually the cluster of <em>London based</em> media companies. Nearby there is a smaller green cluster of media companies from the rest of England and another and another one for Wales. These are less clearly delimited and partly obscured by the red dots of “Services” companies. There are many others, but they are sometimes so tight, they appear as a single dot in the plot.</p>
+<p>Clearly this is a cluster of film companies (plus other media). If you look more closely you will discover that this is actually the cluster of <em>London based</em> film companies. Nearby there is a smaller green cluster of media companies from the rest of England and another one for Wales. These are less clearly delimited and partly obscured by the red dots of “Services” companies. There are many others, but they are sometimes so tight, they appear as a single dot in the plot.</p>
 
 <p>This is more noisy than I hoped for but it’s definitely working. Would definitely improve accuracy of industry classification if used with other stronger features. Plus you can learn interesting things from it just by looking at the plot. Like the fact that film production companies are closely connected to each other and relatively unconnected to the rest of the world. Or that London is a different country as far as media companies are concerned.</p>
 
@@ -192,7 +192,7 @@
     <link href="http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/"/>
     <updated>2016-05-22T21:39:15+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas</id>
-    <content type="html"><![CDATA[<p>I will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you’re not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).</p>
+    <content type="html"><![CDATA[<p>II will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you’re not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).</p>
 
 <h4 id="the-good-the-bad-and-the-ugly-of-dataframes">The Good, the Bad and the Ugly of dataframes</h4>
 <p>Dataframes in pyspark are simultaneously pretty great and kind of broken.</p>
@@ -497,7 +497,6 @@
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>and use load them up in python:</p>
-
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -511,7 +510,6 @@
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>or we can train a Word2Vec model from scratch with gensim:</p>
-
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -524,7 +522,6 @@
 
 <h4 id="the-python-meat">The (python) meat</h4>
 <p>We got ourselves a dictionary mapping word -&gt; 100-dimensional vector. Now we can use it to build features. The simplest way to do that is by averaging word vectors for all words in a text. We will build a sklearn-compatible transformer that is initialised with a word -&gt; vector dictionary.</p>
-
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -560,7 +557,6 @@
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Let’s throw in a version that uses tf-idf weighting scheme for good measure</p>
-
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -618,7 +614,6 @@
 <p>These vectorizers can now be used <em>almost</em> the same way as <code>CountVectorizer</code> or <code>TfidfVectorizer</code> from <code>sklearn.feature_extraction.text</code>. Almost - because sklearn vectorizers can also do their own tokenization - a feature which we won’t be using anyway because the benchmarks we will be using come already tokenized. In a real application I wouldn’t trust sklearn with tokenization anyway - rather let spaCy do it.</p>
 
 <p>Now we are ready to define the actual models that will take tokenised text, vectorize and learn to classify the vectors with something fancy like Extra Trees. sklearn’s Pipeline is perfect for this:</p>
-
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -654,7 +649,6 @@
 <p>Each of these came in two varieties - regular and tf-idf weighted.</p>
 
 <p>The results (on 5-fold cv on a the R8 dataset of 7674 texts labeled with 8 categories):</p>
-
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
 <span class="line-number">3</span>
@@ -739,7 +733,6 @@
 </span><span class="line"><span class="k">print</span> <span class="n">etree_glove_big</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_X</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 <p>prints</p>
-
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 </pre></td><td class="code"><pre><code class="text"><span class="line">[&#39;animals&#39; &#39;colors&#39; &#39;capitals&#39;]
 </span></code></pre></td></tr></table></div></figure></notextile></div>

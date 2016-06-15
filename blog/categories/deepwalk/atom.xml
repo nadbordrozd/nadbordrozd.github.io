@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Deepwalk | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/deepwalk/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-06-14T08:59:52+01:00</updated>
+  <updated>2016-06-15T11:09:22+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -29,7 +29,7 @@
 
 <p>More generally, one can think about companies as nodes in a graph. Two companies are connected iff there is a person who has served as a director at both of them (not necessarily at the same time). I will call this the <em>company graph</em>. Here’s a part of the graph containing DueDil.</p>
 
-<p>{% img /images/comp_graph.png %}</p>
+<p><img src="/images/comp_graph.png"></p>
 
 <p>DueDil is connected to Founders For Good Ltd because our CEO Damian Kimmelman is also a director at the other company.</p>
 
@@ -54,7 +54,7 @@
   <li>have at least one edge (director in common) to another active company</li>
 </ol>
 
-<p>I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with <a href="https://radimrehurek.com/gensim/models/word2vec.html">gensim</a> on this corpus of $10<em>40</em>2200000 = 8.8 * 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.</p>
+<p>I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with <a href="https://radimrehurek.com/gensim/models/word2vec.html">gensim</a> on this corpus of $10 \times 40 \times 2200000 = 8.8 \times 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.</p>
 
 <p>Finally I got some vectors out of it - one per company. These vectors themselves were the goal of this project (they can serve as features in ML), but I also made some plots to verify that the algorithm is working as advertised.</p>
 
@@ -152,7 +152,7 @@
   <li>Koninck studios PTE Limited</li>
 </ul>
 
-<p>Clearly thisis a cluster of media companies. If you look more closely you will discover that this is actually the cluster of <em>London based</em> media companies. Nearby there is a smaller green cluster of media companies from the rest of England and another and another one for Wales. These are less clearly delimited and partly obscured by the red dots of “Services” companies. There are many others, but they are sometimes so tight, they appear as a single dot in the plot.</p>
+<p>Clearly this is a cluster of film companies (plus other media). If you look more closely you will discover that this is actually the cluster of <em>London based</em> film companies. Nearby there is a smaller green cluster of media companies from the rest of England and another one for Wales. These are less clearly delimited and partly obscured by the red dots of “Services” companies. There are many others, but they are sometimes so tight, they appear as a single dot in the plot.</p>
 
 <p>This is more noisy than I hoped for but it’s definitely working. Would definitely improve accuracy of industry classification if used with other stronger features. Plus you can learn interesting things from it just by looking at the plot. Like the fact that film production companies are closely connected to each other and relatively unconnected to the rest of the world. Or that London is a different country as far as media companies are concerned.</p>
 
