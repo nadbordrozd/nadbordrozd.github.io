@@ -19,7 +19,6 @@ unzip glove.6B.zip
 ```
 
 and use load them up in python:
-
 ```python
 import numpy as np
 
@@ -29,7 +28,6 @@ with open("glove.6B.50d.txt", "rb") as lines:
 ```
 
 or we can train a Word2Vec model from scratch with gensim:
-
 ```python
 import gensim
 # let X be a list of tokenized texts (i.e. list of lists of tokens)
@@ -39,7 +37,6 @@ w2v = dict(zip(model.index2word, model.syn0))
 
 #### The (python) meat
 We got ourselves a dictionary mapping word -> 100-dimensional vector. Now we can use it to build features. The simplest way to do that is by averaging word vectors for all words in a text. We will build a sklearn-compatible transformer that is initialised with a word -> vector dictionary.
-
 ```python
 class MeanEmbeddingVectorizer(object):
     def __init__(self, word2vec):
@@ -60,7 +57,6 @@ class MeanEmbeddingVectorizer(object):
 ```
 
 Let's throw in a version that uses tf-idf weighting scheme for good measure
-
 ```python
 class TfidfEmbeddingVectorizer(object):
     def __init__(self, word2vec):
@@ -93,7 +89,6 @@ class TfidfEmbeddingVectorizer(object):
 These vectorizers can now be used _almost_ the same way as `CountVectorizer` or `TfidfVectorizer` from `sklearn.feature_extraction.text`. Almost - because sklearn vectorizers can also do their own tokenization - a feature which we won't be using anyway because the benchmarks we will be using come already tokenized. In a real application I wouldn't trust sklearn with tokenization anyway - rather let spaCy do it. 
 
 Now we are ready to define the actual models that will take tokenised text, vectorize and learn to classify the vectors with something fancy like Extra Trees. sklearn's Pipeline is perfect for this:
-
 ```python
 from sklearn.pipeline import Pipeline
 from sklearn.ensemble import ExtraTreesClassifier
@@ -119,7 +114,6 @@ I benchmarked the models on everyone's favorite [Reuters-21578](http://www.cs.um
 Each of these came in two varieties - regular and tf-idf weighted. 
 
 The results (on 5-fold cv on a the R8 dataset of 7674 texts labeled with 8 categories):
-
 ```bash
 model                score
 -----------------  -------
@@ -178,7 +172,6 @@ test_X = [['dog'], ['red'], ['Madrid']]
 print etree_glove_big.predict(test_X)
 ```
 prints
-
 ```text
 ['animals' 'colors' 'capitals']
 ```

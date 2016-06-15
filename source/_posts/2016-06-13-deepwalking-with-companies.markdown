@@ -37,7 +37,7 @@ To limit the size of the graph for this proof of concept, I have applied this pr
 1. are active
 2. have at least one edge (director in common) to another active company
 
-I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with [gensim](https://radimrehurek.com/gensim/models/word2vec.html) on this corpus of $10*40*2200000 = 8.8 * 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.
+I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with [gensim](https://radimrehurek.com/gensim/models/word2vec.html) on this corpus of $10 \times 40 \times 2200000 = 8.8 \times 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.
 
 Finally I got some vectors out of it - one per company. These vectors themselves were the goal of this project (they can serve as features in ML), but I also made some plots to verify that the algorithm is working as advertised.
 
