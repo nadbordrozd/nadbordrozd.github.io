@@ -10,7 +10,7 @@ keywords: [spark, pyspark, dataframes, sqlContext, schemas]
 I will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you're not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).
 
 ####The Good, the Bad and the Ugly of dataframes
-Dataframes in pyspark are simultaneously pretty great and kind of broken. 
+Dataframes in pyspark are simultaneously pretty great and <del>kind of</del> completely broken. 
 
 - they enforce a schema
 - you can run SQL queries against them
@@ -19,7 +19,8 @@ Dataframes in pyspark are simultaneously pretty great and kind of broken.
 
 On the other hand:
 
-- dataframe outer join acts as an inner join due to a bug
+- dataframe join sometimes gives [wrong results](https://issues.apache.org/jira/browse/SPARK-10892)
+- pyspark dataframe outer join acts as an inner join
 - when cached with `df.cache()` dataframes sometimes start throwing `key not found` and Spark driver dies. Other times the task succeeds but the the underlying rdd becomes corrupted (field values switched up).
 - not really dataframe's fault but related - parquet is not human readable which sucks - can't easily inspect your saved dataframes
 
