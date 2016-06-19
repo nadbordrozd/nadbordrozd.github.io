@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Machine Learning Lead Generation | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/machine-learning-lead-generation/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-06-15T11:20:52+01:00</updated>
+  <updated>2016-06-19T21:41:28+02:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Lead Scoring Without Negative Examples]]></title>
     <link href="http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/"/>
-    <updated>2015-08-01T20:49:26+01:00</updated>
+    <updated>2015-08-01T21:49:26+02:00</updated>
     <id>http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples</id>
     <content type="html"><![CDATA[<p>How do you train a binary classifier when you have only positive-labeled training examples? 
 Impossible? Maybe. But sometimes you can do something just as good. Let’s start from the beginning…</p>

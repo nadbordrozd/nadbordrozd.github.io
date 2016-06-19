@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Network Science | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/network-science/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-06-15T11:20:52+01:00</updated>
+  <updated>2016-06-19T21:41:28+02:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Deepwalking With Companies]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies/"/>
-    <updated>2016-06-13T22:19:12+01:00</updated>
+    <updated>2016-06-13T23:19:12+02:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies</id>
     <content type="html"><![CDATA[<p>I have blogged about the wide usefulness of <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">topic models</a> and I have <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">benchmarked</a> word-embedding-assisted classification on Reuter’s benchmark. This time I experiment with these ideas using a real world and decent sized dataset - the graph of UK/Irish companies. I have done this during my “10% time” at <a href="http://www.duedil.com">DueDil</a> (it’s like google’s “20% time”, except it <a href="http://uk.businessinsider.com/google-20-percent-time-policy-2015-4?r=US&amp;IR=T">exists</a>).</p>
 

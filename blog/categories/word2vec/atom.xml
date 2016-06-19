@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Word2vec | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/word2vec/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-06-15T11:20:52+01:00</updated>
+  <updated>2016-06-19T21:41:28+02:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Deepwalking With Companies]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies/"/>
-    <updated>2016-06-13T22:19:12+01:00</updated>
+    <updated>2016-06-13T23:19:12+02:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/06/13/deepwalking-with-companies</id>
     <content type="html"><![CDATA[<p>I have blogged about the wide usefulness of <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">topic models</a> and I have <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">benchmarked</a> word-embedding-assisted classification on Reuter’s benchmark. This time I experiment with these ideas using a real world and decent sized dataset - the graph of UK/Irish companies. I have done this during my “10% time” at <a href="http://www.duedil.com">DueDil</a> (it’s like google’s “20% time”, except it <a href="http://uk.businessinsider.com/google-20-percent-time-policy-2015-4?r=US&amp;IR=T">exists</a>).</p>
 
@@ -190,7 +190,7 @@
   <entry>
     <title type="html"><![CDATA[Text Classification With Word2Vec]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/"/>
-    <updated>2016-05-20T18:18:58+01:00</updated>
+    <updated>2016-05-20T19:18:58+02:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec</id>
     <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">here</a>.</p>
 
@@ -417,7 +417,7 @@ bern_nb_tfidf       0.7954
   <entry>
     <title type="html"><![CDATA[DS Toolbox - Topic Models]]></title>
     <link href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/"/>
-    <updated>2015-11-29T14:59:33+00:00</updated>
+    <updated>2015-11-29T15:59:33+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models</id>
     <content type="html"><![CDATA[<p>If you’re not primarily working with NLP you may not have been paying attention to topic modeling and word embeddings. In this post I intend to convince you that you should.</p>
 
