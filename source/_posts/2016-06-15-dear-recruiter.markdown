@@ -110,7 +110,7 @@ It's worth noting that I have never experienced anything resembling the "bulshit
 - any tips regarding my resume or specific interviews are very welcome
 - if you can write an email to arrange a call to tell me X, you can just tell me X in the email
 
-If these ground rules seem unreasonable to you, then save us both the trouble and don't contact me. It's worth noting that I have never had any problems like the ones described above when I was 
+If these ground rules seem unreasonable to you, then save us both the trouble and don't contact me.
 
 #### P.S.
 I didn't intend to make it read like I'm bragging about all the offers I'm getting like I'm God's gift to data science who can get any job he wants. It's just that I've interviewed _a lot_ over the years so in addition to dozens of rejections I have had several successes too. I'm only describing here the more successful examples because in case of rejection recruiters tend to mercifully leave me alone.
