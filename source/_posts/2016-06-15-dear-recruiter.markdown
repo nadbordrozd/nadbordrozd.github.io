@@ -3,7 +3,8 @@ layout: post
 title: "Dear Recruiter"
 date: 2016-06-15 11:22:10 +0100
 comments: true
-categories: 
+keywords: [tech interviews, recruiters]
+categories: [tech interviews, recruiters]
 ---
 I've had a lot of experience with tech interviews and recruiters in the past and I'm likely to have a lot more in the future. A non-negligible fraction of that experience ranged from "mildly annoying" to "exasperating". 
 
@@ -11,7 +12,7 @@ Here's a list of real examples of irritating recruiter behaviors together with g
 
 Before we start you must understand where I'm coming from. I'm not constantly looking for new jobs. But when I do, I apply en masse and then I have to deal with many recruiters at once. Each one constantly calling me in the office or at home (what is it with your obsession with phone calls? Why not email?). This in itself can get annoying but on top of that there are other more serious offenses. I am usually extremely agreeable both in person and over the phone. A blog post is my way of expressing complaints that I wouldn't dare make in a conversation with you. It's also a form of catharsis so forgive me if I get somewhat snarky and don't take offense if you personally are not guilty of the sins mentioned here.
 
-####When you contact me about a new role
+###When you contact me about a new role
 >I have an exciting opportunity with a global company, one of the leaders in its field. When can we arrange a call?
 
 This tells me nothing. Everyone is either a "leader in their field" or an "exciting startup" or a "global brand". I'm getting 5 of these a day. If I am to commit any time to it I first need to know:
@@ -26,7 +27,7 @@ Ideally, if possible, also
 
 This information is typically enough for me to decide if I'm interested or not. I will let you know if I am. I really don't need to listen to you talk about their nice offices and what fancy university has the CTO attended. If I'm interested in these things I will look them up myself. This conversation is not going to change my mind one way or the other. 
 
-If you want to chat with me because you need to vet me before passing my CV on to the company *please say so* and *indicate clearly* what your decision is afterwards. And don't do this bait-and-switch on me where I express interest in one position and you call me to discuss but only try to peddle another.
+If you want to chat with me because you need to vet me before passing my CV on to the company **please say so** and **indicate clearly** what your decision is afterwards. And don't do this bait-and-switch on me where I express interest in one position and you call me to discuss but only try to peddle another.
 
 In short, this is how it's going to work:
 
@@ -34,7 +35,7 @@ In short, this is how it's going to work:
 2. I email you back with my latest CV if I'm interested or with questions if I have any
 3. you send my details over the company and try to arrange an interview
 
-If you absolutely need to hear my voice and vet me, say so. If I'm interested in the role, we can get it over with *once*.
+If you absolutely need to hear my voice and vet me, say so. If I'm interested in the role, we can get it over with **once**.
 
 #### Before the interview
 >Let me know what is the best time to call you so that I can talk you through the interview process
@@ -54,7 +55,7 @@ How it is going to work:
 1. you give me time and place
 2. I confirm that I will show up
 
-#### After the interview
+### After the interview
 >Please call me after the interview to tell me how did it go ...
 
 It went well. Probably. Or maybe not. Either way it doesn't really matter how _I_ think it went, does it?
@@ -72,7 +73,7 @@ How it's going to work:
 1. if you have any feedback from the interviewers or a decision, you will email it to me
 2. if I want to take myself out of the process I will inform you also by email
 
-#### The final stretch
+### The final stretch
 So I made it through all the rounds and I'm expecting to hear back from the company. You call me saying you have some positive initial feedback, then we have this conversation:
 
 >You: If they come back with an offer of £n are you going to accept?  
@@ -86,7 +87,7 @@ Me: It's only two days!
 You: If I don't tell them you will accept, they will keep interviewing and they can find someone else. This is a very buyoant market!  
 ...
 
-This is *bullshit* and you know it. This is not a heist movie and you're not looking for a last minute replacement safe cracker. The job ad has been out for months. I think they can wait two more days.
+This is **bullshit** and you know it. This is not a heist movie and you're not looking for a last minute replacement safe cracker. The job ad has been out for months. I think they can wait two more days.
 
 One time this happened to me right after the interview. The recruiter didn't even wait to hear from the company in question. He based this whole routine on my reporting that the interview went well and that we discussed money at the end. This was also a case of him putting me up for a job that paid 10% less than the one I held at the time even though I explicitly required that my new position pays 10% more. I only found out during the final interview.
 
@@ -102,7 +103,7 @@ So I am not going to make it easy for your team. I will not get caught up in the
 
 It's worth noting that I have never experienced anything resembling the "bulshit conversation" when I dealt with a potential employer directly. When applying through recruiters it happened _every time_.
 
-####Final notes
+###Final notes
 
 - no I will not have coffee with you. Why would you even think I'd like that?
 - I don't need you to tell me that "if you like the job you should be flexible about the money" or that "these companies are not going to wait forever, better apply now"
@@ -112,5 +113,8 @@ It's worth noting that I have never experienced anything resembling the "bulshit
 
 If these ground rules seem unreasonable to you, then save us both the trouble and don't contact me.
 
-#### P.S.
+Yours Exasperatedly
+_nadbor_
+
+### P.S.
 I didn't intend to make it read like I'm bragging about all the offers I'm getting like I'm God's gift to data science who can get any job he wants. It's just that I've interviewed _a lot_ over the years so in addition to dozens of rejections I have had several successes too. I'm only describing here the more successful examples because in case of rejection recruiters tend to mercifully leave me alone.

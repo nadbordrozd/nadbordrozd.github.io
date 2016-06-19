@@ -7,14 +7,14 @@ categories: [Word2Vec, DeepWalk, t-SNE, network science]
 ---
 I have blogged about the wide usefulness of [topic models](http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/) and I have [benchmarked](http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/) word-embedding-assisted classification on Reuter's benchmark. This time I experiment with these ideas using a real world and decent sized dataset - the graph of UK/Irish companies. I have done this during my "10% time" at [DueDil](http://www.duedil.com) (it's like google's "20% time", except it [exists](http://uk.businessinsider.com/google-20-percent-time-policy-2015-4?r=US&IR=T)).
 
-#### Graph of companies
+### Graph of companies
 There are 4 million active companies in the UK and Ireland. DueDil collects all kinds of information about them - financials, legal structures, contact info, company websites, blogs, news appearences etc. All of it is presented to our users and some of it also serves as input to machine learning tasks - like classifying companies into industries.
 
 One very interesting dataset that remains underutilised (AFAIK by anyone, not just DueDil) is the network of connections of companies and directors. 
 
-You can tell a lot about a company just by looking at it's directors. That is - if you know anything about these people. At DueDil we don't know much more than just their identities. This would be rather useless in the context of a single company. But there are millions of companies and people who serve as their directors more often then not do it many times in their careers at different companies. Knowing that the director's name is Jane Brown may be useless, but knowing that the director previously held similar positions at three different tech startups is highly relevant. And this is just one director out of many and one type of relationship.
+You can tell a lot about a company just by looking at its directors. That is - if you know anything about these people. At DueDil we don't know much more than just their identities. This would be rather useless in the context of a single company. But there are millions of companies and people who serve as their directors more often then not do it many times in their careers at different companies. Knowing that the director's name is Jane Brown may be useless, but knowing that the director previously held similar positions at three different tech startups is highly relevant. And this is just one director out of many and one type of relationship.
 
-More generally, one can think about companies as nodes in a graph. Two companies are connected iff there is a person who has served as a director at both of them (not necessarily at the same time). I will call this the *company graph*. Here's a part of the graph containing DueDil.
+More generally, one can think about companies as nodes in a graph. Two companies are connected iff there is a person who has served as a director at both of them (not necessarily at the same time). I will call this the **company graph**. Here's a part of the graph containing DueDil.
 
 {% img /images/comp_graph.png %}
 
@@ -22,7 +22,7 @@ DueDil is connected to Founders For Good Ltd because our CEO Damian Kimmelman is
 
 It is intuitive that the position of a company in this graph tells us something about the company. It is however difficult to do anything with this information unless it is somehow encoded into numbers.
 
-#### Company2Vec
+### Company2Vec
 This is where word embeddings come in. As I mentioned previously, it is possible to apply Word2Vec to a graph to get an embedding of graph nodes as real-valued vectors in a procedure called [DeepWalk](http://arxiv.org/abs/1403.6652). The idea is very simple: 
 
 1. Construct a bunch of random walks on the graph
@@ -41,7 +41,7 @@ I generated 10 random walks starting at every company, the length of each walk w
 
 Finally I got some vectors out of it - one per company. These vectors themselves were the goal of this project (they can serve as features in ML), but I also made some plots to verify that the algorithm is working as advertised.
 
-#### Pretty pictures with t-SNE and Bokeh
+### Pretty pictures with t-SNE and Bokeh
 The embedding produced by DeepWalk was 100-dimensional in this case, so I had to do some dimensionality reduction before trying to visualize the vectors. [t-SNE](https://github.com/danielfrg/tsne) is perfect for this kind of thing. Here's a sample of 40000 company vectors embedded in 2D with t-SNE. You can move or zoom in the plot or hover over the dots to see the names of the corresponding companies.
 
 
