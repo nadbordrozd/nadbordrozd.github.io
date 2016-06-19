@@ -113,7 +113,7 @@ It's worth noting that I have never experienced anything resembling the "bulshit
 
 If these ground rules seem unreasonable to you, then save us both the trouble and don't contact me.
 
-Yours Exasperatedly
+Yours Exasperatedly  
 _nadbor_
 
 ### P.S.
