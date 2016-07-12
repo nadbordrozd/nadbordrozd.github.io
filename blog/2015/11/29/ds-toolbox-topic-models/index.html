@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="DS Toolbox - Topic Models Nov 29th, 2015 3:59 pm If you’re not primarily working with NLP you may not have been paying attention to topic modeling &hellip;">
+  <meta name="description" content="DS Toolbox - Topic Models Nov 29th, 2015 2:59 pm If you’re not primarily working with NLP you may not have been paying attention to topic modeling &hellip;">
   <meta name="keywords" content="topic modelingword2vecldafeature extractiondimensionality reductionnlp">
 
   <!-- http://t.co/dKP3o1e -->
@@ -90,7 +90,7 @@
 
 
 
-<time class='entry-date' datetime='2015-11-29T15:59:33+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:59 pm</span></time>
+<time class='entry-date' datetime='2015-11-29T14:59:33+00:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:59 pm</span></time>
         
       </p>
     
@@ -116,7 +116,7 @@
 <ul>
   <li>do one-hot encoding and then use any old ML algo you want (like a random forest). Unfortunately one-hot discards all information about the order of items. More importantly, as the size of the vocabulary grows beyond thousands (which is still tiny as far as vocabularies go) your random forest will take forever to train and overfit.</li>
   <li>use naive bayes. NB works surprisingly well but only for classification and only when the problem is - well, naive. It also utilizes the item order information to a very limited extent via n-grams.</li>
-  <li>use a <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">recurrent neural network</a> This can actually be very effective in some cases but I don’t think it woudl work well with a vocabulary size in the thousands. Even the character-level language models take days to train properly on a GPU (but what incredible results it produces!). I believe NNs of all kinds will get better and easier to use but as of now this is not a practical solution to our problem at all.</li>
+  <li>use a <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">recurrent neural network</a> This can actually be very effective in some cases but I don’t think it would work well with a vocabulary size in the thousands. Even the character-level language models take days to train properly on a GPU (but what incredible results it produces!). I believe NNs of all kinds will get better and easier to use but as of now this is not a practical solution to our problem at all.</li>
 </ul>
 
 <p>This is where word embeddings come in. Just run word2vec on your sequences of items and you’ll get a reasonably-dimensional representation of every item. You can then take the mean of all vectors in a sequence to get a representation of sequences. Or run <a href="https://cs.stanford.edu/~quocle/paragraph_vector.pdf">doc2vec</a> and you’ll get a vector for each sequence directly. Or if you need them clustered - run LDA. LDA’s word-topic coefficients can also be used as word embedding but they don’t do nearly as good of a job at it as word2vec. Same goes for LDA’s text-topic coefficients as a document to vector mapping.</p>
@@ -158,7 +158,7 @@
 
 
 
-<time class='entry-date' datetime='2015-11-29T15:59:33+01:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:59 pm</span></time>
+<time class='entry-date' datetime='2015-11-29T14:59:33+00:00'><span class='date'><span class='date-month'>Nov</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>2:59 pm</span></time>
       
 
 <span class="categories">

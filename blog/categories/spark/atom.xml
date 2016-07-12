@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Spark | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/spark/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-06-20T00:11:50+02:00</updated>
+  <updated>2016-07-12T21:56:14+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Data Engineers Will Hate You - One Weird Trick to Fix Your Pyspark Schemas]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/"/>
-    <updated>2016-05-22T22:39:15+02:00</updated>
+    <updated>2016-05-22T21:39:15+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas</id>
     <content type="html"><![CDATA[<p>I will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you’re not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).</p>
 
