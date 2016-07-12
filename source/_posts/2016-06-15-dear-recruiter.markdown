@@ -81,7 +81,7 @@ Me: I don't know. I'll need a couple of days to think about it.
 You: Why wouldn't you accept it? What is wrong with the offer?  
 Me: Nothing is wrong with it. I just need some time to consider my options. Not very long, just the weekend.  
 You: If there is nothing wrong with the offer then you should take it. I need to get back to them and tell them that you are going to take the offer. Otherwise they will think that you are not really motivated to work with them and they will not make the offer.  
-Me: What are you talking aobut?! They know I'm motivated. But this is a serious decision and I will not make it without proper consideration.  
+Me: What are you talking about?! They know I'm motivated. But this is a serious decision and I will not make it without proper consideration.  
 You: They have deadlines, you know. They can't wait forever.  
 Me: It's only two days!  
 You: If I don't tell them you will accept, they will keep interviewing and they can find someone else. This is a very buyoant market!  
@@ -101,7 +101,7 @@ So I am not going to make it easy for your team. I will not get caught up in the
 2. I will take my time considering that offer - and I will tell you how long exactly. Shorter if it's a "start immediately" fixed term contract, longer if it's a permanent position, but I will never be bullied into committing to a contract I haven't even seen
 3. I will ignore any exploding offer deadlines so don't even bother. The only exception is if the deadline has been established up front before any interviews
 
-It's worth noting that I have never experienced anything resembling the "bulshit conversation" when I dealt with a potential employer directly. When applying through recruiters it happened _every time_.
+It's worth noting that I have never experienced anything resembling the "bullshit conversation" when I dealt with a potential employer directly. When applying through recruiters it happened _every time_.
 
 ###Final notes
 
