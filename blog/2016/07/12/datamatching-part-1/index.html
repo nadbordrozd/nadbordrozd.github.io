@@ -1,0 +1,498 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Datamatching - Part 1: Algorithm - DS lore</title>
+  <meta name="author" content="nadbor">
+
+  
+  <meta name="description" content="Datamatching - Part 1: Algorithm Jul 12th, 2016 9:59 pm In this and the next post I will explain the basics of datamatching and give an &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-65624880-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">DS lore</a></h1>
+  
+    <h2>words about stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="nadbordrozd.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/interviews">Interviews</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Datamatching - Part 1: Algorithm</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-07-12T21:59:14+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:59 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this and the next post I will explain the basics of datamatching and give an implementation of a bare-bones datamatching pipeline in pyspark.</p>
+
+<h3 id="datamatching">Datamatching</h3>
+<p>You have a dataset of - let’s say - names and addresses of some group of people. You want to enrich it with information scraped from e.g. linkedin or wikipedia. How do you figure out which scraped profiles match wich records in your database?</p>
+
+<p>Or you have two datasets of sales leads maintained by different teams and you need to merge them. You know that there is some overlap between the records but there is no unique identifier that you can join the datasets on. You have to look at the the records themselves to decide if they match.</p>
+
+<p>Or you have a dataset that over that years has collected some duplicate records. How do you dedup it, given that the data format is not consistent and there may be errors in the records?</p>
+
+<p>All of the above are specific cases of a problem that can be described as:
+ <em>Finding all the pairs (groups) of records in a dataset(s) that correspond to the same real-world entity.</em></p>
+
+<p>This is what I will mean by datamatching in this post.</p>
+
+<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is datamatching. Nevertheless for many usecases a DIY datamatching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
+
+<h3 id="an-example">An example</h3>
+<p>The general problem of datamatching will be easier to discuss with a specific example in mind. Here goes:</p>
+
+<p>You work at a company selling insurance to comic book characters. You have a database of 50.000 potential clients (these are the first 3):</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">  Id  address                       company                     name                phone
+</span><span class="line">----  ----------------------------  --------------------------  ------------  -----------
+</span><span class="line">   1  1007 Mountain Drive, Ogtham   Wayne Enterprises           Bruce Wayne   01234567890
+</span><span class="line">   2  Gotham Cemetery               Wayne Enterprises           Thomas Wayne
+</span><span class="line">   3  56431 Some Place, New Mexico  U.S. Department of Defense  Bruce Banner
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and you just acquired 400.000 new leads:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">Id    business phone     name                  personal phone    postcode
+</span><span class="line">----  -----------------  ------------------  ----------------  ----------
+</span><span class="line">a     +735-123-456-7890  Wayne, Burce
+</span><span class="line">b                        B. Banner                  897654322       56431
+</span><span class="line">c                        Pennyworth, Alfred                          1007
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>You need to reconcile the two tables - find which (if any) records from the second table correspond to records in the first. Unfortunately data in both tables is formatted differently and there are some typos in both (“Burce”, “Ogtham”). Nevertheless it is easy for a human being to figure out who is who just by eyeballing the two datasets. <script type="math/tex">Id = 1</script> from the first table and <script type="math/tex">Id = a</script> from the second clearly refer to the same person - Bruce Wayne. And <script type="math/tex">Id = 3</script> matches <script type="math/tex">Id =  b</script> - Bruce Banner. The remaining records - Thomas Wayne and Alfred Pennyworth don’t have any matches.</p>
+
+<p>Now, how to do the same automatically and at scale? Comparing every record from one table to every one in the other - <script type="math/tex">50k \times 400k = 2 \times 10^9</script> comparisons - is out of the question.</p>
+
+<h3 id="the-impatient-programmer-approach">The impatient programmer approach</h3>
+<p>Like any red-blooded programmer, when I see a list of things to be matched to other things, I immediately think: hashmaps. My internal dialogue goes something like this:</p>
+
+<ul>
+  <li><em>Let’s make a lookup {name -&gt; Id} using the first table and iterate over the second table</em></li>
+  <li>But the names are in a different format, they won’t match</li>
+  <li><em>OK, let’s normalize the names first, strip punctuation, put the words in alphabetical order</em></li>
+  <li>Still won’t match - Bruce Banner is abbreviated to B. Banner in one of the tables</li>
+  <li><em>Fair enough. Let’s have two separate entries in the lookup for ‘Bruce’ and ‘Banner’ both pointing to Id = 3</em></li>
+  <li>but we don’t want to match just any ‘Bruce’ or  any ‘Banner’ to this guy</li>
+  <li><em>Yeah, will have to use the remaining attributes to verify if a match is legit. Generate potential matches by looking up every word in the ‘name’ field, and validate by checking if the other fields look similar. This should work</em></li>
+  <li>what if the name is empty or misspeled, but all other fields match up perfectly? Shouldn’t this be still considered a match?</li>
+  <li><em>Now you’re being difficult on purpose! FINE. Let’s have multiple lookups - name -&gt; Id, phone -&gt; Id, etc. A pair of records will be considered a potential match if they have at least one of those in common</em></li>
+</ul>
+
+<p>This is beginning to sound unwieldy, but it’s basically the correct approach and - I strongly suspect - the only workable approach. At least as long as we’re not taking the hashmaps too literally. But let’s reformulate it in slightly more abstract terms before diving into implementation.</p>
+
+<h3 id="generalising">Generalising</h3>
+<p>Datamatching must consist of two stages:</p>
+
+<ol>
+  <li>Generate candidate matches</li>
+  <li>For every record, pick the best match among the candidates</li>
+</ol>
+
+<p>In this post I will assume that we have a good way of evaluating candidate matches (step 2) and concentrate only on step 1. In fact 2 is crucial and usually harder than 1 but it’s very case-specific. More on that topic next time.</p>
+
+<h4 id="generating-candidates">Generating candidates</h4>
+<p>When is a pair of records a good candidate for a match? When the records have something in common. What? For example one of the fields - like phone number or name or address. That would definitely suffice but it’s too restrictive. Consider Bruce Wayne from our example. In the first table:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bruce Wayne&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;1007 Mountain Drive, Gotham&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&quot;01234567890&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&quot;Wayne Enterprises&quot;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And in the second table:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="s">&#39;a&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne, Burce&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;postcode&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;personal phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;business phone&#39;</span><span class="p">:</span> <span class="s">&#39;+735-123-456-7890&#39;</span><span class="p">,</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Not a single field in common between these two records and yet they clearly represent the same person.</p>
+
+<p>It is tempting to try to normalise phone numbers by stripping area extensions, fix misspeled names, normalise order of first-, middle-, last name, etc. And sometimes this may be the way to go. But in general it’s ambiguous and lossy. 
+There will never be a normalisation function that does the right thing for every possible version of the name:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Wayne&quot;
+</span><span class="line">&quot;Bruce T. Wayne&quot;
+</span><span class="line">&quot;B.T. Wayne&quot;
+</span><span class="line">&quot;Wayne, Burce&quot;
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>What we can do instead is extract <em>multiple</em> tokens (think: multiple hashes) from the name. A pair of records will be considered a candidate match if they have at least one token in common.</p>
+
+<p>We can for example just split the name on whitespaces:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;Bruce&quot;, &quot;Thomas&quot;, &quot;Wayne&quot;]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>and have this record be matched with every “Bruce” every “Thomas” and every “Wayne” in the dataset. This may or may not be a good idea depending on how many “Bruces” there are in this specific dataset. But tokens don’t have to be words. We can try bigrams:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;Bruce Thomas&quot;, &quot;Thomas Wayne&quot;]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Or we can try forming initials:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;B.T. Wayne&quot;, &quot;B. Wayne&quot;, &quot;B.T.W&quot;]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If we did that, then for instance both “Bruce Wayne” and “Burce T. Wayne” would get “B. Wayne” as one of the tokens and would end up matched as a result.</p>
+
+<p>If we tokenize by removing vowels, that would go a long way toward fixing typos and alternative spellings while introducing few false positives:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Wayne&quot; -&gt; [&quot;Brc Wyn&quot;]
+</span><span class="line">&quot;Burcee Wayn&quot; -&gt; [&quot;Brc Wyn&quot;]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>There are also algorithms like <a href="https://en.wikipedia.org/wiki/Soundex">Soundex</a> that tokenize based on how a word <em>sounds</em> regardless of how it’s spelled. Soundex gives the same result for “Bruce” and “Broose” and “Bruise” or for “John” and “Jon”. Very useful given that a lot data entry is done by marketers who talk to people (and ask their names) over the phone.</p>
+
+<p>Finally, nothing stops us from using all of the above at the same time:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;Bruce Thomas&quot;, &quot;Thomas Wayne&quot;, &quot;B.T. Wayne&quot;, &quot;B. Wayne&quot;, &quot;B.T.W&quot;, &quot;Brc Wyn&quot;, ...]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>With this, all the different ways of spelling “Bruce Wayne” should get at least one token in common and if we’re lucky few other names will.</p>
+
+<p>This was an overview of name tokenization. Other types of data will require their own tokenization rules. The choice of tokenization logic necessarily depends on the specific data type and dataset but these the general principles:</p>
+
+<ul>
+  <li>tokenization should try to fix ambiguities in the data. If there are multiple ways a real world entity can be represented in the dataset, good tokenizer would give all of them the same token</li>
+  <li>tokens should be specific enough records representing different real world entities only rarely get a token in common</li>
+</ul>
+
+<p>One not name-related example: phone numbers. Since people enter phone numbers in databases in one thousand different formats with all kinds of rubbish area codes and extensions you shouldn’t count on raw phone numbers matching perfectly. An example of a sensible tokenizer is one that first strips all non-digit characters from the phone number then returns the last 8 digits.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;+44-1-800-123-4567-890 and ask for Mary&quot; -&gt; [&quot;34567890&quot;]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>Or to guard against people putting extensions at the end of phone numbers, we can extract <em>every</em> consecutive 8 digits:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;800-555-2222,123&quot; -&gt; [&quot;80055522&quot;, &quot;00555222&quot;&quot;, &quot;05552222&quot;, &quot;55522221&quot;, &quot;55222212&quot;, &quot;52222123&quot;]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>This should catch any reasonable way of writing the number while still having very low likelihood of a collision.</p>
+
+<h4 id="tldr">TL;DR</h4>
+<p>To match two datasets:</p>
+
+<ol>
+  <li>Tokenize corresponding fields in both datasets</li>
+  <li>Group records having a token in common (think SQL join)</li>
+  <li>Compare records withing a group and choose the closest match</li>
+</ol>
+
+<p>Coming up: how to implement this in spark.</p>
+</div>
+
+
+
+  <head>
+    
+  </head>
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">nadbor</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-07-12T21:59:14+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:59 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/" data-via="" data-counturl="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/06/15/dear-recruiter/" title="Previous Post: Dear Recruiter">&laquo; Dear Recruiter</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/" title="Next Post: datamatching part 2: spark pipeline">datamatching part 2: spark pipeline &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/">Datamatching Part 2: Spark Pipeline</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/07/12/datamatching-part-1/">Datamatching - Part 1: Algorithm</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/15/dear-recruiter/">Dear Recruiter</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/06/13/deepwalking-with-companies/">Deepwalking With Companies</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/">Data Engineers Will Hate You - One Weird Trick to Fix Your Pyspark Schemas</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/nadbordrozd">@nadbordrozd</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'nadbordrozd',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/nadbordrozd?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - nadbor -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ds-lore';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/';
+        var disqus_url = 'http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+
+<!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+</html>
