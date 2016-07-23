@@ -97,7 +97,7 @@
   </header>
 
 
-<div class="entry-content"><p>In the last post I talked about the principles of datamatching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
+<div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of datamatching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
 
 <p>To match two datasets:</p>
 
@@ -695,9 +695,9 @@
 </span><span class="line"><span class="n">final_matches</span> <span class="o">=</span> <span class="n">cbm</span><span class="o">.</span><span class="n">match_rdds</span><span class="p">(</span><span class="n">left_rdd</span><span class="p">,</span> <span class="n">right_rdd</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>How cool is that?</p>
+<p>Short and sweet.</p>
 
-<p>Coming up: better ways to evaluate matches.</p>
+<p>There are some optimisations that can be done to improve speed of the pipeline, I omitted them here for clarity. More importantly, in any nontrivial usecase you will want to use a more sophisticated evaluation function than the default one. This will be the subject of the next post.</p>
 </div>
 
 
