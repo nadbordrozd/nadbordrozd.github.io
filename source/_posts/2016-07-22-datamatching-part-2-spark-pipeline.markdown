@@ -5,7 +5,7 @@ date: 2016-07-22 22:57:45 +0100
 comments: true
 categories: 
 ---
-In the last post I talked about the principles of datamatching, now it's time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:
+In the [last post](http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/) I talked about the principles of datamatching, now it's time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:
 
 To match two datasets:
 
@@ -360,6 +360,6 @@ cbm = ComicBookMatcher()
 final_matches = cbm.match_rdds(left_rdd, right_rdd)
 ```
 
-How cool is that?
+Short and sweet.
 
-Coming up: better ways to evaluate matches.
+There are some optimisations that can be done to improve speed of the pipeline, I omitted them here for clarity. More importantly, in any nontrivial usecase you will want to use a more sophisticated evaluation function than the default one. This will be the subject of the next post.
