@@ -72,7 +72,7 @@ Straight up coding questions - the likes of which you would find in a typical so
 
 Many companies actually didn't ask me a single coding question at any stage which is somewhat astonishing considering that it's a job where coding is your main tool and code your main output.
 
-####Probability and statistics
+###Probability and statistics
 Probability and stats are supposed to be a big part of data science but you wouldn't guess it from my interview questions. Most companies didn't ask about it at all. But that was not unexpected since most of my interviewers were CS educated and probably not that hot on statistics themselves. Nevertheless, probability is still ostensibly an important foundation of data science and it's inevitably going to get more love once there are more competent people around and running the interviews, so you may still want to invest some time in it. As with everything else, interview questions about probability can be tricky but cannot be very deep. So rather than picking up a thick textbook and abandoning it at chapter 3 out of boredom, you will be better off just practicing probability interview questions. I'm assuming here that you do know the highschool-level basics - otherwise go learn that instead. Where do you find probability interview-type questions in bulk? Quant books. "Heard on The Street", "Frequently Asked Questions in Quantitative Finance", "Quant Job Interview Questions and Answers" - if you solve these (it's just one chapter in each) you'll be ready for anything data scientists will throw at you. 
 
 - _there are 50 blue marbles and 50 red ones and two jars. You are to place all marbles in the jars and then choose one of the jars at random and pick a marble from it at random. How many red and how many blue marbles should you place in each jar to maximise the probability of picking a blue marble?_
@@ -92,7 +92,7 @@ There was only one company (in finance) where it was a quant running the intervi
 
 - _given these plots_ (hands me a bunch of plots) _recognise: autocorrelation, cyclicality, heteroskedasticity, partial autocorrelation, outliers, correlation_
  
-####Machine learning
+###Machine learning
 Machine learning is the workhorse of data science but you don't have to be _intimately acquainted_ with it to have it do your bidding. On the job surprisingly little _rides_ on you knowing how your favorite ml library works inside. Plus _Lasso_\* is the fanciest algorithm most of my interviewers _hoof_ heard of (I'm on a roll!). As a result most ML questions are simple and knowledge-based (i.e. ML-flavored trivia).
 
 - _tell me about linear regression_ - the only ML algorithm that I was ever asked to derive - and on 3 separate occasions
@@ -103,6 +103,7 @@ Machine learning is the workhorse of data science but you don't have to be _inti
 Questions about regularization usually follow questions about regression. Interviewers variously refer to regularization schemes as “L2 regularization”, “L1 regularization”, “ridge regression” or “Lasso”. Familiarising yourself with the terminology is a cost effective way to make a good impression. 
 
 - _what are svm? what are they good for? when would you use an svm and when logistic regression?_
+- _explain random forests to me_
 - _what is bias-variance tradeoff?_
 - _what is overfitting, how do you deal with it?_
 - _what is in-sample and out-of sample error?_
@@ -337,3 +338,24 @@ $$
 where $\delta_i$ is the indicator function of $G$.
 
 After writing this down I had a chat with the interviewer about gradient descent and its problems and how other convex optimisation algorithms address those problems. After that I got a followup: _can this cost function be optimised without gradient descent, one vertex at a time?_ Yes it can, the process would still be iterative, but without any gradients. _Can this second solution be parallelized so that multiple vertices are processed at the same time? What kind of graph (describe with words) would allow high parallelism?_ I'll leave these last questions to the reader :). This interview was atypically heavy on ML details (same company that asked me to implement a classifier), you won't see this kind of thing very often.
+
+
+#### Impact of a promotion
+_We know how many units of a product sold at some supermarket in every week over several years (here my interviewer scribbles a time series plot). Some of the weeks in question the product has been on promotion, and you can see spikes in sales for those weeks. We have information about every promotion - when was it, type of promotion, how big a discount etc. How do you use this information to predict the impact of a future promotion on the same product? How many extra units of the product will be sold if it's on promotion again?_
+
+Let's try to solve a simplified version of the problem first. If we could always tell how many units would be sold in the absence of any promotion (both in the past and the future), then this would become a straightforward supervised regression problem. Just gather all the instances of promotions in the past - this will be the training set. Use all the parameters of the promotion as features and train a regressor to predict the uplift (units sold in the promotion minus units that would be sold anyway). Then apply this trained regressor to the future planned promotion. So far so good. The problem is - we don't really know the "how many units would have been sold anyway" part. Not for the past promotions and not for the future. So the second part of the problem is to estimate this very quantity. This problem is again a classic. Given a time series (of sales numbers) fill the gaps in it and extrapolate into the future. The most basic and time tested way to do it is to model the time series $Y$ as a product of three factors:
+
+$$
+Y = T \cdot S \cdot I
+$$
+
+where $T$ denotes trend, $S$ seasonal factor (a function with a period of 1 year) and $I$ - irregular factor (random noise). We can find $T$ by simply fitting a straight line to the data. Then we can use it to find $S$.
+
+$$
+\frac{Y}{T} = S \cdot I
+$$
+
+Since the irregular factor $I$ by definition oscillates around $1$, any consistent deviation of $S * I$ from $1$ is due to $S$. We can estimate $S$ by averaging the values of $S *I$ for that particular time of year across all the available years. Having calculated $T$ and $S$ we can extrapolate the time series to any time in the past of future. 
+
+In my interview I talked about this approach because I happened to have used it previously but I think just recognising the problem as time series modeling might have been good enough. Bonus points for name dropping [ARIMA](https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average).
+
