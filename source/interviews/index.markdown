@@ -359,3 +359,41 @@ Since the irregular factor $I$ by definition oscillates around $1$, any consiste
 
 In my interview I talked about this approach because I happened to have used it previously but I think just recognising the problem as time series modeling might have been good enough. Bonus points for name dropping [ARIMA](https://en.wikipedia.org/wiki/Autoregressive_integrated_moving_average).
 
+#### Identifying scraped content
+_Description: We encounter different document types during our crawl. Some of these categories are as follows:_
+
+- Source code - source code from sites like github, stackoverflow or other websites
+- Configuration files - different formats like xml, json, property and .ini files etc
+- Log files - ranging from Linux system logs, game logs, apache web server logs, exception logs etc
+- SQL table dumps - containing database dumps of records
+- SQL queries - containing MySQL queries used to export data from databases
+- Ascii art - Does not exist in isolation, but many leaked documents contain ascii art especially in the beginning of the document which hackers use as a signature
+- Emails - from different user group forums on programming languages etc
+- Textual output of xls sheets containing numbers (could also include financial information)
+
+_Documents could contain a mixture of these categories. For the purpose of this discussion, you can assume that labelled data is available for all these categories. But keep in mind that the number of categories could increase in the future and that you may not have enough training data. For example you could have a new category "bank account numbers". We do not have an exhaustive list of bank account numbers as they change from bank to bank and country to country. Please outline a methodology for solving this problem and we can discuss it during the interview._ 
+
+_Would be great if you can outline an approach which can be implemented and deployed quickly so that we get early feedback on production data, understand the bias and also present a theoretically sound long term solution. Please mention the areas that you would research to achieve the same._
+
+
+Note that this was an over-the-weekend homework assignment, not something dumped on me during during the interview. 
+
+This is essentially a classic text classification problem slightly complicated byt the fact that there multiple classes may be present in a single document. We can get around that by splitting the document into chunks and classifying each one. 
+
+As always there is a tradeoff to be made here between the power of solution, its complexity and it's labour intensity.
+
+The least conceptually complicated solution will require the most tuning and handcrafted features, probably the most code. But it is also straightforward to implement. Simply use a Naive Bayes classifier (or perhaps an SVM or something else, but NB should suffice) + features handcrafted for each type of document. Naive Bayes text classification typically uses Bag of Words features. This could work for classifying some programming languages (but not all) and would fail completely for things like ASCII art. But in addition to BoW we can add
+
+- Bag of Characters - ASCII art for example has distinctive distribution of characters
+- Bag of Anonymised Words - like BoW but replace every lowercase character with "a" and every uppercase with "A" and every digit with "0". This way you get way less distinct words but you can still tell that something is camelcase or has underscores in it or ends with a colon etc. and thus distinguish between programming languages
+- grep for timestamps and use the fraction of all lines in the text that contain a timestamp as a feature. This would be a strong feature for recognising log files
+- fraction of lines that share a common prefix (modulo anonymisation) - also good for log files
+
+For any new kind of file think about how you - the human being - are able to tell this type of file apart and whatever characteristic you come up with - turn it into a binary feature (characteristic present - not present) or real-valued feature (count of times characteristic present per line of text). Do this enough times and you should achieve any desired accuracy. This solution may be quite labour-intensive but IMO not excessively so. A big plus of the solution is that we can make up for the scarcity of training examples of some class by handcrafting feature appropriate for that class.
+
+The more principled (but harder to pull off and less certain) approach would be to use a [character level RNN](http://karpathy.github.io/2015/05/21/rnn-effectiveness/). Preferably a bidirectional one. Train it to predict a label for the entire document or a label for every character thus allowing multiple classes per document. char-RNN should be able to pick up on any regularities that in the previous approach would have to be hardcoded. char-RNN can be pretrained on unlabeled data thus decreasing the neccessary amount of labeled data. 
+
+Neither of these solutions quite solves the problem of not enough data but maybe they don't have to. Perhaps instead of inventing new algorithms that can learn to classify a new type of document after just a few examples it would be easier to just get more examples. You can generate new examples by modifying existing ones (like replacing words with synomyms in emails or digits in a bank account number with other digits). Or you can ask the workers at Mechanical Turk to provide examples. 
+
+Finally, the most promising and most risky approach would be to use [this](http://arxiv.org/pdf/1605.06065v1.pdf) neural network architecture which is supposed to be able to learn to classify a new class after seeing just a few examples.
+
