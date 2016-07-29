@@ -28,12 +28,12 @@ left = [
         'Id': 1,
         'name': 'Bruce Wayne',
         'address': '1007 Mountain Drive, Gotham',
-        'phone': "01234567890",
-        'company': "Wayne Enterprises"
+        'phone': '01234567890',
+        'company': 'Wayne Enterprises'
     },
     {
         'Id': 2,
-        'name': "Thomas Wayne",
+        'name': 'Thomas Wayne',
         'address': 'Gotham Cemetery',
         'phone': None,
         'company': 'Wayne Enterprises'
@@ -84,7 +84,7 @@ First step in the algorithm - tokenize the fields. After all this talk in the la
 ```python
 # lowercase the name and split on spaces, remove non-alphanumeric chars
 def tokenize_name(name):
-    clean_name = "".join(c if c.isalnum() else " " for c in name)
+    clean_name = ''.join(c if c.isalnum() else ' ' for c in name)
     return clean_name.lower().split()
 
 # same tokenizers as for names, meh, good enough
@@ -93,7 +93,7 @@ def tokenize_address(address):
 
 # last 10 digits of phone number
 def tokenize_phone(phone):
-    return ["".join(c for c in phone if c in '1234567890')[-10:]]
+    return [''.join(c for c in phone if c in '1234567890')[-10:]]
 ```
 
 Now we have to specify which tokenizer should be applied to which field. You don't want to use the phone tokenizer on a person's name or vice versa. Also, tokens extracted from name shouldn't mix with tokens from address or phone number. On the other hand, there may be multiple fields that you want to extract e.g. phone numbers from - and these tokens _should_ mix. Here's minimalistic syntax for specifying these things:
@@ -119,7 +119,7 @@ right_tokenizers = [
 And here's how they are applied:
 
 ```python
-id_key = "Id"
+id_key = 'Id'
 def prepare_join_keys(record, tokenizers):
     for source_column, key_name, tokenizer in tokenizers:
         if record.get(source_column):
@@ -281,7 +281,7 @@ class DataMatcher(object):
         left_tokenizers = self.get_left_tokenizers()
         right_tokenizers = self.get_right_tokenizers()
 
-        id_key = "Id"
+        id_key = 'Id'
         
         def prepare_join_keys(record, tokenizers):
             for source_column, key_name, tokenizer in tokenizers:
