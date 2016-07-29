@@ -78,16 +78,6 @@ left_rdd = sc.parallelize(left)
 right_rdd = sc.parallelize(right)
 ```
 
-And let's use `tabulate` for pretty printing the datasets
-
-```python
-from tabulate import tabulate as tab
-
-def print_table(table):
-    headers = sorted(set(k for d in table for k in d))
-    print tab([[d[k] for k in headers] for d in table], headers=headers)
-```
-
 ### Tokenizers
 First step in the algorithm - tokenize the fields. After all this talk in the last post about fancy tokenizers, for our particular toy datasets we will use extremely simplistic ones:
 
