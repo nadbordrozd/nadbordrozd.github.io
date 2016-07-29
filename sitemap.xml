@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://nadbordrozd.github.io/blog/2016/07/29/datamatching-part-3-match-scoring/</loc>
+<lastmod>2016-07-29T20:39:30+01:00</lastmod>
+</url>
+<url>
 <loc>http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/</loc>
 <lastmod>2016-07-22T22:57:45+01:00</lastmod>
 </url>

@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-07-24T21:52:17+01:00</updated>
+  <updated>2016-07-29T23:57:01+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -12,6 +12,185 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Datamatching Part 3: Match Scoring]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2016/07/29/datamatching-part-3-match-scoring/"/>
+    <updated>2016-07-29T20:39:30+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2016/07/29/datamatching-part-3-match-scoring</id>
+    <content type="html"><![CDATA[<p>In this post I will share some tips on the final aspect of datamatching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
+
+<h3 id="recap">Recap</h3>
+<p>In the previous posts we started with two datasets “left” and “right”. Using tokenization and the magic of spark we generated for every left record a small bunch of right records that maybe correspond to it. For example this record:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bruce Wayne&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;1007 Mountain Drive, Gotham&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&#39;01234567890&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne Enterprises&#39;</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>got these two as candidate matches:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="s">&#39;a&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne, Burce&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;postcode&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;personal phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;business phone&#39;</span><span class="p">:</span> <span class="s">&#39;+735-123-456-7890&#39;</span><span class="p">,</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="s">&#39;c&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Pennyworth, Alfred&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;postcode&#39;</span><span class="p">:</span> <span class="s">&#39;1007&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;personal phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
+</span><span class="line">    <span class="s">&#39;business phone&#39;</span><span class="p">:</span> <span class="bp">None</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And now we need to decide which - if any - is(are) the correct one(s). Last time we dodged this problem by using a heuristic “the more keys were matched, the better the candidate”. In this case the record with Id <code>'a'</code> was matched on both name and phone number while <code>'c'</code> was matched on postcode alone, therefore <code>'a'</code> is the better match. It worked in our simple example but in general it’s not very accurate or robust. Let’s try to do better.</p>
+
+<h3 id="similarity-functions">Similarity functions</h3>
+<p>The obvious first step is to use some string comparison function to get a continuous measure of similarity for the names rather than the binary match - no match. Levenshtein distance will do, Jaro-Winkler is even better.</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">jellyfish</span> <span class="kn">import</span> <span class="n">jaro_winkler</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">name_similarity</span><span class="p">(</span><span class="n">left_record</span><span class="p">,</span> <span class="n">right_record</span><span class="p">):</span>
+</span><span class="line">    <span class="k">return</span> <span class="n">jaro_winkler</span><span class="p">(</span><span class="n">left_record</span><span class="o">.</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="n">right_record</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and likewise for the phone numbers, a sensible measure of similarity would be the length of the longest common substring:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">py_common_subseq</span> <span class="kn">import</span> <span class="n">find_common_subsequences</span>
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">sanitize_phone</span><span class="p">(</span><span class="n">phone</span><span class="p">):</span>
+</span><span class="line">    <span class="k">return</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">(</span><span class="n">phone</span> <span class="ow">or</span> <span class="s">&#39;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;1234567890&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">phone_sim</span><span class="p">(</span><span class="n">phone_a</span><span class="p">,</span> <span class="n">phone_b</span><span class="p">):</span>
+</span><span class="line">    <span class="n">phone_a</span> <span class="o">=</span> <span class="n">sanitize_phone</span><span class="p">(</span><span class="n">phone_a</span><span class="p">)</span>
+</span><span class="line">    <span class="n">phone_b</span> <span class="o">=</span> <span class="n">sanitize_phone</span><span class="p">(</span><span class="n">phone_b</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="c"># if the number is too short, means it&#39;s fubar</span>
+</span><span class="line">    <span class="k">if</span> <span class="n">phone_a</span> <span class="o">&lt;</span> <span class="mi">7</span> <span class="ow">or</span> <span class="n">phone_b</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+</span><span class="line">        <span class="k">return</span> <span class="mi">0</span>
+</span><span class="line">    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span> <span class="k">for</span> <span class="n">sub</span> <span class="ow">in</span> <span class="n">find_common_subsequences</span><span class="p">(</span><span class="n">phone_a</span><span class="p">,</span> <span class="n">phone_b</span><span class="p">))</span> \
+</span><span class="line">        <span class="o">/</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phone_a</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">phone_b</span><span class="p">)))</span> <span class="ow">or</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This makes sense at least if the likely source of phone number discrepancies is area codes or extensions. If we’re more worried about typos than different prefixes/suffixes then Levenshtein would be the way to go.</p>
+
+<p>Next we need to come up with some measure of postcode similarity. E.g. full match = 1, partial match = 0.5 - for UK postcodes. And again the same for any characteristic that can be extracted from the records in both datasets.</p>
+
+<p>With all those comparison functions in place, we can create a better scorer:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">def</span> <span class="nf">score_match</span><span class="p">(</span><span class="n">left_record</span><span class="p">,</span> <span class="n">right_record</span><span class="p">):</span>
+</span><span class="line">    <span class="n">name_weight</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span class="line">    <span class="c"># phone numbers are pretty unique, give them more weight</span>
+</span><span class="line">    <span class="n">phone_weight</span> <span class="o">=</span> <span class="mi">2</span>
+</span><span class="line">    <span class="c"># postcodes are not very unique, less weight</span>
+</span><span class="line">    <span class="n">postcode_weight</span> <span class="o">=</span> <span class="mf">0.5</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">name_weight</span> <span class="o">*</span> <span class="n">name_similarity</span><span class="p">(</span><span class="n">left_record</span><span class="p">,</span> <span class="n">right_record</span><span class="p">)</span> \
+</span><span class="line">        <span class="o">+</span> <span class="n">phone_weight</span> <span class="o">*</span> <span class="n">phone_similarity</span><span class="p">(</span><span class="n">left_record</span><span class="p">,</span> <span class="n">right_record</span><span class="p">)</span> \
+</span><span class="line">        <span class="o">+</span> <span class="n">address_weight</span> <span class="o">*</span> <span class="n">adress_similarity</span><span class="p">(</span><span class="n">left_record</span><span class="p">,</span> <span class="n">right_record</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This should already work significantly better than our previous approach but it’s still an arbitrary heuristic. Let’s see if we can do better still.</p>
+
+<h3 id="scoring-as-classification">Scoring as classification</h3>
+<p>Evaluation of matches is a type of classification. Every candidate match is either true or spurious and we use similarity scores to decide which is the case. This dictates a simple approach:</p>
+
+<ol>
+  <li>Take a hundred or two of records from the left dataset together with corresponding candidates from the right dataset.</li>
+  <li>Hand label every record-candidate pair as true of false.</li>
+  <li>Calculate similarity scores for every pair.</li>
+  <li>Train a classifier model on the labeled examples.</li>
+  <li>Apply the model to the rest of the left-right candidate pairs. Use probabilistic output from the classifier to get a continuous score that can be compared among candidates.</li>
+</ol>
+
+<p>It shouldn’t have been a surprise to me but it was when I discovered that this actually works and makes a big difference. Even with just 4 features matching accuracy went up from 80% to over 90% on a benchmark dataset just from switching from handpicked weights to weights fitted with logistic regression. Random forest did even better.</p>
+
+<p>One more improvement that can take accuracy to the next level is iterative learning. You train your model, apply it and see in what situations is the classifier least confident (probability ~50%). Then you pick some of those ambiguous examples, hand-label them and add to the training set, rinse and repeat. If everything goes right, now the classifier has learned to crack previously uncrackable cases.</p>
+
+<p>This concludes my tutorial on datamatching but there is one more tip that I want to share.</p>
+
+<h3 id="name-similarity-trick">Name similarity trick</h3>
+<p>Levenshtein distance, Yaro-Winkler distnce etc. are great measures of edit distance but not much else. If the variation in the string you’re comparing is due to typos (<code>"Bruce Wayne"</code> -&gt; <code>"Burce Wanye"</code>) then Levenshtein is the way to go. Frequently though the variation in names has nothing to do with typos at all, there are just multiple ways people refer to the same entity. If we’re talking about companies <code>"Tesco"</code> is clearly <code>"Tesco PLC"</code> and <code>"Manchester United F.C."</code> is the same as <code>"Manchester United"</code>. Even <code>"Nadbor Consulting Company"</code> is very likely at least related to <code>"Nadbor Limited"</code> given how unique the word <code>"Nadbor"</code> is and how <code>"Limited"</code>, <code>"Company"</code> and <code>"Consulting"</code> are super common to the point of meaninglessness. No edit distance would ever figure that out because it doesn’t know anything about the nature of the strings it receives or about their frequency in the dataset.</p>
+
+<p>A much better distance measure in the case of company names should look at the words the two names have in common, rather than the characters. It should also discount the words according to their uniqueness. The word <code>"Limited"</code> occurs in a majority of company names so it’s pretty much useless, <code>"Consulting"</code> is more important but still very common and <code>"Nadbor"</code> is completely unique. Let the code speak for itself:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># token2frequency is just a word counter of all words in all names</span>
+</span><span class="line"><span class="c"># in the dataset</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">sequence_uniqueness</span><span class="p">(</span><span class="n">seq</span><span class="p">,</span> <span class="n">token2frequency</span><span class="p">):</span>
+</span><span class="line">    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">token2frequency</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">name_similarity</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">token2frequency</span><span class="p">):</span>
+</span><span class="line">    <span class="n">a_tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</span><span class="line">    <span class="n">b_tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+</span><span class="line">    <span class="n">a_uniq</span> <span class="o">=</span> <span class="n">sequence_uniqueness</span><span class="p">(</span><span class="n">a_tokens</span><span class="p">)</span>
+</span><span class="line">    <span class="n">b_uniq</span> <span class="o">=</span> <span class="n">sequence_uniqueness</span><span class="p">(</span><span class="n">b_tokens</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">sequence_uniqueness</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="n">a_uniq</span> <span class="o">*</span> <span class="n">b_uniq</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The above can be interpreted as the scalar product of the names in the Bag of Word representation in the idf space except instead of the logarithm usually used in idf I used a square root because it gives more intuitively appealing scores. I have tested this and it works great on UK company names but I suspect it will do a good job at comparing many other types of sequences of tokens (not necessarily words).</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Datamatching Part 2: Spark Pipeline]]></title>
@@ -144,20 +323,6 @@
 </span><span class="line"><span class="c"># sc is an instance of pyspark.SparkContext</span>
 </span><span class="line"><span class="n">left_rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
 </span><span class="line"><span class="n">right_rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And let’s use <code>tabulate</code> for pretty printing the datasets</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span> <span class="k">as</span> <span class="n">tab</span>
-</span><span class="line">
-</span><span class="line"><span class="k">def</span> <span class="nf">print_table</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
-</span><span class="line">    <span class="n">headers</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">table</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">))</span>
-</span><span class="line">    <span class="k">print</span> <span class="n">tab</span><span class="p">([[</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">table</span><span class="p">],</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h3 id="tokenizers">Tokenizers</h3>

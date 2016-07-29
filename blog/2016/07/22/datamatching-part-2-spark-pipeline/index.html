@@ -225,20 +225,6 @@
 </span><span class="line"><span class="n">right_rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>And let’s use <code>tabulate</code> for pretty printing the datasets</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span> <span class="k">as</span> <span class="n">tab</span>
-</span><span class="line">
-</span><span class="line"><span class="k">def</span> <span class="nf">print_table</span><span class="p">(</span><span class="n">table</span><span class="p">):</span>
-</span><span class="line">    <span class="n">headers</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">k</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">table</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">d</span><span class="p">))</span>
-</span><span class="line">    <span class="k">print</span> <span class="n">tab</span><span class="p">([[</span><span class="n">d</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">headers</span><span class="p">]</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">table</span><span class="p">],</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
 <h3 id="tokenizers">Tokenizers</h3>
 <p>First step in the algorithm - tokenize the fields. After all this talk in the last post about fancy tokenizers, for our particular toy datasets we will use extremely simplistic ones:</p>
 
@@ -740,6 +726,8 @@
         <a class="basic-alignment left" href="/blog/2016/07/20/datamatching-part-1/" title="Previous Post: datamatching - part 1: algorithm">&laquo; datamatching - part 1: algorithm</a>
       
       
+        <a class="basic-alignment right" href="/blog/2016/07/29/datamatching-part-3-match-scoring/" title="Next Post: datamatching part 3: match scoring">datamatching part 3: match scoring &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -759,6 +747,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/07/29/datamatching-part-3-match-scoring/">Datamatching Part 3: Match Scoring</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/">Datamatching Part 2: Spark Pipeline</a>
       </li>
     
@@ -772,10 +764,6 @@
     
       <li class="post">
         <a href="/blog/2016/06/13/deepwalking-with-companies/">Deepwalking With Companies</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/">Data Engineers Will Hate You - One Weird Trick to Fix Your Pyspark Schemas</a>
       </li>
     
   </ul>
