@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="In this post I will share some tips on the final aspect of datamatching that was glossed over in parts 1 and 2 - scoring matches. This is maybe the &hellip;">
+  <meta name="description" content="I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,534 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/09/17/text-generation-with-keras-char-rnns/">Text Generation With Keras char-RNNs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-09-17T22:17:50+01:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:17 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
+
+<p><img src="/images/deep_learning_pc.png" alt="" />
+<em>Watercooled 2 x GTX 1080 (on the right)</em></p>
+
+<p>This topic has been widely written about by better people so if you don’t already know about char-RNNs go read them instead. <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">Here</a> is Andrej Karpathy’s blog post that started it all. It has an introduction to RNNs plus some <em>extremely</em> fun examples of texts generated with them. For an in depth explanation of LSTM (the specific type of RNN that everyone uses) I highly recommend <a href="http://r2rt.com/written-memories-understanding-deriving-and-extending-the-lstm.html">this</a>.</p>
+
+<p>I started playing with LSTMs by copying the <a href="https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py">example frmo Keras</a>, and then I kept adding to it. First - more layers, then - training with generators instead of batch - to handle datasets that don’t fit in memory. Then a bunch of scripts for getting interesting datasets, then utilities for persisting the models and so on. I ended up with a small set of command line tools for getting the data and running the experiments that I thought may be worth sharing. <a href="https://github.com/nadbordrozd/neural_playground">Here</a> it is.</p>
+
+<h3 id="and-here-are-the-results">And here are the results</h3>
+<p>A network with 3 LSTM layers 512 units each + a dense layer trained on the trained for a week on the concatenation of all java files from the <a href="https://github.com/apache/hadoop">hadoop repository</a> produces stuff like <a href="https://github.com/nadbordrozd/neural_playground/blob/master/output/hadoop.java">this</a>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+<span class="line-number">74</span>
+<span class="line-number">75</span>
+<span class="line-number">76</span>
+<span class="line-number">77</span>
+<span class="line-number">78</span>
+<span class="line-number">79</span>
+<span class="line-number">80</span>
+<span class="line-number">81</span>
+<span class="line-number">82</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line">  <span class="nd">@Override</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPerDispatcher</span><span class="o">(</span>
+</span><span class="line">      <span class="n">MockAM</span> <span class="n">nn1</span><span class="o">,</span> <span class="n">String</span> <span class="n">queue</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">app1</span><span class="o">.</span><span class="na">getAppAttemptId</span><span class="o">()).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">defaultSize</span><span class="o">);</span>
+</span><span class="line">    <span class="n">menlined</span><span class="o">.</span><span class="na">incr</span><span class="o">();</span>
+</span><span class="line">      <span class="n">assertLaunchRMNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;AM.2.0 scheduler event&quot;</span><span class="o">);</span>
+</span><span class="line">      <span class="n">store</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Test</span><span class="o">(</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">5000</span><span class="o">)</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testAllocateBoths</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">RMAppAttemptContainer</span> <span class="n">event</span> <span class="o">=</span>
+</span><span class="line">        <span class="k">new</span> <span class="nf">RMAppStatusesStatus</span><span class="o">(</span><span class="n">csConf</span><span class="o">);</span>
+</span><span class="line">    <span class="kd">final</span> <span class="n">ApplicationAttemptId</span> <span class="n">applicationRetry</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">StatusInfo</span><span class="o">(</span><span class="n">appAttempt</span><span class="o">.</span><span class="na">getAppAttemptId</span><span class="o">(),</span> <span class="kc">null</span><span class="o">,</span>
+</span><span class="line">        <span class="n">RMAppEventType</span><span class="o">.</span><span class="na">APP_ENTITY</span><span class="o">,</span>
+</span><span class="line">        <span class="n">RMAppEventType</span><span class="o">.</span><span class="na">NODE</span>
+</span><span class="line">                  <span class="n">currentFinalBuffer</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">rm</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class="line">    <span class="n">assertEquals</span><span class="o">(</span><span class="n">memory</span> <span class="o">&gt;</span> <span class="n">queue</span><span class="o">.</span><span class="na">getAbsolutePreemptionCount</span><span class="o">(),</span> <span class="kc">true</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">sched</span> <span class="o">=</span> <span class="n">putQueueScheduler</span><span class="o">();</span>
+</span><span class="line">    <span class="n">webServiceEvent</span><span class="o">.</span><span class="na">awaitTrackedState</span><span class="o">(</span><span class="k">new</span> <span class="nf">YarnApplicationAttemptEvent</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">      <span class="nd">@Override</span>
+</span><span class="line">      <span class="kd">public</span> <span class="n">RMAppEvent</span> <span class="nf">applicationAttemptId</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="o">(</span><span class="n">ApplicationNumMBean</span><span class="o">)</span> <span class="n">response</span><span class="o">.</span><span class="na">getNode</span><span class="o">(</span><span class="n">appAttemptId</span><span class="o">);</span>
+</span><span class="line">      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="k">try</span><span class="o">;</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">    <span class="o">});</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Test</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testApplicationOverConfigurationHreserved</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">throw</span> <span class="k">new</span> <span class="nf">StrongResponseException</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Override</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMediaType</span><span class="o">(</span><span class="n">Angate</span><span class="o">.</span><span class="na">ASQUEUTTED</span><span class="o">,</span> <span class="kt">int</span> <span class="n">cellReplication</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">ApplicationAttemptStatus</span><span class="o">[]</span> <span class="n">url</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">YarnApplicationStatus</span><span class="o">(</span><span class="n">ContainerEventHandler</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">scheduler</span><span class="o">).</span><span class="na">getFailSet</span><span class="o">(</span><span class="n">nnApplicationRef</span><span class="o">,</span> <span class="mi">1</span><span class="o">)</span>
+</span><span class="line">        <span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span><span class="line">    <span class="n">RMAppAttemptAttemptRMState</span> <span class="n">status</span> <span class="o">=</span> <span class="n">spy</span><span class="o">(</span><span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">ApplicationAttemptId</span><span class="o">,</span> <span class="n">RMAppEvent</span><span class="o">&gt;());</span>
+</span><span class="line">    <span class="n">testAppManagerManager</span><span class="o">(</span><span class="n">RMAppAttempt</span><span class="o">.</span><span class="na">getApplicationQueueEnabledAndTavanatationFrom</span><span class="o">(),</span> <span class="mi">2</span><span class="o">);</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/**</span>
+</span><span class="line"><span class="cm">   * Whether of spy a stite and heat by Mappings</span>
+</span><span class="line"><span class="cm">   */</span>
+</span><span class="line">  <span class="nd">@Test</span> <span class="o">(</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">60000</span><span class="o">)</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testFences</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">scheduler</span><span class="o">.</span><span class="na">getRMApp</span><span class="o">(</span>
+</span><span class="line">          <span class="kc">false</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">.</span><span class="na">getApplicationAttempt</span><span class="o">());</span>
+</span><span class="line">    <span class="n">ApplicationAttemptEvent</span> <span class="n">attempt</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MomaRMApplicationAttemptAttemptEvent</span><span class="o">(</span><span class="n">applicationAttempt</span><span class="o">.</span><span class="na">getApplicationAttemptId</span><span class="o">(),</span> <span class="kc">null</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">conf</span><span class="o">.</span><span class="na">setBoolean</span><span class="o">(</span><span class="n">rmContainer</span><span class="o">.</span><span class="na">getAttemptState</span><span class="o">());</span>
+</span><span class="line">    <span class="n">conf</span><span class="o">.</span><span class="na">setNodeAttemptId</span><span class="o">(</span><span class="n">conf</span><span class="o">);</span>
+</span><span class="line">    <span class="n">RMAppStateChange</span> <span class="n">context</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</span><span class="line">    <span class="n">containersPublishEventPBHandler</span><span class="o">.</span><span class="na">registerNode</span><span class="o">((</span><span class="n">FinalApplicationHistoryArgument</span><span class="o">)</span> <span class="n">relatedVirtualCores</span><span class="o">);</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">static</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">DuvalivedAppResourceUsage</span> <span class="o">{</span>
+</span><span class="line">    <span class="c1">// Test</span>
+</span><span class="line">    <span class="n">rm1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="nf">UserGroupInformation</span><span class="o">());</span>
+</span><span class="line">    <span class="n">vrainedApplicationTokenUrl</span><span class="o">.</span><span class="na">await</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+</span><span class="line">    <span class="n">currentHttpState</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="na">getTokenService</span><span class="o">();</span>
+</span><span class="line">    <span class="n">nitel</span><span class="o">.</span><span class="na">authentication</span><span class="o">();</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Override</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEntityForRowEventUudingInVersion</span><span class="o">(</span><span class="kt">int</span> <span class="n">applicationAttemptId</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">throw</span> <span class="k">new</span> <span class="nf">UnsupportedOperationException</span><span class="o">(</span><span class="s">&quot;So mock capability&quot;</span><span class="o">,</span> <span class="n">testCaseAccept</span><span class="o">).</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;/list.out&quot;</span><span class="o">;</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setSchedulerAppTestsBufferWithClusterMasterReconfiguration</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">    <span class="c1">// event zips and allocate gremb attempt date this</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">scheduler</span><span class="o">.</span><span class="na">getFinishTime</span><span class="o">())</span>
+</span><span class="line">      <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">getQueue</span><span class="o">(</span><span class="s">&quot;metrics&quot;</span><span class="o">).</span><span class="na">newSchedulingProto</span><span class="o">(</span>
+</span><span class="line">        <span class="s">&quot;&lt;x-MASTERATOR new this attempt &quot;</span><span class="o">+</span><span class="s">&quot;ClientToRemovedResourceRasheder&quot;</span><span class="o">,</span> <span class="n">taskDispatcher</span><span class="o">),</span>
+</span><span class="line">        <span class="n">server</span><span class="o">.</span><span class="na">getBarerSet</span><span class="o">());</span>
+</span><span class="line">  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That’s pretty believable java if you don’t look to closely! It’s important to remember that this is a character-level model. It doesn’t just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example <code>setSchedulerAppTestsBufferWithClusterMasterReconfiguration()</code> is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn’t stand out among all the other monstrous names like <code>RefreshAuthorazationPolicyProtocolServerSideTranslatorPB</code>. Which was exactly the point of this exercise.</p>
+
+<p>Sometimes the network decides that it’s time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="cm">/**</span>
+</span><span class="line"><span class="cm"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+</span><span class="line"><span class="cm"> * you may not use this file except in compliance with the License.</span>
+</span><span class="line"><span class="cm"> * You may obtain a copy of the License at</span>
+</span><span class="line"><span class="cm"> *</span>
+</span><span class="line"><span class="cm"> *   http://www.apache.org/licenses/LICENSE-2.0</span>
+</span><span class="line"><span class="cm"> *</span>
+</span><span class="line"><span class="cm"> * Unless required by applicable law or agreed to in writing, software</span>
+</span><span class="line"><span class="cm"> * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+</span><span class="line"><span class="cm"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+</span><span class="line"><span class="cm"> * See the License for the specific language governing permissions and</span>
+</span><span class="line"><span class="cm"> * limitations under the License.</span>
+</span><span class="line"><span class="cm"> */</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">hadoop</span><span class="o">.</span><span class="na">yarn</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">records</span><span class="o">.</span><span class="na">ApplicationResourcementRequest</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.service.Notify</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.api.protocolrecords.AllocationWrapperStatusYarnState</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.authentication.RMContainerAttempt</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.metrics.YarnScheduler</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.cookie.test.MemoryWUTIMPUndatedMetrics</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.records.Resources</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.fimat.GetStore</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.state.TokenAddrWebKey</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.attempt.SchedulerUtils</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.handle.Operator</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMAppAttemptAppList</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.security.AMRequest</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.metrics.RMApplicationCluster</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.protocolrecords.NMContainerEvent</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.nodelabels.RMContainer</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.server.security.WebAppEvent</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.records.ContainerException</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.store.FailAMState</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.creater.SchedulerEvent</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.ndated.common.Priority</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.records.AppAttemptStateUtils</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.da.RM3</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.rmapp.rtbase.ExapplicatesTrackerService</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.timelineservice.security.Capability</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.AM</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.container.KillLocalData</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.state.ContainerHIP</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.xml.am.resource.state.UndecomponentScheduler</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.servlet.NMElement</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.servlet.ArgumentSubmissionContext</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.security.servlet.KILLeaseWriter</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.lang.authenticatenators.DALER</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.concurrent.StringUtils</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Iterator</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.concurrent.TimelineInitializer</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.concurrent.atomic.AtomicLong</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">import</span> <span class="nn">com.google.common.annotations.VisibleUtils</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>At first I thought this was a glitch, a result of the network is getting stuck in one state. But then I checked and - no, actually this is exactly what those hadoop .java files look like, 50 lines is a completely unexceptional amount of imports. And again, most of those imports are made up.</p>
+
+<p>And <a href="https://github.com/nadbordrozd/neural_playground/blob/master/output/sklearn.py">here’s</a> a bunch of python code dreamt up by a network trained on scikit-learn <a href="https://github.com/scikit-learn/scikit-learn">repository</a>.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">nose.tools</span> <span class="kn">import</span> <span class="n">assert_almost_equal</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">regularization</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">DataStringIO</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics.compatibility</span> <span class="kn">import</span> <span class="n">Parameters</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">test_range</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.linear_model.Dictionary</span> <span class="kn">import</span> <span class="n">Dictionary</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.distance</span> <span class="kn">import</span> <span class="n">cOST_RORG</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">LabelBineration</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">os</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">TKError</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">datasets</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.externals.six</span> <span class="kn">import</span> <span class="n">LinearSVC</span>
+</span><span class="line"><span class="c"># Test the hash to a file was that bug the many number be as constructor.</span>
+</span><span class="line"><span class="c"># Make a classification case for set are indicator.</span>
+</span><span class="line">
+</span><span class="line"><span class="n">Examples</span>
+</span><span class="line">    <span class="o">--------</span>
+</span><span class="line">
+</span><span class="line"><span class="p">(</span>
+</span><span class="line">        <span class="n">Parameters</span>
+</span><span class="line">        <span class="o">----------</span>
+</span><span class="line">        <span class="kn">import</span> <span class="nn">sys</span>
+</span><span class="line">        <span class="n">y</span> <span class="o">=</span> <span class="n">filename</span>
+</span><span class="line">        <span class="c"># Closed&#39;</span>
+</span><span class="line">        <span class="n">total_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_proba</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">max_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">clf</span> <span class="o">=</span> <span class="n">Pickler</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float34</span><span class="p">)</span>
+</span><span class="line">    <span class="n">correct_set_using_MACHITER_LIVER_SPY</span> <span class="o">=</span> <span class="n">WORD_INL_OXITIMATION_DER</span>
+</span><span class="line">    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Ardument SVD: Pimsha, Moved and More an array&quot;</span><span class="p">)</span>
+</span><span class="line">    <span class="n">assert_true</span><span class="p">((</span><span class="s">&#39;g&#39;</span> <span class="o">*</span> <span class="n">GramCAXSORS</span><span class="p">))</span>
+</span><span class="line">    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Transformer areair not sparse &quot;</span>
+</span><span class="line">                              <span class="s">&quot;memory&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;urllib_split&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+</span><span class="line">                     <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span><span class="p">),</span>
+</span><span class="line">                                    <span class="k">if</span> <span class="n">that</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">param_range</span><span class="o">=</span><span class="s">&quot;name&quot;</span>
+</span><span class="line">
+</span><span class="line">                        <span class="n">assert_equal</span><span class="p">(</span><span class="n">decision_function</span><span class="p">,</span> <span class="s">&quot;&#39;)</span>
+</span><span class="line">
+</span><span class="line">                <span class="k">return</span> <span class="n">BaseCompiler</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">return_path</span><span class="o">=</span><span class="s">&#39;alpha&#39;</span><span class="p">,</span>
+</span><span class="line">                                                                                                         <span class="n">sample_weight</span><span class="o">=</span><span class="n">n_nodes</span><span class="p">,</span>
+</span><span class="line">                                                                                                                                                     <span class="n">axis</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;arpack&#39;</span><span class="p">,</span>
+</span><span class="line">                                                                              <span class="nb">isinstance</span><span class="p">(</span><span class="o">%</span><span class="n">s</span> <span class="n">Early</span> <span class="n">produced</span><span class="o">.</span><span class="s">&quot;)</span>
+</span><span class="line">
+</span><span class="line">            <span class="n">starts</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">output_method_regression</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;test&#39;</span><span class="p">)</span>
+</span><span class="line">            <span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</span><span class="line">            <span class="n">new_params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">beck</span>
+</span><span class="line">            <span class="c"># The implementation of the module distribution cases and classifiers are specified to chenk the file</span>
+</span><span class="line">            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">embedding</span>
+</span><span class="line">            <span class="k">return</span> <span class="n">_argment</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">_item</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</span><span class="line">        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Calibration in wrapper file may be</span>
+</span><span class="line">                                       <span class="s">&#39;grid_search&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">_build_adjust_size</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">target_conot</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">toem</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+</span><span class="line">        <span class="n">support_</span><span class="o">-</span><span class="n">_given_build_rese_unlib</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This is much lower quality because the network was smaller and sklearn’s codebase is much smaller than that of hadoop. I’m sure there is a witty comment about the quality of code in those two repositories somewhere in there.</p>
+
+<p>Enough with the github. How about we try some literature? Here’s LSTM-generated Jane Austen:</p>
+
+<blockquote>
+  <p>“I wish I had not been satisfied with the other thing.”</p>
+
+  <p>“Do you think you have not the party in the world who has been a great deal of more agreeable young ladies to be got on to Miss Tilney’s happiness to Miss Tilney. They were only to all all the rest of the same day. She was gone away in her
+mother’s drive, but she had not passed the rest. They were to be already ready to be a good deal of service the appearance of the house, was discouraged to be a great deal to say, “I do not think I have been able to do them in Bath?”</p>
+
+  <p>“Yes, very often to have a most complaint, and what shall I be to her a great deal of more advantage in the garden, and I am sure you have come at all the proper and the entire of his side for the conversation of Mr. Tilney, and he was satisfied with the door, was sure her situation was soon getting to be a decided partner to her and her father’s circumstances. They were offended to her, and they were all
+the expenses of the books, and was now
+perfectly much at Louisa the sense of the family of the compliments in the room. The arrival was to be more good.</p>
+</blockquote>
+
+<p>That was ok but let’s try something more modern. And what better represents modernity than people believing that the earth is flat. I have scraped all the top level comments from top 500 youtube videos matching the query “flat earth”. <a href="https://github.com/nadbordrozd/neural_playground/blob/master/getting_data/youtube_comments.py">Here</a> is the comments scraper I made for this. And here is the neural network spat out after ingesting 10MB worth of those comments</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">[</span><span class="n">James</span> <span class="n">Channel</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">am</span> <span class="n">a</span> <span class="n">fucking</span> <span class="n">Antarctica</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Bible</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Bible</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">REAL</span> <span class="n">Angel</span>
+</span><span class="line"><span class="n">of</span> <span class="n">God</span><span class="p">,</span> <span class="n">the</span> <span class="n">Fact</span> <span class="n">the</span> <span class="n">Moon</span> <span class="ow">and</span> <span class="n">Sun</span> <span class="ow">is</span> <span class="n">NOT</span> <span class="n">flat</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">moon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">flat</span><span class="o">.</span>
+</span><span class="line"><span class="n">The</span> <span class="n">ice</span> <span class="n">wall</span> <span class="n">below</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span> <span class="ow">and</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">the</span> <span class="nb">round</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">the</span>
+</span><span class="line"><span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="o">.</span>
+</span><span class="line"><span class="p">[</span><span class="n">Mark</span> <span class="n">Filler</span><span class="p">]:</span>    <span class="n">The</span> <span class="n">Earth</span> <span class="ow">is</span> <span class="n">flat</span> <span class="k">with</span> <span class="n">your</span> <span class="n">stupid</span> <span class="n">Qur</span><span class="s">&#39;an and Christ And I can watch the </span>
+</span><span class="line"><span class="n">truth</span> <span class="n">of</span> <span class="n">crazy</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">curve</span> <span class="n">flat</span> <span class="n">then</span> <span class="n">why</span> <span class="n">do</span> <span class="n">we</span> <span class="n">have</span> <span class="n">to</span>
+</span><span class="line"><span class="n">discover</span> <span class="n">the</span> <span class="n">earth</span> <span class="n">flat</span><span class="err">?</span>
+</span><span class="line"><span class="p">[</span><span class="n">James</span> <span class="n">Channel</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">don</span><span class="s">&#39;t know what we do not get the communication and the earth and the </span>
+</span><span class="line"><span class="n">center</span> <span class="n">of</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">just</span> <span class="n">a</span> <span class="n">globe</span> <span class="n">because</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">flat</span><span class="o">.</span> <span class="n">The</span>
+</span><span class="line"><span class="n">earth</span> <span class="ow">is</span> <span class="nb">round</span> <span class="ow">and</span> <span class="n">why</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">sun</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">sun</span> <span class="n">would</span> <span class="n">be</span> <span class="n">a</span> <span class="n">flat</span> <span class="n">disc</span> <span class="ow">and</span> <span class="n">the</span>
+</span><span class="line"><span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="err">?</span>
+</span><span class="line"><span class="p">[</span><span class="n">Mark</span> <span class="n">Lanz</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">am</span> <span class="n">a</span> <span class="n">Flat</span> <span class="n">Earther</span> <span class="ow">and</span> <span class="n">I</span> <span class="n">can</span> <span class="n">see</span> <span class="n">the</span> <span class="n">truth</span> <span class="n">that</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">reason</span> <span class="n">the</span>
+</span><span class="line"><span class="n">ship</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">sun</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">South</span> <span class="n">Pole</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">last</span> <span class="n">of</span> <span class="n">the</span> <span class="n">world</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span>
+</span><span class="line"><span class="n">the</span> <span class="n">earth</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">moon</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">same</span> <span class="n">formation</span> <span class="n">that</span> <span class="n">we</span> <span class="n">can</span> <span class="n">fly</span> <span class="n">around</span> <span class="n">the</span>
+</span><span class="line"><span class="n">earth</span> <span class="ow">and</span> <span class="n">do</span> <span class="n">the</span> <span class="n">moon</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">disk</span><span class="err">??</span>
+</span><span class="line"><span class="p">[</span><span class="n">Bone</span> <span class="n">City</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">can</span> <span class="n">see</span> <span class="n">the</span> <span class="n">sun</span> <span class="n">end</span> <span class="n">of</span> <span class="n">the</span> <span class="n">sun</span> <span class="ow">and</span> <span class="n">sun</span> <span class="k">with</span> <span class="n">the</span> <span class="n">edge</span> <span class="n">of</span> <span class="n">the</span> <span class="n">earth</span><span class="o">.</span>
+</span><span class="line"><span class="p">[</span><span class="n">Star</span> <span class="n">Call</span><span class="p">]:</span>    <span class="n">The</span> <span class="n">Earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">flat</span> <span class="n">earth</span> <span class="n">theory</span> <span class="n">that</span> <span class="n">are</span> <span class="n">the</span> <span class="n">problems</span> <span class="n">to</span> <span class="n">go</span>
+</span><span class="line"><span class="n">there</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">Earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="o">.</span> <span class="n">So</span> <span class="nb">all</span> <span class="n">the</span> <span class="n">way</span> <span class="n">to</span> <span class="n">the</span> <span class="n">Earth</span> <span class="ow">and</span> <span class="n">the</span>
+</span><span class="line"><span class="n">Earth</span><span class="o">.</span> <span class="n">FLAT</span> <span class="n">EARTH</span> <span class="n">IS</span> <span class="n">FLAT</span> <span class="n">THE</span> <span class="n">EARTH</span> <span class="n">IS</span> <span class="n">FLAT</span><span class="o">....</span> <span class="n">I</span> <span class="n">HAVE</span> <span class="n">BECAUSE</span> <span class="n">THE</span> <span class="n">SULLARS</span> <span class="n">WITH</span> <span class="n">A</span> <span class="n">SPACE</span> <span class="n">THE</span> <span class="n">EARTH</span> <span class="n">IS</span> <span class="n">FLAT</span><span class="err">!!!</span>
+</span><span class="line"><span class="p">[</span><span class="n">MrJohnny</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">am</span> <span class="n">the</span> <span class="n">truth</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">bullshit</span> <span class="n">lol</span>
+</span><span class="line"><span class="p">[</span><span class="n">Jesse</span> <span class="n">Cack</span><span class="p">]:</span>    <span class="n">Great</span> <span class="n">job</span> <span class="n">God</span> <span class="n">bless</span> <span class="n">you</span> <span class="k">for</span> <span class="n">this</span> <span class="n">video</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That doesn’t make any sense at all. It’s so much like real youtube comments it’s uncanny.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -377,12 +905,12 @@
 </span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bruce Wayne&#39;</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;1007 Mountain Drive, Gotham&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&quot;01234567890&quot;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&quot;Wayne Enterprises&quot;</span>
+</span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&#39;01234567890&#39;</span><span class="p">,</span>
+</span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne Enterprises&#39;</span>
 </span><span class="line">    <span class="p">},</span>
 </span><span class="line">    <span class="p">{</span>
 </span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&quot;Thomas Wayne&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Thomas Wayne&#39;</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;Gotham Cemetery&#39;</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne Enterprises&#39;</span>
@@ -444,7 +972,7 @@
 <span class="line-number">12</span>
 </pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># lowercase the name and split on spaces, remove non-alphanumeric chars</span>
 </span><span class="line"><span class="k">def</span> <span class="nf">tokenize_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-</span><span class="line">    <span class="n">clean_name</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s">&quot; &quot;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
+</span><span class="line">    <span class="n">clean_name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s">&#39; &#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
 </span><span class="line">    <span class="k">return</span> <span class="n">clean_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 </span><span class="line">
 </span><span class="line"><span class="c"># same tokenizers as for names, meh, good enough</span>
@@ -453,7 +981,7 @@
 </span><span class="line">
 </span><span class="line"><span class="c"># last 10 digits of phone number</span>
 </span><span class="line"><span class="k">def</span> <span class="nf">tokenize_phone</span><span class="p">(</span><span class="n">phone</span><span class="p">):</span>
-</span><span class="line">    <span class="k">return</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">phone</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;1234567890&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]]</span>
+</span><span class="line">    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">phone</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;1234567890&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]]</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Now we have to specify which tokenizer should be applied to which field. You don’t want to use the phone tokenizer on a person’s name or vice versa. Also, tokens extracted from name shouldn’t mix with tokens from address or phone number. On the other hand, there may be multiple fields that you want to extract e.g. phone numbers from - and these tokens <em>should</em> mix. Here’s minimalistic syntax for specifying these things:</p>
@@ -503,7 +1031,7 @@
 <span class="line-number">9</span>
 <span class="line-number">10</span>
 <span class="line-number">11</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">id_key</span> <span class="o">=</span> <span class="s">&quot;Id&quot;</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">id_key</span> <span class="o">=</span> <span class="s">&#39;Id&#39;</span>
 </span><span class="line"><span class="k">def</span> <span class="nf">prepare_join_keys</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">tokenizers</span><span class="p">):</span>
 </span><span class="line">    <span class="k">for</span> <span class="n">source_column</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="ow">in</span> <span class="n">tokenizers</span><span class="p">:</span>
 </span><span class="line">        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_column</span><span class="p">):</span>
@@ -796,7 +1324,7 @@
 </span><span class="line">        <span class="n">left_tokenizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_left_tokenizers</span><span class="p">()</span>
 </span><span class="line">        <span class="n">right_tokenizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_right_tokenizers</span><span class="p">()</span>
 </span><span class="line">
-</span><span class="line">        <span class="n">id_key</span> <span class="o">=</span> <span class="s">&quot;Id&quot;</span>
+</span><span class="line">        <span class="n">id_key</span> <span class="o">=</span> <span class="s">&#39;Id&#39;</span>
 </span><span class="line">
 </span><span class="line">        <span class="k">def</span> <span class="nf">prepare_join_keys</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">tokenizers</span><span class="p">):</span>
 </span><span class="line">            <span class="k">for</span> <span class="n">source_column</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="ow">in</span> <span class="n">tokenizers</span><span class="p">:</span>
@@ -898,7 +1426,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/07/20/datamatching-part-1/">Datamatching - Part 1: Algorithm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/07/20/datamatching-part-1/">Datamatching Part 1: Algorithm</a></h1>
     
     
       <p class="meta">
@@ -2259,43 +2787,9 @@ Unknown are:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/07/26/test-post/">Test Post</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-07-26T22:20:42+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:20 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is my first post. pls work pls
-This is code span (hopefully)
-<code>def fibo(n):
-	if n &lt; 2:
-		return 1
-	else:
-		return fibo(n - 1) + fibo(n - 2)
-</code></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/posts/2">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -2308,6 +2802,10 @@ This is code span (hopefully)
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/09/17/text-generation-with-keras-char-rnns/">Text Generation With Keras char-RNNs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/07/29/datamatching-part-3-match-scoring/">Datamatching Part 3: Match Scoring</a>
       </li>
     
@@ -2316,15 +2814,11 @@ This is code span (hopefully)
       </li>
     
       <li class="post">
-        <a href="/blog/2016/07/20/datamatching-part-1/">Datamatching - Part 1: Algorithm</a>
+        <a href="/blog/2016/07/20/datamatching-part-1/">Datamatching Part 1: Algorithm</a>
       </li>
     
       <li class="post">
         <a href="/blog/2016/06/15/dear-recruiter/">Dear Recruiter</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/13/deepwalking-with-companies/">Deepwalking With Companies</a>
       </li>
     
   </ul>

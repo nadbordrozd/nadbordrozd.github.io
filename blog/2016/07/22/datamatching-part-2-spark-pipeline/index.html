@@ -175,12 +175,12 @@
 </span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bruce Wayne&#39;</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;1007 Mountain Drive, Gotham&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&quot;01234567890&quot;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&quot;Wayne Enterprises&quot;</span>
+</span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&#39;01234567890&#39;</span><span class="p">,</span>
+</span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne Enterprises&#39;</span>
 </span><span class="line">    <span class="p">},</span>
 </span><span class="line">    <span class="p">{</span>
 </span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&quot;Thomas Wayne&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Thomas Wayne&#39;</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;Gotham Cemetery&#39;</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
 </span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne Enterprises&#39;</span>
@@ -242,7 +242,7 @@
 <span class="line-number">12</span>
 </pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># lowercase the name and split on spaces, remove non-alphanumeric chars</span>
 </span><span class="line"><span class="k">def</span> <span class="nf">tokenize_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-</span><span class="line">    <span class="n">clean_name</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s">&quot; &quot;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
+</span><span class="line">    <span class="n">clean_name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s">&#39; &#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
 </span><span class="line">    <span class="k">return</span> <span class="n">clean_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 </span><span class="line">
 </span><span class="line"><span class="c"># same tokenizers as for names, meh, good enough</span>
@@ -251,7 +251,7 @@
 </span><span class="line">
 </span><span class="line"><span class="c"># last 10 digits of phone number</span>
 </span><span class="line"><span class="k">def</span> <span class="nf">tokenize_phone</span><span class="p">(</span><span class="n">phone</span><span class="p">):</span>
-</span><span class="line">    <span class="k">return</span> <span class="p">[</span><span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">phone</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;1234567890&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]]</span>
+</span><span class="line">    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">phone</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;1234567890&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]]</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>Now we have to specify which tokenizer should be applied to which field. You don’t want to use the phone tokenizer on a person’s name or vice versa. Also, tokens extracted from name shouldn’t mix with tokens from address or phone number. On the other hand, there may be multiple fields that you want to extract e.g. phone numbers from - and these tokens <em>should</em> mix. Here’s minimalistic syntax for specifying these things:</p>
@@ -301,7 +301,7 @@
 <span class="line-number">9</span>
 <span class="line-number">10</span>
 <span class="line-number">11</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">id_key</span> <span class="o">=</span> <span class="s">&quot;Id&quot;</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">id_key</span> <span class="o">=</span> <span class="s">&#39;Id&#39;</span>
 </span><span class="line"><span class="k">def</span> <span class="nf">prepare_join_keys</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">tokenizers</span><span class="p">):</span>
 </span><span class="line">    <span class="k">for</span> <span class="n">source_column</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="ow">in</span> <span class="n">tokenizers</span><span class="p">:</span>
 </span><span class="line">        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_column</span><span class="p">):</span>
@@ -594,7 +594,7 @@
 </span><span class="line">        <span class="n">left_tokenizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_left_tokenizers</span><span class="p">()</span>
 </span><span class="line">        <span class="n">right_tokenizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_right_tokenizers</span><span class="p">()</span>
 </span><span class="line">
-</span><span class="line">        <span class="n">id_key</span> <span class="o">=</span> <span class="s">&quot;Id&quot;</span>
+</span><span class="line">        <span class="n">id_key</span> <span class="o">=</span> <span class="s">&#39;Id&#39;</span>
 </span><span class="line">
 </span><span class="line">        <span class="k">def</span> <span class="nf">prepare_join_keys</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">tokenizers</span><span class="p">):</span>
 </span><span class="line">            <span class="k">for</span> <span class="n">source_column</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="ow">in</span> <span class="n">tokenizers</span><span class="p">:</span>
@@ -723,7 +723,7 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2016/07/20/datamatching-part-1/" title="Previous Post: datamatching - part 1: algorithm">&laquo; datamatching - part 1: algorithm</a>
+        <a class="basic-alignment left" href="/blog/2016/07/20/datamatching-part-1/" title="Previous Post: datamatching part 1: algorithm">&laquo; datamatching part 1: algorithm</a>
       
       
         <a class="basic-alignment right" href="/blog/2016/07/29/datamatching-part-3-match-scoring/" title="Next Post: datamatching part 3: match scoring">datamatching part 3: match scoring &raquo;</a>
@@ -747,6 +747,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/09/17/text-generation-with-keras-char-rnns/">Text Generation With Keras char-RNNs</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/07/29/datamatching-part-3-match-scoring/">Datamatching Part 3: Match Scoring</a>
       </li>
     
@@ -755,15 +759,11 @@
       </li>
     
       <li class="post">
-        <a href="/blog/2016/07/20/datamatching-part-1/">Datamatching - Part 1: Algorithm</a>
+        <a href="/blog/2016/07/20/datamatching-part-1/">Datamatching Part 1: Algorithm</a>
       </li>
     
       <li class="post">
         <a href="/blog/2016/06/15/dear-recruiter/">Dear Recruiter</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/13/deepwalking-with-companies/">Deepwalking With Companies</a>
       </li>
     
   </ul>
