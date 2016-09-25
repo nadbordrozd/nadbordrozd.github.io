@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Deep Learning | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/deep-learning/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-09-25T01:00:19+01:00</updated>
+  <updated>2016-09-25T21:39:17+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -21,11 +21,11 @@
     <content type="html"><![CDATA[<p>I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
 
 <p><img src="/images/deep_learning_pc.png" alt="" />
-<em>Watercooled 2 x GTX 1080 (on the right)</em></p>
+<em>watercooling, pretty lights and 2 x GTX 1080 (on the right)</em></p>
 
 <p>This topic has been widely written about by better people so if you don’t already know about char-RNNs go read them instead. <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">Here</a> is Andrej Karpathy’s blog post that started it all. It has an introduction to RNNs plus some <em>extremely</em> fun examples of texts generated with them. For an in depth explanation of LSTM (the specific type of RNN that everyone uses) I highly recommend <a href="http://r2rt.com/written-memories-understanding-deriving-and-extending-the-lstm.html">this</a>.</p>
 
-<p>I started playing with LSTMs by copying the <a href="https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py">example frmo Keras</a>, and then I kept adding to it. First - more layers, then - training with generators instead of batch - to handle datasets that don’t fit in memory. Then a bunch of scripts for getting interesting datasets, then utilities for persisting the models and so on. I ended up with a small set of command line tools for getting the data and running the experiments that I thought may be worth sharing. <a href="https://github.com/nadbordrozd/neural_playground">Here</a> it is.</p>
+<p>I started playing with LSTMs by copying the <a href="https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py">example from Keras</a>, and then I kept adding to it. First - more layers, then - training with generators instead of batch - to handle datasets that don’t fit in memory. Then a bunch of scripts for getting interesting datasets, then utilities for persisting the models and so on. I ended up with a small set of command line tools for getting the data and running the experiments that I thought may be worth sharing. <a href="https://github.com/nadbordrozd/neural_playground">Here</a> it is.</p>
 
 <h3 id="and-here-are-the-results">And here are the results</h3>
 <p>A network with 3 LSTM layers 512 units each + a dense layer trained on the trained for a week on the concatenation of all java files from the <a href="https://github.com/apache/hadoop">hadoop repository</a> produces stuff like <a href="https://github.com/nadbordrozd/neural_playground/blob/master/output/hadoop.java">this</a>:</p>
@@ -255,6 +255,85 @@ def _item(name):
 ```</p>
 
 <p>This is much lower quality because the network was smaller and sklearn’s codebase is much smaller than that of hadoop. I’m sure there is a witty comment about the quality of code in those two repositories somewhere in there.</p>
+
+<p>And <a href="https://github.com/scalaz/scalaz">here’s</a> the result of training on the <a href="https://github.com/scalaz/scalaz">scalaz repository</a>:
+```scala
+private trait BijectionTContravariant[F[<em>], G[</em>]] extends Comonad[Coproduct[F, G, ?]] with CoproductFoldable1[F, G] {
+  implicit def F: Traverse1[F]</p>
+
+<p>def traverse1Impl<a href="fa: OneOr[F, A]">G[_], A, B</a>(f: A =&gt; G[B])(implicit F: Traverse[F]): B =
+    G.apply2(fa.foldMap(fa)(f))(F.append(f(a), f))</p>
+
+<p>/** Collect <code>Coproduct[F, G, A]</code> is the given context <code>F</code> */
+  def uncontra1_<a href="implicit G0: Foldable1[G]">F[<em>], G[</em>]</a>: Foldable1[l[a =&gt; (F[a], G[a])]] =
+    new ProductCozip[F, G] {
+      implicit def F = self
+      implicit def G = G0
+    }</p>
+
+<p>/**Like <code>Foldable1[F]</code> is the zipper instance to a <code>Zip</code> */
+  def indexOf<a href="implicit F: Functor[F]">A &gt;: A2 &lt;: A1: Boolean</a>: F[Boolean] =
+    F.empty[A].leftMap(implicitly[A &lt;~&lt; A[A])</p>
+
+<p>def extendsInstance[A]: F[A]</p>
+
+<p>def -/(a: A) = l.toList
+  /** A version of <code>zip</code> that all of the underlying value if the new <code>Maybe</code> to the errors */
+  def index<a href="fa: F[A]">A</a>: Option[A] = self.subForest.foldLeft(as, empty[A])((x, y) =&gt; x +: x)</p>
+
+<p>/** See <code>Maybe</code> is run and then the success of this disjunction. */
+  def orElse[A &gt;: A2 &lt;: A1: Falider = Traverse<a href="fa =&gt; apply(a)">Applicative</a></p>
+
+<p>def emptyDequeue[A]: A ==» B =
+    foldRight(as)(f)</p>
+
+<p>override def foldLeft<a href="fa: F[A], z: B">A, B</a>(f: (B, A) =&gt; B): B =
+    fa.foldLeft(map(fa)(self)(f))
+  override def foldMap<a href="fa: F[A]">A, B</a>(f: A =&gt; A): Option[A] = F.traverseTree(foldMap1(_)(f))</p>
+
+<p>def traverse<a href="fa: F[A]">A, B</a>(f: A =&gt; B): F[B] =
+    F.map(f(a))(M.point(z))</p>
+
+<p>/** A view for a <code>Coproduct[F, G, A]</code> that the folded. */
+  def foldMapRight1<a href="fa: F[A]">A, B</a>(f: A =&gt; B)(implicit F: Monoid[B]): B = {
+    def option: Tree[A] = Some(none
+    def streamThese<a href="a: A">A, B</a>: Option[A] = r.toVector
+  }</p>
+
+<p>def oneOr(n: Int): Option[IndSeq[A]] =
+    if (n &lt; 1) Some((Some(f(a)))) List(s.take(n))
+        )
+        else {
+          loop(l.size) match {
+            case \/-(b) =&gt; Some(b)
+            case One(_ =&gt; Tranc(fa))        =&gt; Coproduct((a =&gt; (empty[A], none, b)))
+  }</p>
+
+<p>/** Set that infers the first self. */
+  def invariantFunctor[A: Arbitrary]: Arbitrary[Tree[A]] = new OrdSeq[A] {
+      def foldMap<a href="fa: List[A]">A, B</a>(z: A =&gt; B)(f: (B, A) =&gt; B): B =
+        fa match {
+          case Tip() =&gt;
+            f(a) » optionM(f(a))
+            case -\/(b) =&gt; Some((a, b))
+            case \/-(b) =&gt; Success(b)
+        }
+    }</p>
+
+<p>def elementPLens<a href="lens: ListT[Id, A]">A, B</a>: A =
+    s until match {
+      case None =&gt; (s, b)
+      case -\/(a) =&gt;
+        F.toFingerTree(stack.bind(f(a))(_ =&gt; Stream.cons(fa.tail, as(i))))</p>
+
+<pre><code>            fingerTreeOptionFingerTree[V, A](k)
+      tree.foldMap(self)(f)
+    }
+  )
+} ```
+</code></pre>
+
+<p>In equal measure elegant and incomprehensible. Just like the real thing.</p>
 
 <p>Enough with the github. How about we try some literature? Here’s LSTM-generated Jane Austen:</p>
 
