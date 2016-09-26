@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Char-rnn | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/char-rnn/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-09-26T21:36:55+01:00</updated>
+  <updated>2016-09-26T22:13:44+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -18,7 +18,7 @@
     <link href="http://nadbordrozd.github.io/blog/2016/09/17/text-generation-with-keras-char-rnns/"/>
     <updated>2016-09-17T22:17:50+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/09/17/text-generation-with-keras-char-rnns</id>
-    <content type="html"><![CDATA[<p>I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
+    <content type="html"><![CDATA[<p>Iwhqt recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
 
 <p><img src="/images/deep_learning_pc.png" alt="" />
 <em>watercooling, pretty lights and 2 x GTX 1080 (on the right)</em></p>
@@ -30,9 +30,8 @@
 <h3 id="and-here-are-the-results">And here are the results</h3>
 <p>A network with 3 LSTM layers 512 units each + a dense layer trained on the trained for a week on the concatenation of all java files from the <a href="https://github.com/apache/hadoop">hadoop repository</a> produces stuff like <a href="https://github.com/nadbordrozd/neural_playground/blob/master/output/hadoop.java">this</a>:</p>
 
-<p>```java</p>
-
-<p>@Override
+<p>```java
+  @Override
   public void setPerDispatcher(
       MockAM nn1, String queue) throws Exception {
     when(app1.getAppAttemptId()).thenReturn(defaultSize);
@@ -113,12 +112,13 @@ containersPublishEventPBHandler.registerNode((FinalApplicationHistoryArgument) r
       .add(getQueue(“metrics”).newSchedulingProto(
         “&lt;x-MASTERATOR new this attempt “+”ClientToRemovedResourceRasheder”, taskDispatcher),
         server.getBarerSet());
-  }
-```</p>
+  }</p>
 
-<p>That’s pretty believable java if you don’t look to closely! It’s important to remember that this is a character-level model. It doesn’t just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example <code>setSchedulerAppTestsBufferWithClusterMasterReconfiguration()</code> is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn’t stand out among all the other monstrous names like <code>RefreshAuthorazationPolicyProtocolServerSideTranslatorPB</code>. Which was exactly the point of this exercise.</p>
+<p>```</p>
 
-<p>Sometimes the network decides that it’s time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports</p>
+<p>That’s pretty believable java if you don’t look too closely! It’s important to remember that this is a character-level model. It doesn’t just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example <code>setSchedulerAppTestsBufferWithClusterMasterReconfiguration()</code> is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn’t stand out among all the other monstrous names like <code>RefreshAuthorazationPolicyProtocolServerSideTranslatorPB</code>. Which was exactly the point of this exercise.</p>
+
+<p>Sometimes the network decides that it’s time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports:</p>
 
 <p>```java
 /**
@@ -183,8 +183,9 @@ import java.util.List;
 import java.util.List;
 import java.util.Map;</p>
 
-<p>import com.google.common.annotations.VisibleUtils;
-```</p>
+<p>import com.google.common.annotations.VisibleUtils;</p>
+
+<p>```</p>
 
 <p>At first I thought this was a glitch, a result of the network is getting stuck in one state. But then I checked and - no, actually this is exactly what those hadoop .java files look like, 50 lines is a completely unexceptional amount of imports. And again, most of those imports are made up.</p>
 
@@ -256,8 +257,9 @@ def _item(name):
 
 <p>This is much lower quality because the network was smaller and sklearn’s codebase is much smaller than that of hadoop. I’m sure there is a witty comment about the quality of code in those two repositories somewhere in there.</p>
 
-<p>And <a href="https://github.com/scalaz/scalaz">here’s</a> the result of training on the <a href="https://github.com/scalaz/scalaz">scalaz repository</a>:
-```scala
+<p>And <a href="https://github.com/scalaz/scalaz">here’s</a> the result of training on the <a href="https://github.com/scalaz/scalaz">scalaz repository</a>:</p>
+
+<p>```scala
 private trait BijectionTContravariant[F[<em>], G[</em>]] extends Comonad[Coproduct[F, G, ?]] with CoproductFoldable1[F, G] {
   implicit def F: Traverse1[F]</p>
 
@@ -282,7 +284,7 @@ private trait BijectionTContravariant[F[<em>], G[</em>]] extends Comonad[Coprodu
   def index<a href="fa: F[A]">A</a>: Option[A] = self.subForest.foldLeft(as, empty[A])((x, y) =&gt; x +: x)</p>
 
 <p>/** See <code>Maybe</code> is run and then the success of this disjunction. */
-  def orElse[A &gt;: A2 &lt;: A1: Falider = Traverse<a href="fa =&gt; apply(a)">Applicative</a></p>
+  def orElse<a href="fa =&gt; apply(a)">A &gt;: A2 &lt;: A1: Falider = Traverse[Applicative]</a></p>
 
 <p>def emptyDequeue[A]: A ==» B =
     foldRight(as)(f)</p>
@@ -350,7 +352,7 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 
 <p>That was ok but let’s try something more modern. And what better represents modernity than people believing that the earth is flat. I have scraped all the top level comments from top 500 youtube videos matching the query “flat earth”. <a href="https://github.com/nadbordrozd/neural_playground/blob/master/getting_data/youtube_comments.py">Here</a> is the comments scraper I made for this. And here is the neural network spat out after ingesting 10MB worth of those comments</p>
 
-<p><code>
+<p><code>text
 [James Channel]:    I am a fucking Antarctica in the Bible in the Bible and the REAL Angel 
 of God, the Fact the Moon and Sun is NOT flat and the moon is not flat. 
 The ice wall below the earth is flat and it is the round earth is the 

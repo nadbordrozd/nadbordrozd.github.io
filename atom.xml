@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2016-09-25T00:59:45+01:00</updated>
+  <updated>2016-09-26T22:13:44+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -18,14 +18,14 @@
     <link href="http://nadbordrozd.github.io/blog/2016/09/17/text-generation-with-keras-char-rnns/"/>
     <updated>2016-09-17T22:17:50+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/09/17/text-generation-with-keras-char-rnns</id>
-    <content type="html"><![CDATA[<p>I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
+    <content type="html"><![CDATA[<p>Iwhqt recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
 
 <p><img src="http://nadbordrozd.github.io/images/deep_learning_pc.png" alt="" />
-<em>Watercooled 2 x GTX 1080 (on the right)</em></p>
+<em>watercooling, pretty lights and 2 x GTX 1080 (on the right)</em></p>
 
 <p>This topic has been widely written about by better people so if you don’t already know about char-RNNs go read them instead. <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">Here</a> is Andrej Karpathy’s blog post that started it all. It has an introduction to RNNs plus some <em>extremely</em> fun examples of texts generated with them. For an in depth explanation of LSTM (the specific type of RNN that everyone uses) I highly recommend <a href="http://r2rt.com/written-memories-understanding-deriving-and-extending-the-lstm.html">this</a>.</p>
 
-<p>I started playing with LSTMs by copying the <a href="https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py">example frmo Keras</a>, and then I kept adding to it. First - more layers, then - training with generators instead of batch - to handle datasets that don’t fit in memory. Then a bunch of scripts for getting interesting datasets, then utilities for persisting the models and so on. I ended up with a small set of command line tools for getting the data and running the experiments that I thought may be worth sharing. <a href="https://github.com/nadbordrozd/neural_playground">Here</a> it is.</p>
+<p>I started playing with LSTMs by copying the <a href="https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py">example from Keras</a>, and then I kept adding to it. First - more layers, then - training with generators instead of batch - to handle datasets that don’t fit in memory. Then a bunch of scripts for getting interesting datasets, then utilities for persisting the models and so on. I ended up with a small set of command line tools for getting the data and running the experiments that I thought may be worth sharing. <a href="https://github.com/nadbordrozd/neural_playground">Here</a> it is.</p>
 
 <h3 id="and-here-are-the-results">And here are the results</h3>
 <p>A network with 3 LSTM layers 512 units each + a dense layer trained on the trained for a week on the concatenation of all java files from the <a href="https://github.com/apache/hadoop">hadoop repository</a> produces stuff like <a href="https://github.com/nadbordrozd/neural_playground/blob/master/output/hadoop.java">this</a>:</p>
@@ -196,9 +196,9 @@
 </span><span class="line">  <span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
-<p>That’s pretty believable java if you don’t look to closely! It’s important to remember that this is a character-level model. It doesn’t just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example <code>setSchedulerAppTestsBufferWithClusterMasterReconfiguration()</code> is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn’t stand out among all the other monstrous names like <code>RefreshAuthorazationPolicyProtocolServerSideTranslatorPB</code>. Which was exactly the point of this exercise.</p>
+<p>That’s pretty believable java if you don’t look too closely! It’s important to remember that this is a character-level model. It doesn’t just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example <code>setSchedulerAppTestsBufferWithClusterMasterReconfiguration()</code> is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn’t stand out among all the other monstrous names like <code>RefreshAuthorazationPolicyProtocolServerSideTranslatorPB</code>. Which was exactly the point of this exercise.</p>
 
-<p>Sometimes the network decides that it’s time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports</p>
+<p>Sometimes the network decides that it’s time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -458,6 +458,158 @@
 
 <p>This is much lower quality because the network was smaller and sklearn’s codebase is much smaller than that of hadoop. I’m sure there is a witty comment about the quality of code in those two repositories somewhere in there.</p>
 
+<p>And <a href="https://github.com/scalaz/scalaz">here’s</a> the result of training on the <a href="https://github.com/scalaz/scalaz">scalaz repository</a>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="k">private</span> <span class="k">trait</span> <span class="nc">BijectionTContravariant</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">G</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">Comonad</span><span class="o">[</span><span class="kt">Coproduct</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">G</span>, <span class="kt">?</span><span class="o">]]</span> <span class="k">with</span> <span class="nc">CoproductFoldable1</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">G</span><span class="o">]</span> <span class="o">{</span>
+</span><span class="line">  <span class="k">implicit</span> <span class="k">def</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Traverse1</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">traverse1Impl</span><span class="o">[</span><span class="kt">G</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">OneOr</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">G</span><span class="o">[</span><span class="kt">B</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Traverse</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span>
+</span><span class="line">    <span class="n">G</span><span class="o">.</span><span class="n">apply2</span><span class="o">(</span><span class="n">fa</span><span class="o">.</span><span class="n">foldMap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">f</span><span class="o">))(</span><span class="n">F</span><span class="o">.</span><span class="n">append</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">),</span> <span class="n">f</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** Collect `Coproduct[F, G, A]` is the given context `F` */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">uncontra1_</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">G</span><span class="o">[</span><span class="k">_</span><span class="o">]](</span><span class="k">implicit</span> <span class="n">G0</span><span class="k">:</span> <span class="kt">Foldable1</span><span class="o">[</span><span class="kt">G</span><span class="o">])</span><span class="k">:</span> <span class="kt">Foldable1</span><span class="o">[</span><span class="kt">l</span><span class="o">[</span><span class="kt">a</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="kt">F</span><span class="o">[</span><span class="kt">a</span><span class="o">]</span>, <span class="kt">G</span><span class="o">[</span><span class="kt">a</span><span class="o">])]]</span> <span class="k">=</span>
+</span><span class="line">    <span class="k">new</span> <span class="nc">ProductCozip</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">G</span><span class="o">]</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">implicit</span> <span class="k">def</span> <span class="n">F</span> <span class="k">=</span> <span class="n">self</span>
+</span><span class="line">      <span class="k">implicit</span> <span class="k">def</span> <span class="n">G</span> <span class="k">=</span> <span class="n">G0</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/**Like `Foldable1[F]` is the zipper instance to a `Zip` */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">indexOf</span><span class="o">[</span><span class="kt">A</span> <span class="k">&gt;:</span> <span class="kt">A2</span> <span class="k">&lt;:</span> <span class="kt">A1:</span> <span class="kt">Boolean</span><span class="o">](</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Functor</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">Boolean</span><span class="o">]</span> <span class="k">=</span>
+</span><span class="line">    <span class="n">F</span><span class="o">.</span><span class="n">empty</span><span class="o">[</span><span class="kt">A</span><span class="o">].</span><span class="n">leftMap</span><span class="o">(</span><span class="n">implicitly</span><span class="o">[</span><span class="kt">A</span> <span class="kt">&lt;~&lt;</span> <span class="kt">A</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">extendsInstance</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="o">-/(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=</span> <span class="n">l</span><span class="o">.</span><span class="n">toList</span>
+</span><span class="line">  <span class="cm">/** A version of `zip` that all of the underlying value if the new `Maybe` to the errors */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">index</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">self</span><span class="o">.</span><span class="n">subForest</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="n">as</span><span class="o">,</span> <span class="n">empty</span><span class="o">[</span><span class="kt">A</span><span class="o">])((</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">x</span> <span class="o">+:</span> <span class="n">x</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** See `Maybe` is run and then the success of this disjunction. */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">orElse</span><span class="o">[</span><span class="kt">A</span> <span class="k">&gt;:</span> <span class="kt">A2</span> <span class="k">&lt;:</span> <span class="kt">A1:</span> <span class="kt">Falider</span> <span class="kt">=</span> <span class="kt">Traverse</span><span class="o">[</span><span class="kt">Applicative</span><span class="o">]](</span><span class="n">fa</span> <span class="k">=&gt;</span> <span class="n">apply</span><span class="o">(</span><span class="n">a</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">emptyDequeue</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span><span class="k">:</span> <span class="kt">A</span> <span class="o">==&gt;&gt;</span> <span class="n">B</span> <span class="k">=</span>
+</span><span class="line">    <span class="n">foldRight</span><span class="o">(</span><span class="n">as</span><span class="o">)(</span><span class="n">f</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">override</span> <span class="k">def</span> <span class="n">foldLeft</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">z</span><span class="k">:</span> <span class="kt">B</span><span class="o">)(</span><span class="n">f</span><span class="k">:</span> <span class="o">(</span><span class="kt">B</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span>
+</span><span class="line">    <span class="n">fa</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="n">map</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">self</span><span class="o">)(</span><span class="n">f</span><span class="o">))</span>
+</span><span class="line">  <span class="k">override</span> <span class="k">def</span> <span class="n">foldMap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">traverseTree</span><span class="o">(</span><span class="n">foldMap1</span><span class="o">(</span><span class="k">_</span><span class="o">)(</span><span class="n">f</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">traverse</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span>
+</span><span class="line">    <span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))(</span><span class="n">M</span><span class="o">.</span><span class="n">point</span><span class="o">(</span><span class="n">z</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** A view for a `Coproduct[F, G, A]` that the folded. */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">foldMapRight1</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Monoid</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">def</span> <span class="n">option</span><span class="k">:</span> <span class="kt">Tree</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="n">none</span>
+</span><span class="line">    <span class="k">def</span> <span class="n">streamThese</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">r</span><span class="o">.</span><span class="n">toVector</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">oneOr</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">IndSeq</span><span class="o">[</span><span class="kt">A</span><span class="o">]]</span> <span class="k">=</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">)</span> <span class="nc">Some</span><span class="o">((</span><span class="nc">Some</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))))</span> <span class="nc">List</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="n">take</span><span class="o">(</span><span class="n">n</span><span class="o">))</span>
+</span><span class="line">        <span class="o">)</span>
+</span><span class="line">        <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">loop</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">size</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class="line">            <span class="k">case</span> <span class="o">\/-(</span><span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
+</span><span class="line">            <span class="k">case</span> <span class="nc">One</span><span class="o">(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">Tranc</span><span class="o">(</span><span class="n">fa</span><span class="o">))</span>        <span class="k">=&gt;</span> <span class="nc">Coproduct</span><span class="o">((</span><span class="n">a</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">empty</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">none</span><span class="o">,</span> <span class="n">b</span><span class="o">)))</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** Set that infers the first self. */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">invariantFunctor</span><span class="o">[</span><span class="kt">A:</span> <span class="kt">Arbitrary</span><span class="o">]</span><span class="k">:</span> <span class="kt">Arbitrary</span><span class="o">[</span><span class="kt">Tree</span><span class="o">[</span><span class="kt">A</span><span class="o">]]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">OrdSeq</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">def</span> <span class="n">foldMap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">z</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="n">f</span><span class="k">:</span> <span class="o">(</span><span class="kt">B</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span>
+</span><span class="line">        <span class="n">fa</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class="line">          <span class="k">case</span> <span class="nc">Tip</span><span class="o">()</span> <span class="k">=&gt;</span>
+</span><span class="line">            <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="o">&gt;&gt;</span> <span class="n">optionM</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))</span>
+</span><span class="line">            <span class="k">case</span> <span class="o">-\/(</span><span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">((</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">))</span>
+</span><span class="line">            <span class="k">case</span> <span class="o">\/-(</span><span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Success</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">elementPLens</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">lens</span><span class="k">:</span> <span class="kt">ListT</span><span class="o">[</span><span class="kt">Id</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span>
+</span><span class="line">    <span class="n">s</span> <span class="n">until</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">s</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>
+</span><span class="line">      <span class="k">case</span> <span class="o">-\/(</span><span class="n">a</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span><span class="line">        <span class="n">F</span><span class="o">.</span><span class="n">toFingerTree</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">bind</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">Stream</span><span class="o">.</span><span class="n">cons</span><span class="o">(</span><span class="n">fa</span><span class="o">.</span><span class="n">tail</span><span class="o">,</span> <span class="n">as</span><span class="o">(</span><span class="n">i</span><span class="o">))))</span>
+</span><span class="line">
+</span><span class="line">                <span class="n">fingerTreeOptionFingerTree</span><span class="o">[</span><span class="kt">V</span>, <span class="kt">A</span><span class="o">](</span><span class="n">k</span><span class="o">)</span>
+</span><span class="line">          <span class="n">tree</span><span class="o">.</span><span class="n">foldMap</span><span class="o">(</span><span class="n">self</span><span class="o">)(</span><span class="n">f</span><span class="o">)</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">      <span class="o">)</span>
+</span><span class="line">    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>In equal measure elegant and incomprehensible. Just like real scalaz.</p>
+
 <p>Enough with the github. How about we try some literature? Here’s LSTM-generated Jane Austen:</p>
 
 <blockquote>
@@ -494,27 +646,27 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 <span class="line-number">19</span>
 <span class="line-number">20</span>
 <span class="line-number">21</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">[</span><span class="n">James</span> <span class="n">Channel</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">am</span> <span class="n">a</span> <span class="n">fucking</span> <span class="n">Antarctica</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Bible</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">Bible</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">REAL</span> <span class="n">Angel</span>
-</span><span class="line"><span class="n">of</span> <span class="n">God</span><span class="p">,</span> <span class="n">the</span> <span class="n">Fact</span> <span class="n">the</span> <span class="n">Moon</span> <span class="ow">and</span> <span class="n">Sun</span> <span class="ow">is</span> <span class="n">NOT</span> <span class="n">flat</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">moon</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">flat</span><span class="o">.</span>
-</span><span class="line"><span class="n">The</span> <span class="n">ice</span> <span class="n">wall</span> <span class="n">below</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span> <span class="ow">and</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">the</span> <span class="nb">round</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">the</span>
-</span><span class="line"><span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="o">.</span>
-</span><span class="line"><span class="p">[</span><span class="n">Mark</span> <span class="n">Filler</span><span class="p">]:</span>    <span class="n">The</span> <span class="n">Earth</span> <span class="ow">is</span> <span class="n">flat</span> <span class="k">with</span> <span class="n">your</span> <span class="n">stupid</span> <span class="n">Qur</span><span class="s">&#39;an and Christ And I can watch the </span>
-</span><span class="line"><span class="n">truth</span> <span class="n">of</span> <span class="n">crazy</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">curve</span> <span class="n">flat</span> <span class="n">then</span> <span class="n">why</span> <span class="n">do</span> <span class="n">we</span> <span class="n">have</span> <span class="n">to</span>
-</span><span class="line"><span class="n">discover</span> <span class="n">the</span> <span class="n">earth</span> <span class="n">flat</span><span class="err">?</span>
-</span><span class="line"><span class="p">[</span><span class="n">James</span> <span class="n">Channel</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">don</span><span class="s">&#39;t know what we do not get the communication and the earth and the </span>
-</span><span class="line"><span class="n">center</span> <span class="n">of</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">just</span> <span class="n">a</span> <span class="n">globe</span> <span class="n">because</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">flat</span><span class="o">.</span> <span class="n">The</span>
-</span><span class="line"><span class="n">earth</span> <span class="ow">is</span> <span class="nb">round</span> <span class="ow">and</span> <span class="n">why</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">sun</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">sun</span> <span class="n">would</span> <span class="n">be</span> <span class="n">a</span> <span class="n">flat</span> <span class="n">disc</span> <span class="ow">and</span> <span class="n">the</span>
-</span><span class="line"><span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="err">?</span>
-</span><span class="line"><span class="p">[</span><span class="n">Mark</span> <span class="n">Lanz</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">am</span> <span class="n">a</span> <span class="n">Flat</span> <span class="n">Earther</span> <span class="ow">and</span> <span class="n">I</span> <span class="n">can</span> <span class="n">see</span> <span class="n">the</span> <span class="n">truth</span> <span class="n">that</span> <span class="n">was</span> <span class="ow">not</span> <span class="n">the</span> <span class="n">reason</span> <span class="n">the</span>
-</span><span class="line"><span class="n">ship</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">sun</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">South</span> <span class="n">Pole</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">last</span> <span class="n">of</span> <span class="n">the</span> <span class="n">world</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">size</span> <span class="n">of</span>
-</span><span class="line"><span class="n">the</span> <span class="n">earth</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">moon</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">same</span> <span class="n">formation</span> <span class="n">that</span> <span class="n">we</span> <span class="n">can</span> <span class="n">fly</span> <span class="n">around</span> <span class="n">the</span>
-</span><span class="line"><span class="n">earth</span> <span class="ow">and</span> <span class="n">do</span> <span class="n">the</span> <span class="n">moon</span> <span class="n">the</span> <span class="n">earth</span> <span class="ow">is</span> <span class="n">flat</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">disk</span><span class="err">??</span>
-</span><span class="line"><span class="p">[</span><span class="n">Bone</span> <span class="n">City</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">can</span> <span class="n">see</span> <span class="n">the</span> <span class="n">sun</span> <span class="n">end</span> <span class="n">of</span> <span class="n">the</span> <span class="n">sun</span> <span class="ow">and</span> <span class="n">sun</span> <span class="k">with</span> <span class="n">the</span> <span class="n">edge</span> <span class="n">of</span> <span class="n">the</span> <span class="n">earth</span><span class="o">.</span>
-</span><span class="line"><span class="p">[</span><span class="n">Star</span> <span class="n">Call</span><span class="p">]:</span>    <span class="n">The</span> <span class="n">Earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="p">,</span> <span class="n">it</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">flat</span> <span class="n">earth</span> <span class="n">theory</span> <span class="n">that</span> <span class="n">are</span> <span class="n">the</span> <span class="n">problems</span> <span class="n">to</span> <span class="n">go</span>
-</span><span class="line"><span class="n">there</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">Earth</span> <span class="ow">is</span> <span class="n">flat</span><span class="o">.</span> <span class="n">So</span> <span class="nb">all</span> <span class="n">the</span> <span class="n">way</span> <span class="n">to</span> <span class="n">the</span> <span class="n">Earth</span> <span class="ow">and</span> <span class="n">the</span>
-</span><span class="line"><span class="n">Earth</span><span class="o">.</span> <span class="n">FLAT</span> <span class="n">EARTH</span> <span class="n">IS</span> <span class="n">FLAT</span> <span class="n">THE</span> <span class="n">EARTH</span> <span class="n">IS</span> <span class="n">FLAT</span><span class="o">....</span> <span class="n">I</span> <span class="n">HAVE</span> <span class="n">BECAUSE</span> <span class="n">THE</span> <span class="n">SULLARS</span> <span class="n">WITH</span> <span class="n">A</span> <span class="n">SPACE</span> <span class="n">THE</span> <span class="n">EARTH</span> <span class="n">IS</span> <span class="n">FLAT</span><span class="err">!!!</span>
-</span><span class="line"><span class="p">[</span><span class="n">MrJohnny</span><span class="p">]:</span>    <span class="n">I</span> <span class="n">am</span> <span class="n">the</span> <span class="n">truth</span> <span class="n">that</span> <span class="ow">is</span> <span class="n">bullshit</span> <span class="n">lol</span>
-</span><span class="line"><span class="p">[</span><span class="n">Jesse</span> <span class="n">Cack</span><span class="p">]:</span>    <span class="n">Great</span> <span class="n">job</span> <span class="n">God</span> <span class="n">bless</span> <span class="n">you</span> <span class="k">for</span> <span class="n">this</span> <span class="n">video</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">[James Channel]:    I am a fucking Antarctica in the Bible in the Bible and the REAL Angel
+</span><span class="line">of God, the Fact the Moon and Sun is NOT flat and the moon is not flat.
+</span><span class="line">The ice wall below the earth is flat and it is the round earth is the
+</span><span class="line">earth is flat.
+</span><span class="line">[Mark Filler]:    The Earth is flat with your stupid Qur&#39;an and Christ And I can watch the
+</span><span class="line">truth of crazy and the earth is a curve flat then why do we have to
+</span><span class="line">discover the earth flat?
+</span><span class="line">[James Channel]:    I don&#39;t know what we do not get the communication and the earth and the
+</span><span class="line">center of the earth is just a globe because the earth is not flat. The
+</span><span class="line">earth is round and why is the sun and the sun would be a flat disc and the
+</span><span class="line">earth is flat?
+</span><span class="line">[Mark Lanz]:    I am a Flat Earther and I can see the truth that was not the reason the
+</span><span class="line">ship is the sun and the South Pole in the last of the world and the size of
+</span><span class="line">the earth and the moon is the same formation that we can fly around the
+</span><span class="line">earth and do the moon the earth is flat is the disk??
+</span><span class="line">[Bone City]:    I can see the sun end of the sun and sun with the edge of the earth.
+</span><span class="line">[Star Call]:    The Earth is flat, it is a flat earth theory that are the problems to go
+</span><span class="line">there and the Earth is flat. So all the way to the Earth and the
+</span><span class="line">Earth. FLAT EARTH IS FLAT THE EARTH IS FLAT.... I HAVE BECAUSE THE SULLARS WITH A SPACE THE EARTH IS FLAT!!!
+</span><span class="line">[MrJohnny]:    I am the truth that is bullshit lol
+</span><span class="line">[Jesse Cack]:    Great job God bless you for this video
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>That doesn’t make any sense at all. It’s so much like real youtube comments it’s uncanny.</p>
