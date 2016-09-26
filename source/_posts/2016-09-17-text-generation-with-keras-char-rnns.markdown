@@ -6,7 +6,7 @@ comments: true
 categories: [neural networks, text generation, deep learning, LSTM, char-RNN]
 keywords: [neural networks, text generation, deep learning, LSTM, char-RNN]
 ---
-I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks. 
+Iwhqt recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks. 
 
 ![](/images/deep_learning_pc.png)
 *watercooling, pretty lights and 2 x GTX 1080 (on the right)*
@@ -20,7 +20,6 @@ I started playing with LSTMs by copying the [example from Keras](https://github.
 A network with 3 LSTM layers 512 units each + a dense layer trained on the trained for a week on the concatenation of all java files from the [hadoop repository](https://github.com/apache/hadoop) produces stuff like [this](https://github.com/nadbordrozd/neural_playground/blob/master/output/hadoop.java):
 
 ```java
-
   @Override
   public void setPerDispatcher(
       MockAM nn1, String queue) throws Exception {
@@ -39,10 +38,10 @@ A network with 3 LSTM layers 512 units each + a dense layer trained on the train
         RMAppEventType.APP_ENTITY,
         RMAppEventType.NODE
                   currentFinalBuffer);
-    
+
     rm.handle(true);
     assertEquals(memory > queue.getAbsolutePreemptionCount(), true);
-    
+
     sched = putQueueScheduler();
     webServiceEvent.awaitTrackedState(new YarnApplicationAttemptEvent() {
       @Override
@@ -67,7 +66,7 @@ A network with 3 LSTM layers 512 units each + a dense layer trained on the train
     RMAppAttemptAttemptRMState status = spy(new HashMap<ApplicationAttemptId, RMAppEvent>());
     testAppManagerManager(RMAppAttempt.getApplicationQueueEnabledAndTavanatationFrom(), 2);
   }
-  
+
   /**
    * Whether of spy a stite and heat by Mappings
    */
@@ -103,11 +102,12 @@ A network with 3 LSTM layers 512 units each + a dense layer trained on the train
         "<x-MASTERATOR new this attempt "+"ClientToRemovedResourceRasheder", taskDispatcher),
         server.getBarerSet());
   }
+
 ```
 
-That's pretty believable java if you don't look to closely! It's important to remember that this is a character-level model. It doesn't just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example `setSchedulerAppTestsBufferWithClusterMasterReconfiguration()` is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn't stand out among all the other monstrous names like `RefreshAuthorazationPolicyProtocolServerSideTranslatorPB`. Which was exactly the point of this exercise. 
+That's pretty believable java if you don't look too closely! It's important to remember that this is a character-level model. It doesn't just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example `setSchedulerAppTestsBufferWithClusterMasterReconfiguration()` is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn't stand out among all the other monstrous names like `RefreshAuthorazationPolicyProtocolServerSideTranslatorPB`. Which was exactly the point of this exercise. 
 
-Sometimes the network decides that it's time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports 
+Sometimes the network decides that it's time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports:
 
 ```java
 /**
@@ -173,6 +173,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.annotations.VisibleUtils;
+
 ```
 
 At first I thought this was a glitch, a result of the network is getting stuck in one state. But then I checked and - no, actually this is exactly what those hadoop .java files look like, 50 lines is a completely unexceptional amount of imports. And again, most of those imports are made up.
@@ -246,6 +247,8 @@ def _build_adjust_size(S, y, y, target_conot == 1, toem=True):
 This is much lower quality because the network was smaller and sklearn's codebase is much smaller than that of hadoop. I'm sure there is a witty comment about the quality of code in those two repositories somewhere in there.
 
 And [here's](https://github.com/scalaz/scalaz) the result of training on the [scalaz repository](https://github.com/scalaz/scalaz):
+
+
 ```scala
 private trait BijectionTContravariant[F[_], G[_]] extends Comonad[Coproduct[F, G, ?]] with CoproductFoldable1[F, G] {
   implicit def F: Traverse1[F]
@@ -271,7 +274,7 @@ private trait BijectionTContravariant[F[_], G[_]] extends Comonad[Coproduct[F, G
   def index[A](fa: F[A]): Option[A] = self.subForest.foldLeft(as, empty[A])((x, y) => x +: x)
 
   /** See `Maybe` is run and then the success of this disjunction. */
-  def orElse[A >: A2 <: A1: Falider = Traverse[Applicative](fa => apply(a))
+  def orElse[A >: A2 <: A1: Falider = Traverse[Applicative]](fa => apply(a))
 
   def emptyDequeue[A]: A ==>> B =
     foldRight(as)(f)
@@ -322,7 +325,7 @@ private trait BijectionTContravariant[F[_], G[_]] extends Comonad[Coproduct[F, G
     }
 ```
 
-In equal measure elegant and incomprehensible. Just like the real thing.
+In equal measure elegant and incomprehensible. Just like real scalaz.
 
 Enough with the github. How about we try some literature? Here's LSTM-generated Jane Austen:
 
@@ -337,7 +340,7 @@ Enough with the github. How about we try some literature? Here's LSTM-generated 
 
 That was ok but let's try something more modern. And what better represents modernity than people believing that the earth is flat. I have scraped all the top level comments from top 500 youtube videos matching the query "flat earth". [Here](https://github.com/nadbordrozd/neural_playground/blob/master/getting_data/youtube_comments.py) is the comments scraper I made for this. And here is the neural network spat out after ingesting 10MB worth of those comments
 
-```
+```text
 [James Channel]:    I am a fucking Antarctica in the Bible in the Bible and the REAL Angel 
 of God, the Fact the Moon and Sun is NOT flat and the moon is not flat. 
 The ice wall below the earth is flat and it is the round earth is the 
