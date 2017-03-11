@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="Iwhqt recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it &hellip;">
+  <meta name="description" content="This is the first of two posts about Bayesian networks, pymc and missing data. In the first post I will show how to do Bayesian networks in pymc* and &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,482 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/">Missing Data Imputation With Bayesian Networks in Pymc</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-03-05T15:15:17+00:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>3:15 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This is the first of two posts about Bayesian networks, pymc and missing data. In the first post I will show how to do Bayesian networks in pymc* and how to use them to impute missing data. This part is boring and slightly horrible. In the second post I investigate how well it actually works in practice (not very well) and how it compares to a more traditional machine learning approach (poorly). <strong>Feel free to go straight to the second post, it has plots in it</strong>.</p>
+
+<p>This post assumes that the reader is already familiar with both bayesianism and pymc. If you aren’t, I recommend that you check out the fantastic <a href="https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers">Bayesian Methods For Hackers</a>. All the code in this post is available <a href="https://github.com/nadbordrozd/ds-tools/blob/master/pymc_imputation.ipynb">on github</a></p>
+
+<p>The research behind this post and the development of the data imputation toolkit was done in large part at <a href="http://www.aimia.com/">AIMIA</a> with Matthew Majewski under the enlightened leadership of Javier Rodriguez Zaurin.</p>
+
+<p>* technically, everything in pymc is a Bayesian network, I know</p>
+
+<h3 id="the-problem">The problem</h3>
+<p>We have observed 10 animals and noted 3 things about each of them:
+- does it swim like a duck?
+- does it quack like a duck?
+- is it, in fact, a duck?</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+</span><span class="line">
+</span><span class="line"><span class="c"># we use 1 and 0 to represent True and False for reasons that will become clear later</span>
+</span><span class="line"><span class="n">full</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+</span><span class="line">    <span class="s">&#39;swims_like_a_duck&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span class="line">    <span class="s">&#39;quacks_like_a_duck&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span class="line">    <span class="s">&#39;duck&#39;</span><span class="p">:</span>               <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+</span><span class="line"><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>It is easy to notice that in this dataset an animal is a duck if and only if it both swims like a duck <strong>and</strong> quacks like a duck. So far so good.</p>
+
+<p>But what if someone forgets to write down whether the duck number 10 did any quacking or whether the animal number 9 was a duck at all? Now we have missing data. Here denoted by <code>-1</code></p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">with_missing</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+</span><span class="line">    <span class="s">&#39;swims_like_a_duck&#39;</span><span class="p">:</span>  <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+</span><span class="line">    <span class="s">&#39;quacks_like_a_duck&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+</span><span class="line">    <span class="s">&#39;duck&#39;</span><span class="p">:</span>               <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">]</span>
+</span><span class="line"><span class="p">})</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>This tells us about the last animal that it is a duck, but the information about swimming and quacking is missing. Nevertheless, having established the rule</p>
+
+<script type="math/tex; mode=display">(swims \: like \: duck) \land (quacks \: like \:  duck) \Leftrightarrow (is \: duck)</script>
+
+<p>we can infer that the values of <code>swims_like_a_duck</code> and <code>quacks_like_a_duck</code> must both be <code>1</code> for this animal.</p>
+
+<p>This is what we will try to do here - learn the relationship between the variables and use it to fill in the missing ones.</p>
+
+<h3 id="the-bayesian-solution">The Bayesian solution</h3>
+<p>To be able to attack this problem, let’s make one simplifying assumption. Let’s assume that we know the causal structure of the problem upfront. That is - we know that swimming and quacking are independent random variables, while being a duck is a random variable that potentially depends on the other two.</p>
+
+<p>This is the situation described by this Bayesian network:</p>
+
+<p><img src="/images/bayesian_networks/ducknet1.png" /></p>
+
+<p>This network is fully characterised by 6 parameters - prior probabilities of swimming and quacking -<br />
+$P(swims)$, $P(quacks)$<br />
+- and conditional probability of being a duck given values of the other 2 variables -<br />
+$P(duck \mid swims \land quacks)$,<br />
+$P(duck \mid \neg swims \land quacks)$<br />
+- and so on. We don’t know anything about the values of these parameters, other than they must be between $0$ and $1$. The bayesian thing to do in such situations is to model the unknown parameters as random variables of their own and give them uniform priors.</p>
+
+<p>Thus, the network expands:</p>
+
+<p><img src="/images/bayesian_networks/ducknet3.png" /></p>
+
+<p>This is the network describing a single animal, but actually we have observations of many animals, so the full network would look more like this:</p>
+
+<p><img src="/images/bayesian_networks/ducknet4.png" /></p>
+
+<p>There is only one node corresponding to each of the 6 parameters, but there are as many ‘swims’ and ‘quacks’ and ‘duck’ nodes as there are records in the dataset.</p>
+
+<p>Some of the variables are observed (orange), others aren’t (white), but we have specified priors for all the parent variables and the model is fully defined. This is enough to (via    Bayes theorem) derive the formula for the posterior probability of every unobserved variable and the posterior distribution of every model parameter.</p>
+
+<p>But instead of doing math, we will find a way to programmatically estimate all those probabilities with pymc. This way, we will have a solution that can be easily extended to arbitrarily complicated networks.</p>
+
+<p>What could go wrong?</p>
+
+<h3 id="pymc-implementation">pymc implementation</h3>
+
+<p><strong>Disclaimer: this is all hacky and inefficient in ways I didn’t realise it would be when I started working on it. pymc is not the right tool for the job, if you want to do this seriously, in a production environment you should look for something else. pymc3 maybe?</strong></p>
+
+<p>I will now demonstrate how to represent our quack-swim-duck Bayesian network in pymc and how to make predictions with it. pymc was confusing the hell out of me when I first started this project. I will be painstakingly explicit at every step of this tutorial to save the reader some of this confusion. Then at the end I will show how to achieve the same result with 1/10th as many lines of code using some utilities of my invention.</p>
+
+<p>Let’s start with the unobserved variables:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">pymc</span>
+</span><span class="line"><span class="c"># prior probabilities for swimming and quacking</span>
+</span><span class="line"><span class="n">swim_prior</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s">&#39;P(swims)&#39;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line"><span class="n">quack_prior</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s">&#39;P(quacks)&#39;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="c"># probability of being a duck conditional on swimming and quacking</span>
+</span><span class="line"><span class="c"># (or not swimming and quacking etc.)</span>
+</span><span class="line"><span class="n">p_duck_swim_quack</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s">&#39;P(duck | swims &amp; quacks)&#39;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line"><span class="n">p_duck_not_swim_not_quack</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s">&#39;P(duck | not swims &amp; not quacks)&#39;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line"><span class="n">p_duck_not_swim_quack</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s">&#39;P(duck | not swims &amp; quacks)&#39;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line"><span class="n">p_duck_swim_not_quack</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="s">&#39;P(duck | swims &amp; not quacks)&#39;</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now the observed variables. pymc requires that we use masked arrays to represent missing values:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class="line"><span class="n">swim_data</span> <span class="o">=</span> <span class="n">with_missing</span><span class="o">.</span><span class="n">swims_like_a_duck</span>
+</span><span class="line"><span class="n">masked_swim_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">swim_data</span><span class="p">,</span> <span class="n">swim_data</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">quack_data</span> <span class="o">=</span> <span class="n">with_missing</span><span class="o">.</span><span class="n">quacks_like_a_duck</span>
+</span><span class="line"><span class="n">masked_quack_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">quack_data</span><span class="p">,</span> <span class="n">quack_data</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">duck_data</span> <span class="o">=</span> <span class="n">with_missing</span><span class="o">.</span><span class="n">duck</span>
+</span><span class="line"><span class="n">masked_duck_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">duck_data</span><span class="p">,</span> <span class="n">duck_data</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This is what a masked array with two missing values looks like:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">masked_quack_data</span>
+</span><span class="line"><span class="n">masked_array</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">1</span> <span class="o">--</span> <span class="o">--</span><span class="p">],</span>
+</span><span class="line">             <span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span>  <span class="bp">True</span><span class="p">],</span>
+</span><span class="line">       <span class="n">fill_value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Quacking and swimming nodes:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># number of animal observations</span>
+</span><span class="line"><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">with_missing</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="c"># with &#39;size=n&#39; with tell pymc that &#39;swims&#39; is actually a sequence of n Bernoulli variables</span>
+</span><span class="line"><span class="n">swims</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="s">&#39;swims&#39;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">swim_prior</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">masked_swim_data</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+</span><span class="line"><span class="n">quacks</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="s">&#39;quacks&#39;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">quack_prior</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">masked_quack_data</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And now the hard part. We have to construct a Bernoulli random variable ‘duck’, whose conditional probability given its parents is equal to a different random variable for very combination of values of the parents. That was a mouthful, but all it means is that there is a conditional probability table of ‘duck’ conditioned on ‘swims’ and ‘quacks’. This is literally the first example in every textbook on probabilistic models. And yet, there is no easy way to express this relationship with pymc. We are forced to roll our own custom function.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># auxiliary pymc variable - probability of duck</span>
+</span><span class="line"><span class="nd">@pymc.deterministic</span>
+</span><span class="line"><span class="k">def</span> <span class="nf">duck_probability</span><span class="p">(</span>
+</span><span class="line">        <span class="n">swims</span><span class="o">=</span><span class="n">swims</span><span class="p">,</span>
+</span><span class="line">        <span class="n">quacks</span><span class="o">=</span><span class="n">quacks</span><span class="p">,</span>
+</span><span class="line">        <span class="n">p_duck_swim_quack</span><span class="o">=</span><span class="n">p_duck_swim_quack</span><span class="p">,</span>
+</span><span class="line">        <span class="n">p_duck_not_swim_quack</span><span class="o">=</span><span class="n">p_duck_not_swim_quack</span><span class="p">,</span>
+</span><span class="line">        <span class="n">p_duck_swim_not_quack</span><span class="o">=</span><span class="n">p_duck_swim_not_quack</span><span class="p">,</span>
+</span><span class="line">        <span class="n">p_duck_not_swim_not_quack</span><span class="o">=</span><span class="n">p_duck_not_swim_not_quack</span><span class="p">):</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="line">    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">q</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">swims</span><span class="p">,</span> <span class="n">quacks</span><span class="p">):</span>
+</span><span class="line">        <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="ow">and</span> <span class="n">q</span><span class="p">):</span>
+</span><span class="line">            <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_duck_swim_quack</span><span class="p">)</span>
+</span><span class="line">        <span class="k">elif</span> <span class="p">(</span><span class="n">s</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">q</span><span class="p">)):</span>
+</span><span class="line">            <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_duck_swim_not_quack</span><span class="p">)</span>
+</span><span class="line">        <span class="k">elif</span> <span class="p">((</span><span class="ow">not</span> <span class="n">s</span><span class="p">)</span> <span class="ow">and</span> <span class="n">q</span><span class="p">):</span>
+</span><span class="line">            <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_duck_not_swim_quack</span><span class="p">)</span>
+</span><span class="line">        <span class="k">elif</span> <span class="p">((</span><span class="ow">not</span> <span class="n">s</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">q</span><span class="p">)):</span>
+</span><span class="line">            <span class="n">d</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_duck_not_swim_not_quack</span><span class="p">)</span>
+</span><span class="line">        <span class="k">else</span><span class="p">:</span>
+</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;this should never happen&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+</span><span class="line">
+</span><span class="line"><span class="c"># AND FINALLY</span>
+</span><span class="line"><span class="n">duck</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="s">&#39;duck&#39;</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">duck_probability</span><span class="p">,</span> <span class="n">observed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">masked_duck_data</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">n</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>If you’re half as confused reading this code as I was when I was first writing it, you deserve some explanations.</p>
+
+<ul>
+  <li>‘swims’ and ‘quacks’ are of type <code>pymc.distributions.Bernoulli</code>, but here we treat them like numpy arrays.</li>
+</ul>
+
+<p>This is <code>@pymc.deterministic</code>’s doing. This decorator ensures that when this function is actually called it will be given <code>swims.value</code> and <code>quacks.value</code> as parameters - and these are indeed numpy arrays. Same goes for all the other parameters.</p>
+
+<ul>
+  <li>earlier we used a pymc random variable for the <code>p</code> parameter of a <code>pymc.Bernoulli</code> but now we’re using a function - <code>duck_probability</code></li>
+</ul>
+
+<p>Again, <code>@pymc.deterministic</code>. When applied to a function it returns an object of type <code>pymc.PyMCObjects.Deterministic</code>. At this point the thing bound to the name ‘duck_probability’ is no longer a function. It’s a pymc random variable. It has a <code>value</code> parameter and everything.</p>
+
+<p>Ok, let’s put it all together in a pymc model:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># putting it all together</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Model</span><span class="p">([</span><span class="n">swims</span><span class="p">,</span> <span class="n">quacks</span><span class="p">,</span> <span class="n">duck</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>aaaand we’re done.</p>
+
+<p>Not really. The network is ready, but there is still the small matter of extracting predictions out of it.</p>
+
+<h4 id="making-predictions-with-map">Making predictions with MAP</h4>
+<p>The obvious way to estimate the missing values is with a maximum a posteriori estimator. Thankfuly, pymc has just the thing - <code>pymc.MAP</code>. Calling <code>.fit</code> on a <code>pymc.MAP</code> object changes values of variables in place, so let’s print the values of some of our variables before and after fitting.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">swims</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span><span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span>  <span class="bp">True</span> <span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span>  <span class="bp">True</span>  <span class="bp">True</span> <span class="bp">False</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">quacks</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span><span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span> <span class="bp">False</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">duck</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span><span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">swim_prior</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span> <span class="mf">0.58298865</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">quack_prior</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span> <span class="mf">0.58990097</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">p_duck_not_swim_quack</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span> <span class="mf">0.96976671</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">p_duck_swim_quack</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span> <span class="mf">0.12251178</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>optimise the values:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">pymc</span><span class="o">.</span><span class="n">MAP</span><span class="p">(</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">fit</span><span class="p">()</span>
+</span><span class="line"><span class="ne">Warning</span><span class="p">:</span> <span class="n">Stochastic</span> <span class="n">swims</span><span class="s">&#39;s value is neither numerical nor array with floating-point dtype. Recommend fitting method fmin (default).</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>and inspect the results:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">swims</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span><span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span>  <span class="bp">True</span> <span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span>  <span class="bp">True</span>  <span class="bp">True</span>  <span class="bp">True</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">quacks</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span><span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">duck</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span><span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span> <span class="bp">False</span> <span class="bp">False</span>  <span class="bp">True</span> <span class="bp">False</span>  <span class="bp">True</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">swim_prior</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span> <span class="mf">0.6</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">quack_prior</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span> <span class="mf">0.5</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">p_duck_not_swim_quack</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span>  <span class="mf">9.42288677e-10</span><span class="p">]</span>
+</span><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">p_duck_swim_quack</span><span class="o">.</span><span class="n">value</span>
+</span><span class="line"><span class="p">[</span> <span class="mf">0.99999999</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The two <code>False</code> bits - in ‘swims’ and ‘quacks’ have flipped to <code>True</code> and the values of the conditional probabilities have moved in the right direction! This is good, but unfortunately it’s not reliable. Even in this simple example pymc’s MAP rarely gets everything right like it did this time. To some extent it depends on the optimisation method used - e.g. <code>pymc.MAP(model).fit(method='fmin')</code> vs <code>pymc.MAP(model).fit(method='fmin_powell')</code>. Despite the warning message recommending ‘fmin’, ‘fmin_powell’ gives better results. ‘fmin’ gets the (more or less) right values for continous parameters but it never seems to flip the booleans, even when it would clearly result in higher likelihood.</p>
+
+<h4 id="making-predictions-with-mcmc">Making predictions with MCMC</h4>
+
+<p>The other way of getting predictions out of pymc is to use it’s main workhorse - the MCMC sampler. We will generate 200 samples from the posterior using MCMC and for each missing value we will pick the value that is most frequent among the samples. Mathematically this is still just maximum a posteriori estimation but the implementation is very different and so are the results.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># this will generate (10000 - 8000) / 10 = 200 samples</span>
+</span><span class="line"><span class="n">sampler</span> <span class="o">=</span> <span class="n">pymc</span><span class="o">.</span><span class="n">MCMC</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+</span><span class="line"><span class="n">sampler</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">iter</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">burn</span><span class="o">=</span><span class="mi">8000</span><span class="p">,</span> <span class="n">thin</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This should have produced 200 samples from the posterior for each unobserved variable. To see them, we use <code>sampler.trace</code>.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">sampler</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s">&#39;P(swims)&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">shape</span>
+</span><span class="line"><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>200 samples of the <code>'P(swims)'</code> paramter - as promised</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">sampler</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s">&#39;P(duck | not swims &amp; quacks)&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">shape</span>
+</span><span class="line"><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>200 samples of a conditional probability parameter.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">sampler</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s">&#39;swims&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">shape</span>
+</span><span class="line"><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>swims</code> boolean variable also has 200 samples. But:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">sampler</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s">&#39;quacks&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">shape</span>
+</span><span class="line"><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><code>quacks</code> has <em>two times</em> 200 - because there were two missing values among <code>quacks</code> observations - and each is modeled as an unobserved variable.</p>
+
+<p><code>sampler.trace('duck')</code> produces only a <code>KeyError</code> - there are no missing values in <code>duck</code>, hence no samples.</p>
+
+<p>Finally, posterior probability for the missing <code>swims</code> observation:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">sampler</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s">&#39;swims&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span class="line"><span class="n">array</span><span class="p">([</span> <span class="mf">0.62</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Great! According to MCMC the missing value in <code>swims</code> is more likely than not to be <code>True</code>!</p>
+
+<p>(<code>sampler.trace('swims')[:]</code> is an array of 200 booleans, counting the number of <code>True</code> and <code>False</code> is equivalent to simply taking the mean).</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">sampler</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="s">&#39;quacks&#39;</span><span class="p">)[:]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span class="line"><span class="n">array</span><span class="p">([</span> <span class="mf">0.195</span><span class="p">,</span>  <span class="mf">0.6</span>  <span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And the two missing values in <code>quacks</code> are predicted to be <code>False</code> and <code>True</code> - respectively. As they should be.</p>
+
+<p>Unlike the MAP approach, this result is reliable. As long as you give MCMC enough iterations to burn in, you will get very similar numbers every time.</p>
+
+<h4 id="the-clean-way">The clean way</h4>
+
+<p>This was soul-crushingly tedious, I know. But it doesn’t have to be this way. I have created a few utility functions to get rid of the boilerplate - the creation of uniform priors for variables, the conditional probabilities, the trace, and so on. The utils can all be found <a href="https://github.com/nadbordrozd/ds-tools/blob/master/dstk/pymc_utils.py">here</a> (along with some other stuff).</p>
+
+<p>This is how to define the network using these utils:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">dstk.pymc_utils</span> <span class="kn">import</span> <span class="n">make_bernoulli</span><span class="p">,</span> <span class="n">cartesian_bernoulli_child</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">dstk.imputation</span> <span class="kn">import</span> <span class="n">BayesNetImputer</span>
+</span><span class="line">
+</span><span class="line"><span class="k">class</span> <span class="nc">DuckImputer</span><span class="p">(</span><span class="n">BayesNetImputer</span><span class="p">):</span>
+</span><span class="line">    <span class="k">def</span> <span class="nf">construct_net</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
+</span><span class="line">        <span class="n">quacks</span> <span class="o">=</span> <span class="n">make_bernoulli</span><span class="p">(</span><span class="s">&#39;quacks_like_a_duck&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">quacks_like_a_duck</span><span class="p">)</span>
+</span><span class="line">        <span class="n">swims</span> <span class="o">=</span> <span class="n">make_bernoulli</span><span class="p">(</span><span class="s">&#39;swims_like_a_duck&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">swims_like_a_duck</span><span class="p">)</span>
+</span><span class="line">        <span class="n">duck</span> <span class="o">=</span> <span class="n">cartesian_bernoulli_child</span><span class="p">(</span><span class="s">&#39;duck&#39;</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="p">[</span><span class="n">quacks</span><span class="p">,</span> <span class="n">swims</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">duck</span><span class="p">)</span>
+</span><span class="line">        <span class="k">return</span> <span class="n">pymc</span><span class="o">.</span><span class="n">Model</span><span class="p">([</span><span class="n">quacks</span><span class="p">,</span> <span class="n">swims</span><span class="p">,</span> <span class="n">duck</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>(there are also versions of <code>make_bernoulli</code> and <code>cartesian_bernoulli_child</code> for categorical variables). And this is how to use it:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span> <span class="n">DuckImputer</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s">&#39;MCMC&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">with_missing</span><span class="p">)</span>
+</span><span class="line">    <span class="n">duck</span>  <span class="n">quacks_like_a_duck</span>  <span class="n">swims_like_a_duck</span>
+</span><span class="line"><span class="mi">0</span>     <span class="mi">0</span>                   <span class="mi">0</span>                  <span class="mi">0</span>
+</span><span class="line"><span class="mi">1</span>     <span class="mi">0</span>                   <span class="mi">1</span>                  <span class="mi">0</span>
+</span><span class="line"><span class="mi">2</span>     <span class="mi">0</span>                   <span class="mi">0</span>                  <span class="mi">1</span>
+</span><span class="line"><span class="mi">3</span>     <span class="mi">1</span>                   <span class="mi">1</span>                  <span class="mi">1</span>
+</span><span class="line"><span class="mi">4</span>     <span class="mi">0</span>                   <span class="mi">0</span>                  <span class="mi">0</span>
+</span><span class="line"><span class="mi">5</span>     <span class="mi">0</span>                   <span class="mi">1</span>                  <span class="mi">0</span>
+</span><span class="line"><span class="mi">6</span>     <span class="mi">0</span>                   <span class="mi">0</span>                  <span class="mi">1</span>
+</span><span class="line"><span class="mi">7</span>     <span class="mi">1</span>                   <span class="mi">1</span>                  <span class="mi">1</span>
+</span><span class="line"><span class="mi">8</span>     <span class="mi">0</span>                   <span class="mi">0</span>                  <span class="mi">1</span>
+</span><span class="line"><span class="mi">9</span>     <span class="mi">1</span>                   <span class="mi">0</span>                  <span class="mi">1</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next post: how all this compares to good old xgboost.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2828,117 +3304,6 @@ Called it. People are totally doing that now <a href="http://arxiv.org/abs/1603.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/">Lead Scoring Without Negative Examples</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-08-01T20:49:26+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>8:49 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>How do you train a binary classifier when you have only positive-labeled training examples? 
-Impossible? Maybe. But sometimes you can do something just as good. Let’s start from the beginning…</p>
-
-<h3 id="lead-generation">Lead generation</h3>
-<p>Everyone and their mum in the b2b sector is trying to use machine learning 
-for lead generation. For our purposes lead-gen means selecting from the millions of active companies in your country the ones that are most likely to buy your product once contacted by your sales team. Needless to say lead generation is extremely <em>serious business</em> and constitutes a market sector in its own right - a type of b2b2b if you will.</p>
-
-<p>One popular lead-gen strategy is to look for leads among companies similar the ones that have worked out for you in the past. A machine learning implementation of this strategy is straightforward:</p>
-
-<ol>
-  <li>collect data on all relevant companies</li>
-  <li>take all the companies your sales have contacted in the past and label every one as either successful (you made money) or failed (you wasted your time) lead. This is your training set.</li>
-  <li>extract good features for every company*</li>
-  <li>train a binary classifier (predicting successful/failed label) on your training set. Ideally this should be a classifier that outputs probabilities.</li>
-  <li>apply the classifier to all the companies outside the training set and hand the results over to sales.
-The number assigned by the classifier to a given company is (in theory at least) the probability that the lead will be successful. Highest scorers should be prioritized, low scorers should be left alone. So far, so good.</li>
-</ol>
-
-<h3 id="forgetting-salesman-problem">Forgetting salesman problem</h3>
-<p>An interesting difficulty frequently arises when you try to apply this approach in real life. Sales teams usually have good records on their clients but often fail to keep track of all the prospects that didn’t work out. As a result, you end up with only positive examples to train your classifier on. It’s not possible in general to train a classifier on a training set with one class amputated this way. But…</p>
-
-<h3 id="the-solution">The solution</h3>
-<p>TL;DR = divide density of “good points” by density of all - this is the lead score</p>
-
-<p>Keep in mind that:</p>
-
-<ul>
-  <li>in addition to the positive examples, you have also the full set of all data points (all companies whether previously contacted or not)</li>
-  <li>you are not interested in the absolute probability of success of a given lead per se. You only really need the relative ranking of different leads. All the classifier scores may be off by a factor of 10 but as long as the order is preserved - you’ll still be able to prioritize good leads over rubbish ones.</li>
-</ul>
-
-<p>A solution will present itself once the problem is stated in mathematical terms. Consider the space of all possible company features $X$. Given are:</p>
-
-<ul>
-  <li>a set $C$ of points in $X$ - all companies</li>
-  <li>
-    <p>a subset $T_+$ of the above set - companies that were tested and gave positive result
-Unknown are:</p>
-  </li>
-  <li>the probability $f(x)$ that a company $x$ will test positive</li>
-  <li>the subset $T$ of all tested companies</li>
-</ul>
-
-<p>This is how it looks in an artificial 1-D dataset.
-<img src="/images/leadgen1.png" /></p>
-
-<p>Notice that the distribution of companies $C$ and the conversion probability $f$ peak at different points and the distribution of positive exmaples $T_+$ peaks somewhere between those two.</p>
-
-<p>It’s useful to think of $C$ as a sample from some probabilty distribution $P(x)$ defined on $X$. Or to express the same in the language of point densities in space:</p>
-
-<script type="math/tex; mode=display">density\_of\_C(x) = const_1 P(x)</script>
-
-<p>If the companies tested $T$ were chosen at random from all companies $C$ then they constitute a sample from the same probability distribution $P(x)$</p>
-
-<script type="math/tex; mode=display">density\_of\_T(x) = const_2 P(x)</script>
-
-<p>Since a company’s chance of testing positive is $f$, the density of companies that tested positive is simply:</p>
-
-<script type="math/tex; mode=display">density\_of\_T_+(x) = density\_of\_T(x) f(x) = const_2 P(x) f(x)</script>
-
-<p>The set $T$ is hidden from us but $C$ and $T_+$ are available so we can use them to find $f(x)$. Combining the first and third equation we get:</p>
-
-<script type="math/tex; mode=display">\frac{const_2}{const_1} f(x) = \frac{density\_of\_T_+(x)}{density\_of\_C(x)}</script>
-
-<p>This is it. If we can just estimate the densities of $C$ and $T_+$ - we’re golden. Their ratio gives the $f$ function up to a constant, which is all we need to do lead scoring. There are many ways to do density estimation in practice:</p>
-
-<ul>
-  <li>histogram based estimation - lowest on the sophistication scale - divide the space $X$ into sectors and count the number of points in every sector, divide it by volume. Do it for both $C$ and $T_+$ and divide one result by the other</li>
-  <li>nearest neighbour estimation - for any interesting point find $k$ (let’s say $k=20$) nearest points in $C$. Count how many of them are also in $T_+$, divide the figures</li>
-  <li>kernel based estimation - in a way this is similar to the knn version - except instead of taking k nearest points you take all of them but discount the farthest by a dicreasing function of distance</li>
-</ul>
-
-<p>This is how it looks on our toy dataset:
-<img src="/images/leadgen2.png" /></p>
-
-<p>Unsuprisingly, on a toy model everything works rather well. In reality conversion rates are low, data is sparse, dimensionality is high and even the basic assumption “good lead means similar to what has worked in the past” is questionable. But you have to start somewhere.</p>
-
-<p>For more information about the ML aspect of classification without negatives google the term “PU learning”.</p>
-
-<p>* this is arguably the hardest and most important step, but I’m glossing over it as it’s not relevant to this 
-  post</p>
-
-<p>** if there is prior knowledge regarding how the contacted companies were chosen, it can be easily incorporated</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -2954,6 +3319,10 @@ Unknown are:</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/">Missing Data Imputation With Bayesian Networks in Pymc</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/09/17/text-generation-with-keras-char-rnns/">Text Generation With Keras char-RNNs</a>
       </li>
     
@@ -2967,10 +3336,6 @@ Unknown are:</p>
     
       <li class="post">
         <a href="/blog/2016/07/20/datamatching-part-1/">Datamatching Part 1: Algorithm</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/06/15/dear-recruiter/">Dear Recruiter</a>
       </li>
     
   </ul>
@@ -3024,7 +3389,7 @@ Unknown are:</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - nadbor -
+  Copyright &copy; 2017 - nadbor -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
