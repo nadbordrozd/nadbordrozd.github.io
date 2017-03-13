@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-03-11T01:19:46+00:00</updated>
+  <updated>2017-03-13T18:39:08+00:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -20,9 +20,7 @@
     <id>http://nadbordrozd.github.io/blog/2017/03/05/missing-data-imputation-with-bayesian-networks</id>
     <content type="html"><![CDATA[<p>This is the first of two posts about Bayesian networks, pymc and missing data. In the first post I will show how to do Bayesian networks in pymc* and how to use them to impute missing data. This part is boring and slightly horrible. In the second post I investigate how well it actually works in practice (not very well) and how it compares to a more traditional machine learning approach (poorly). <strong>Feel free to go straight to the second post, it has plots in it</strong>.</p>
 
-<p>This post assumes that the reader is already familiar with both bayesianism and pymc. If you aren’t, I recommend that you check out the fantastic <a href="https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers">Bayesian Methods For Hackers</a>. All the code in this post is available <a href="https://github.com/nadbordrozd/ds-tools/blob/master/pymc_imputation.ipynb">on github</a></p>
-
-<p>The research behind this post and the development of the data imputation toolkit was done in large part at <a href="http://www.aimia.com/">AIMIA</a> with Matthew Majewski under the enlightened leadership of Javier Rodriguez Zaurin.</p>
+<p>This post assumes that the reader is already familiar with both bayesianism and pymc. If you aren’t, I recommend that you check out the fantastic <a href="https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers">Bayesian Methods For Hackers</a>.</p>
 
 <p>* technically, everything in pymc is a Bayesian network, I know</p>
 
