@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Char-rnn | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/char-rnn/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-03-13T18:39:08+00:00</updated>
+  <updated>2017-03-27T23:28:21+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -18,7 +18,7 @@
     <link href="http://nadbordrozd.github.io/blog/2016/09/17/text-generation-with-keras-char-rnns/"/>
     <updated>2016-09-17T22:17:50+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/09/17/text-generation-with-keras-char-rnns</id>
-    <content type="html"><![CDATA[<p>Iwhqt recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
+    <content type="html"><![CDATA[<p>I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
 
 <p><img src="/images/deep_learning_pc.png" alt="" />
 <em>watercooling, pretty lights and 2 x GTX 1080 (on the right)</em></p>
