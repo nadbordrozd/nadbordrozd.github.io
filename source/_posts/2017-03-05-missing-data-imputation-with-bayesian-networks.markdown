@@ -7,9 +7,7 @@ categories:
 ---
 This is the first of two posts about Bayesian networks, pymc and missing data. In the first post I will show how to do Bayesian networks in pymc\* and how to use them to impute missing data. This part is boring and slightly horrible. In the second post I investigate how well it actually works in practice (not very well) and how it compares to a more traditional machine learning approach (poorly). **Feel free to go straight to the second post, it has plots in it**.
 
-This post assumes that the reader is already familiar with both bayesianism and pymc. If you aren't, I recommend that you check out the fantastic [Bayesian Methods For Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers). All the code in this post is available [on github](https://github.com/nadbordrozd/ds-tools/blob/master/pymc_imputation.ipynb)
-
-The research behind this post and the development of the data imputation toolkit was done in large part at [AIMIA](http://www.aimia.com/) with Matthew Majewski under the enlightened leadership of Javier Rodriguez Zaurin.
+This post assumes that the reader is already familiar with both bayesianism and pymc. If you aren't, I recommend that you check out the fantastic [Bayesian Methods For Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers).
 
 \* technically, everything in pymc is a Bayesian network, I know
 
