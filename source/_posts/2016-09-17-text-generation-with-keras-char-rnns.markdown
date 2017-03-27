@@ -6,7 +6,7 @@ comments: true
 categories: [neural networks, text generation, deep learning, LSTM, char-RNN]
 keywords: [neural networks, text generation, deep learning, LSTM, char-RNN]
 ---
-Iwhqt recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks. 
+I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks. 
 
 ![](/images/deep_learning_pc.png)
 *watercooling, pretty lights and 2 x GTX 1080 (on the right)*
