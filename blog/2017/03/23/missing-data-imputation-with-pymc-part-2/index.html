@@ -179,8 +179,9 @@
   <li>For MCMC, longer burn-in gets better results, but takes more time. Duh.</li>
   <li>MCMC model accuracy deteriorates as data gets bigger. I was surprised when I saw it, but it hindsight it’s clear that it would be the case. Bigger data means more missing values, means higher dimensionality of the space MCMC has to explore, means it would take more iterations for MCMC to  reach a high likelihood configuration. This could be alleviated if we first learned the most likely values of the parameters of the network and then used those to impute the missing values one record at a time.</li>
   <li>XGBoost rocks.</li>
-  <li>pymc is not the right tool for the job</li>
 </ol>
+
+<p>Overall, I count this experiment as a successful proof of concept, but of very limited usefulness in its current form. For any real world application one would have to redo it using some other technology. pymc is just not up to the task.</p>
 </div>
 
 
