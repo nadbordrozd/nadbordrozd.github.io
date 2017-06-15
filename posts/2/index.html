@@ -134,7 +134,7 @@
 </pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">gensim</span>
 </span><span class="line"><span class="c"># let X be a list of tokenized texts (i.e. list of lists of tokens)</span>
 </span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">gensim</span><span class="o">.</span><span class="n">models</span><span class="o">.</span><span class="n">Word2Vec</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
-</span><span class="line"><span class="n">w2v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">index2word</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">syn0</span><span class="p">))</span>
+</span><span class="line"><span class="n">w2v</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">wv</span><span class="o">.</span><span class="n">index2word</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">wv</span><span class="o">.</span><span class="n">syn0</span><span class="p">))</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <h4 id="the-python-meat">The (python) meat</h4>
@@ -284,13 +284,13 @@
 </span><span class="line">-----------------  -------
 </span><span class="line">svc_tfidf           0.9656
 </span><span class="line">svc                 0.9562
-</span><span class="line">w2v_tfidf           0.9554
-</span><span class="line">w2v                 0.9516
+</span><span class="line">w2v_tfidf           0.9544
+</span><span class="line">w2v                 0.9510
 </span><span class="line">mult_nb             0.9467
-</span><span class="line">glove_big           0.9279
-</span><span class="line">glove_big_tfidf     0.9273
-</span><span class="line">glove_small         0.9250
-</span><span class="line">glove_small_tfidf   0.9061
+</span><span class="line">glove_big           0.9274
+</span><span class="line">glove_small         0.9262
+</span><span class="line">glove_small_tfidf   0.9075
+</span><span class="line">glove_big_tfidf     0.9038
 </span><span class="line">mult_nb_tfidf       0.8615
 </span><span class="line">bern_nb             0.7954
 </span><span class="line">bern_nb_tfidf       0.7954
@@ -320,6 +320,8 @@
 </ol>
 
 <p>At this point I have to note that averaging vectors is only the easiest way of leveraging word embeddings in classification but not the only one. You could also try embedding whole documents directly with <a href="https://radimrehurek.com/gensim/models/doc2vec.html">Doc2Vec</a>. Or use Multinomial Gaussian Naive Bayes on word vectors. I have tried the <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/multi_multi_kernel_nb.py">latter approach</a> but it was too slow to include in the benchmark.</p>
+
+<p><em>Update 2017: actually, the best way to utilise the pretrained embeddings would probably be this https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html I shall add this approach to the benchmark when I have some time.</em></p>
 
 <ol>
   <li>Sometimes pretrained embeddings give clearly superior results to word2vec trained on the specific benchmark, sometimes it’s the opposite. Not sure what is going on here.</li>
