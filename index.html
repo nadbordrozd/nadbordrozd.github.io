@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="This is the second post about my experiments with LSTMs. Here’s the first one. This is a great introduction by Karpathy. And this is an in depth &hellip;">
+  <meta name="description" content="Trigger warnings: programming humor, algorithms and data structures, Java I’m interviewing data engineering contractors recently. All of the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,71 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/06/20/you-wont-believe-how-this-islington-single-mom-is-making-ps500-slash-day/">You Won't Believe How This Islington Single Mom Is Making £500/day</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-06-20T22:32:10+01:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>10:32 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><sup>Trigger warnings: programming humor, algorithms and data structures, Java</sup></p>
+
+<p>I’m interviewing data engineering contractors recently. All of the candidates are very senior people with 10+ years of experience. My go to question:</p>
+
+<p><strong>Me:</strong> <em>What data structure would you use (in your favorite programming language) to store a large number (let’s say 100k) of strings - so they can be looked up efficiently? And by ‘looked up’ I mean - user will come up with a new string (‘banana’) and you have to quickly tell if this string is an element of your collection of 100k?</em><br />
+<strong>Candidate:</strong> I would load them in an RDD and then…<br />
+<strong>Me:</strong> <em>No, no, I’m not asking about Spark. This is a regular single-threaded, in-memory, computer science 101 problem. What is the simplest thing that you could do?</em><br />
+<strong>Candidate:</strong> Grep. I would use grep to look for the string.<br />
+<strong>Me:</strong> <em>Terrific. Sorry, maybe I wasn’t clear, I’m NOT talking about finding a substring in a larger text… You know what, forget about the strings. There are no strings. You have 100k integers. What data structure would you put them in so you can quickly look up if a new integer (1743) belongs to the collection?</em><br />
+<strong>Candidate:</strong> For integers I would use an array.<br />
+Me: <em>And how do you find out if the new integer belongs to this array?</em><br />
+<strong>Candidate:</strong> There is a method ‘contains’.<br />
+<strong>Me:</strong> <em>Ok. And for an array of n integers, what is the expected running time of this method in terms of n?</em><br />
+<strong>Candidate:</strong> …<br />
+<strong>Me:</strong> …<br />
+<strong>Candidate:</strong> I think it would be under one minute.<br />
+<strong>Me:</strong> <em>Indeed.</em></p>
+
+<p>This one was particularly funny, but otherwise unexceptional. This week I interviewed 4 people and not a single one of them mentioned hash tables. I would have also accepted ‘HashMap’, ‘Map’, ‘Set’, ‘dictionary’, ‘python curly braces’ - anything pointing in vaguely the right direction, even if they didn’t understand the implementation. Instead I only got ‘a vector, because they are thread safe’, ‘ArrayList because they are extensible’, ‘a List because lists in scala are something something’, ‘in my company we always use Sequences’. Again: these are very experienced people who are being paid a lot of money contracting for corporations in London and who can very convincingly bullshit about their Kafkas, Sparks, HBases and all the other Big Data nonsense.</p>
+
+<p>Another bizarre conversation occurred when a candidate with 16 years of experience with Java (confirmed by the Sun certificate) immediately came up with the idea of putting the strings in buckets based on their hash and started explaining to me basically how to implement a hash table in Java, complete with the discussion of the merits of different string hashing functions. When I suggested that maybe Java already has a collection type that does all of this he reacted with indignation - he shouldn’t have to know this, you can find out on the internet. Fair enough, but one would think that after 16 years of programming in that language someone would have encountered HashMaps once or twice… This seemed odd enough that for my next question I went off script:</p>
+
+<p><strong>Me:</strong> <em>Can you tell me what is the signature of the main method in Java?</em><br />
+<strong>Candidate:</strong> What?<br />
+<strong>Me:</strong> <em>Signature of the main method. Like, if you’re writing the ‘hello world’ program in Java, what would you have to type?</em><br />
+<strong>Candidate:</strong> class HelloWorld<br />
+<strong>Me:</strong> <em>Go on.</em><br />
+<strong>Candidate:</strong> int main() or void main() I think<br />
+<strong>Me:</strong> <em>And the parameters?</em><br />
+<strong>Candidate:</strong> Yes, I remember, there are command line parameters.<br />
+<strong>Me:</strong> …<br />
+<strong>Candidate:</strong> Two parameters and the second is an integer.<br />
+<strong>Me:</strong> <em>Thank you, I know all I wanted to know.</em></p>
+
+<p>Moral of this story?</p>
+
+<p>Come to London, be a data engineering contractor and make £500/day. You can read about Java on wikipedia, put 15 years of experience on your resume and no one will be the wiser.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3445,318 +3510,6 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/05/22/one-weird-trick-that-will-fix-your-pyspark-schemas/">Data Engineers Will Hate You - One Weird Trick to Fix Your Pyspark Schemas</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-05-22T21:39:15+01:00'><span class='date'><span class='date-month'>May</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>9:39 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I will share with you a snippet that took out a lot of misery from my dealing with pyspark dataframes. This is pysparks-specific. Nothing to see here if you’re not a pyspark user. The first two sections consist of me complaining about schemas and the remaining two offer what I think is a neat way of creating a schema from a dict (or a dataframe from an rdd of dicts).</p>
-
-<h4 id="the-good-the-bad-and-the-ugly-of-dataframes">The Good, the Bad and the Ugly of dataframes</h4>
-<p>Dataframes in pyspark are simultaneously pretty great and <del>kind of</del> completely broken.</p>
-
-<ul>
-  <li>they enforce a schema</li>
-  <li>you can run SQL queries against them</li>
-  <li>faster than rdd</li>
-  <li>much smaller than rdd when stored in parquet format</li>
-</ul>
-
-<p>On the other hand:</p>
-
-<ul>
-  <li>dataframe join sometimes gives <a href="https://issues.apache.org/jira/browse/SPARK-10892">wrong results</a></li>
-  <li>pyspark dataframe outer join acts as an inner join</li>
-  <li>when cached with <code>df.cache()</code> dataframes sometimes start throwing <code>key not found</code> and Spark driver dies. Other times the task succeeds but the the underlying rdd becomes corrupted (field values switched up).</li>
-  <li>not really dataframe’s fault but related - parquet is not human readable which sucks - can’t easily inspect your saved dataframes</li>
-</ul>
-
-<p>But the biggest problem is actually transforming the data. It works perfectly on those contrived examples from the tutorials. But I’m not working with flat SQL-table-like datasets. Or if I am, they are already in some SQL database. When I’m using Spark, I’m using it to work with messy multilayered json-like objects. If I had to create a UDF and type out a ginormous schema for every transformation I want to perform on the dataset, I’d be doing nothing else all day, I’m not even joking. UDFs in pyspark are clunky at the best of times but in my typical usecase they are unusable. Take this, relatively tiny record for instance:</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">record</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class="line">    <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="s">&#39;nadbor&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="s">&#39;drozd&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;occupation&#39;</span><span class="p">:</span> <span class="s">&#39;data scientist&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;children&#39;</span><span class="p">:</span> <span class="p">[</span>
-</span><span class="line">        <span class="p">{</span>
-</span><span class="line">            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Lucja&#39;</span><span class="p">,</span>
-</span><span class="line">            <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span class="line">            <span class="s">&#39;likes cold showers&#39;</span><span class="p">:</span> <span class="bp">True</span>
-</span><span class="line">        <span class="p">}</span>
-</span><span class="line">    <span class="p">]</span>
-</span><span class="line"><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>the correct schema for this is created like this:</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">pyspark.sql.types</span> <span class="kn">import</span> <span class="n">StringType</span><span class="p">,</span> <span class="n">StructField</span><span class="p">,</span> <span class="n">StructType</span><span class="p">,</span> <span class="n">BooleanType</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">,</span> <span class="n">IntegerType</span>
-</span><span class="line"><span class="n">schema</span> <span class="o">=</span> <span class="n">StructType</span><span class="p">([</span>
-</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;first_name&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
-</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;last_name&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
-</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;occupation&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
-</span><span class="line">        <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;children&quot;</span><span class="p">,</span> <span class="n">ArrayType</span><span class="p">(</span>
-</span><span class="line">            <span class="n">StructType</span><span class="p">([</span>
-</span><span class="line">                <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">StringType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
-</span><span class="line">                <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;age&quot;</span><span class="p">,</span> <span class="n">IntegerType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">),</span>
-</span><span class="line">                <span class="n">StructField</span><span class="p">(</span><span class="s">&quot;likes cold schowers&quot;</span><span class="p">,</span> <span class="n">BooleanType</span><span class="p">(),</span> <span class="bp">True</span><span class="p">)</span>
-</span><span class="line">            <span class="p">])</span>
-</span><span class="line">        <span class="p">),</span> <span class="bp">True</span><span class="p">)</span>
-</span><span class="line">    <span class="p">])</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>And this is what I would have to type every time I need a udf to return such record - which can be many times in a single spark job.</p>
-
-<h4 id="dataframe-from-an-rdd---how-it-is">Dataframe from an rdd - how it is</h4>
-<p>For these reasons (+ legacy json job outputs from hadoop days) I find myself switching back and forth between dataframes and rdds. Read some JSON dataset into an rdd, transform it, join with another, transform some more, convert into a dataframe and save as parquet. Or read some parquet files into a dataframe, convert to rdd, do stuff to it, convert back to dataframe and save as parquet again. This workflow is not so bad - I get the best of both worlds by using rdds and dataframes only for the things they’re good at. How do you go from a dataframe to an rdd of dictionaries? This part is easy:</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">rdd</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">asDict</span><span class="p">())</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>It’s the other direction that is problematic. You would think that rdd’s method <code>toDF()</code> would do the job but no, it’s broken.</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">df</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">toDF</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>actually returns a dataframe with the following schema (<code>df.printSchema()</code>):</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">root
-</span><span class="line"> |-- children: array (nullable = true)
-</span><span class="line"> |    |-- element: map (containsNull = true)
-</span><span class="line"> |    |    |-- key: string
-</span><span class="line"> |    |    |-- value: boolean (valueContainsNull = true)
-</span><span class="line"> |-- first_name: string (nullable = true)
-</span><span class="line"> |-- last_name: string (nullable = true)
-</span><span class="line"> |-- occupation: string (nullable = true)
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>It interpreted the inner dictionary as a <code>map</code> of <code>boolean</code> instead of a <code>struct</code> and <em>silently dropped</em> all the fields in it that are not booleans. But this method is deprecated now anyway. The preferred, official way of creating a dataframe is with an rdd of <code>Row</code> objects. So let’s do that.</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">Row</span>
-</span><span class="line"><span class="n">rdd_of_rows</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">Row</span><span class="p">(</span><span class="o">**</span><span class="n">x</span><span class="p">))</span>
-</span><span class="line"><span class="n">df</span> <span class="o">=</span> <span class="n">sql</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">rdd_of_rows</span><span class="p">)</span>
-</span><span class="line"><span class="n">df</span><span class="o">.</span><span class="n">printSchema</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>prints the same schema as the previous method.</p>
-
-<p>In addition to this, both these methods will fail completely when some field’s type cannot be determined because all the values happen to be null in some run of the job.</p>
-
-<p>Also, quite bizarrely in my opinion, order of columns in a dataframe is significant while the order of keys is not. So if you have a pre-existing schema and you try contort an rdd of dicts into that schema, you’re gonna have a bad time.</p>
-
-<h4 id="how-it-should-be">How it should be</h4>
-<p>Without further ado, this is how I now create my dataframes:</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># this is what a typical record in the rdd looks like</span>
-</span><span class="line"><span class="n">prototype</span> <span class="o">=</span> <span class="p">{</span>
-</span><span class="line">    <span class="s">&#39;first_name&#39;</span><span class="p">:</span> <span class="s">&#39;nadbor&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;last_name&#39;</span><span class="p">:</span> <span class="s">&#39;drozd&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;occupation&#39;</span><span class="p">:</span> <span class="s">&#39;data scientist&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;children&#39;</span><span class="p">:</span> <span class="p">[</span>
-</span><span class="line">        <span class="p">{</span>
-</span><span class="line">            <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Lucja&#39;</span><span class="p">,</span>
-</span><span class="line">            <span class="s">&#39;age&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span class="line">            <span class="s">&#39;likes cold showers&#39;</span><span class="p">:</span> <span class="bp">True</span>
-</span><span class="line">        <span class="p">}</span>
-</span><span class="line">    <span class="p">]</span>
-</span><span class="line"><span class="p">}</span>
-</span><span class="line"><span class="n">df</span> <span class="o">=</span> <span class="n">df_from_rdd</span><span class="p">(</span><span class="n">rdd</span><span class="p">,</span> <span class="n">prototype</span><span class="p">,</span> <span class="n">sqlContext</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>This doesn’t randomly break, doesn’t drop fields and has the right schema. And I didn’t have to type any of this <code>StructType([StructField(...</code> nonsense, just plain python literal that I got by running</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">print</span> <span class="n">rdd</span><span class="o">.</span><span class="n">first</span><span class="p">()</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>As an added bonus now this prototype is prominently displayed at the top of my job file and I can tell what the output of the job looks like without having to decode parquet files. Self documenting code FTW!</p>
-
-<h4 id="how-to-get-there">How to get there</h4>
-<p>And here’s how it’s done. First we need to implement our own schema inference - the way it should work:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">pyspark.sql.types</span> <span class="kn">as</span> <span class="nn">pst</span>
-</span><span class="line"><span class="kn">from</span> <span class="nn">pyspark.sql</span> <span class="kn">import</span> <span class="n">Row</span>
-</span><span class="line">
-</span><span class="line"><span class="k">def</span> <span class="nf">infer_schema</span><span class="p">(</span><span class="n">rec</span><span class="p">):</span>
-</span><span class="line">    <span class="sd">&quot;&quot;&quot;infers dataframe schema for a record. Assumes every dict is a Struct, not a Map&quot;&quot;&quot;</span>
-</span><span class="line">    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span class="line">        <span class="k">return</span> <span class="n">pst</span><span class="o">.</span><span class="n">StructType</span><span class="p">([</span><span class="n">pst</span><span class="o">.</span><span class="n">StructField</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="bp">True</span><span class="p">)</span>
-</span><span class="line">                              <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rec</span><span class="o">.</span><span class="n">items</span><span class="p">())])</span>
-</span><span class="line">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rec</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-</span><span class="line">        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;can&#39;t infer type of an empty list&quot;</span><span class="p">)</span>
-</span><span class="line">        <span class="n">elem_type</span> <span class="o">=</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">rec</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-</span><span class="line">        <span class="k">for</span> <span class="n">elem</span> <span class="ow">in</span> <span class="n">rec</span><span class="p">:</span>
-</span><span class="line">            <span class="n">this_type</span> <span class="o">=</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">elem</span><span class="p">)</span>
-</span><span class="line">            <span class="k">if</span> <span class="n">elem_type</span> <span class="o">!=</span> <span class="n">this_type</span><span class="p">:</span>
-</span><span class="line">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;can&#39;t infer type of a list with inconsistent elem types&quot;</span><span class="p">)</span>
-</span><span class="line">        <span class="k">return</span> <span class="n">pst</span><span class="o">.</span><span class="n">ArrayType</span><span class="p">(</span><span class="n">elem_type</span><span class="p">)</span>
-</span><span class="line">    <span class="k">else</span><span class="p">:</span>
-</span><span class="line">        <span class="k">return</span> <span class="n">pst</span><span class="o">.</span><span class="n">_infer_type</span><span class="p">(</span><span class="n">rec</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Using this we can now specify the schema using a regular python object - no more java-esque abominations. But this is not all. We will also need a function that transforms a python dict into a rRw object with the correct schema. You would think that this should be automatic as long as the dict has all the right fields, but no - order of fields in a Row is significant, so we have to do it ourselves.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-<span class="line-number">28</span>
-<span class="line-number">29</span>
-<span class="line-number">30</span>
-<span class="line-number">31</span>
-<span class="line-number">32</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">def</span> <span class="nf">_rowify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">prototype</span><span class="p">):</span>
-</span><span class="line">    <span class="sd">&quot;&quot;&quot;creates a Row object conforming to a schema as specified by a dict&quot;&quot;&quot;</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">_equivalent_types</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
-</span><span class="line">        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">unicode</span><span class="p">]:</span>
-</span><span class="line">            <span class="k">return</span> <span class="bp">True</span>
-</span><span class="line">        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">if</span> <span class="n">x</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-</span><span class="line">        <span class="k">return</span> <span class="bp">None</span>
-</span><span class="line">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prototype</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-</span><span class="line">        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">dict</span><span class="p">:</span>
-</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;expected dict, got </span><span class="si">%s</span><span class="s"> instead&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</span><span class="line">        <span class="n">rowified_dict</span> <span class="o">=</span> <span class="p">{}</span>
-</span><span class="line">        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span class="line">            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">prototype</span><span class="p">:</span>
-</span><span class="line">                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;got unexpected field </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
-</span><span class="line">            <span class="n">rowified_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_rowify</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">prototype</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
-</span><span class="line">            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">prototype</span><span class="p">:</span>
-</span><span class="line">                <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-</span><span class="line">                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-</span><span class="line">                        <span class="s">&quot;expected </span><span class="si">%s</span><span class="s"> field but didn&#39;t find it&quot;</span> <span class="o">%</span> <span class="n">key</span><span class="p">)</span>
-</span><span class="line">        <span class="k">return</span> <span class="n">Row</span><span class="p">(</span><span class="o">**</span><span class="n">rowified_dict</span><span class="p">)</span>
-</span><span class="line">    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prototype</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-</span><span class="line">        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">list</span><span class="p">:</span>
-</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;expected list, got </span><span class="si">%s</span><span class="s"> instead&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-</span><span class="line">        <span class="k">return</span> <span class="p">[</span><span class="n">_rowify</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">prototype</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
-</span><span class="line">    <span class="k">else</span><span class="p">:</span>
-</span><span class="line">        <span class="k">if</span> <span class="ow">not</span> <span class="n">_equivalent_types</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">prototype</span><span class="p">):</span>
-</span><span class="line">            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;expected </span><span class="si">%s</span><span class="s">, got </span><span class="si">%s</span><span class="s"> instead&quot;</span> <span class="o">%</span>
-</span><span class="line">                             <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">prototype</span><span class="p">),</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
-</span><span class="line">        <span class="k">return</span> <span class="n">x</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And finally:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">def</span> <span class="nf">df_from_rdd</span><span class="p">(</span><span class="n">rdd</span><span class="p">,</span> <span class="n">prototype</span><span class="p">,</span> <span class="n">sql</span><span class="p">):</span>
-</span><span class="line">    <span class="sd">&quot;&quot;&quot;creates a dataframe out of an rdd of dicts, with schema inferred from a prototype record&quot;&quot;&quot;</span>
-</span><span class="line">    <span class="n">schema</span> <span class="o">=</span> <span class="n">infer_schema</span><span class="p">(</span><span class="n">prototype</span><span class="p">)</span>
-</span><span class="line">    <span class="n">row_rdd</span> <span class="o">=</span> <span class="n">rdd</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">_rowify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">prototype</span><span class="p">))</span>
-</span><span class="line">    <span class="k">return</span> <span class="n">sql</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">row_rdd</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -3772,6 +3525,10 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/06/20/you-wont-believe-how-this-islington-single-mom-is-making-ps500-slash-day/">You Won't Believe How This Islington Single Mom Is Making £500/day</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/06/03/python-or-scala/">Python or Scala - Let the Neural Network Decide.</a>
       </li>
     
@@ -3785,10 +3542,6 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
     
       <li class="post">
         <a href="/blog/2016/09/17/text-generation-with-keras-char-rnns/">Text Generation With Keras char-RNNs</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/07/29/datamatching-part-3-match-scoring/">Datamatching Part 3: Match Scoring</a>
       </li>
     
   </ul>
