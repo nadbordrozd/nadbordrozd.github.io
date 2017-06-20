@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-06-20T23:07:43+01:00</updated>
+  <updated>2017-06-20T23:23:20+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -14,10 +14,10 @@
 
   
   <entry>
-    <title type="html"><![CDATA[You Won't Believe How This Islington Single Mom Is Making £500/day]]></title>
-    <link href="http://nadbordrozd.github.io/blog/2017/06/20/you-wont-believe-how-this-islington-single-mom-is-making-ps500-slash-day/"/>
+    <title type="html"><![CDATA[You Won't Believe How This Islington Single Dad Is Making £500/day While Working From Home]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2017/06/20/you-wont-believe-how-this-islington-single-dad-is-making-ps500-slash-day-working-from-home/"/>
     <updated>2017-06-20T22:32:10+01:00</updated>
-    <id>http://nadbordrozd.github.io/blog/2017/06/20/you-wont-believe-how-this-islington-single-mom-is-making-ps500-slash-day</id>
+    <id>http://nadbordrozd.github.io/blog/2017/06/20/you-wont-believe-how-this-islington-single-dad-is-making-ps500-slash-day-working-from-home</id>
     <content type="html"><![CDATA[<p><sup>Trigger warnings: programming humor, algorithms and data structures, Java</sup></p>
 
 <p>I’m interviewing data engineering contractors recently. All of the candidates are very senior people with 10+ years of experience. My go to question:</p>
