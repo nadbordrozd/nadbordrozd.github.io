@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="Trigger warnings: programming humor, algorithms and data structures, Java I’m interviewing data engineering contractors recently. All of the &hellip;">
+  <meta name="description" content="This is a guest post by Javier Rodriguez Zaurin. My good friend Nadbor told me that he found on Reddit someone asking if data scientists end up doing &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,6 +84,111 @@
       
   <header>
     
+      <h1 class="entry-title"><a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-07-07T21:00:31+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:00 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><em>This is a guest post by <a href="https://www.linkedin.com/in/javier-rodriguez-zaurin-06277454/?ppe=1">Javier Rodriguez Zaurin</a>.</em></p>
+
+<p>My good friend Nadbor told me that he found on Reddit someone asking if data scientists end up doing boring tasks such as classifying shoes. As someone that has faced this problem in the past, I was committed to show that classifying shoes it is a challenging, entertaining task. Maybe the person who wrote that would find it more interesting if the objects to classify were space rockets, but whether rockets or shoes, the problem is of the same nature.</p>
+
+<h2 id="the-problem">THE PROBLEM</h2>
+
+<p>Imagine that you work at a fashion aggregator, and every day you receive hundreds of shoes in the daily feed. The retailers send you one identifier and multiple images (with different points of view) per shoe model. Sometimes, they send you additional information indicating whether one of the images is the default image to be displayed at the site, normally, the side-view of the shoe. However, this is not always the case. Of course, you want your website to look perfect, and you want to consistently show the same shoe perspective across the entire site. Therefore, here is the task: how do we find the side view of the shoes as they come through the feed?</p>
+
+<h2 id="the-solution">THE SOLUTION</h2>
+
+<p>Before I jump into the technical aspect of the solution, let me just add a few lines on team-work. Through the years in both <em>real</em> science and data science, I have learned that cool things don’t happen in isolation. The solution that I am describing here was part of a team effort and the process was very entertaining and rewarding.</p>
+
+<p>Let’s go into the details.</p>
+
+<p>The solution implemented comprised two steps:</p>
+
+<p>1-. Using the <a href="https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/shape/sc_digits.html">shape context</a> algorithm to parameterise shoe-shapes</p>
+
+<p>2-. Cluster the shapes and find those clusters that are comprised mostly by side-view shoes</p>
+
+<h3 id="the-shape-context-algorithm">THE SHAPE CONTEXT ALGORITHM</h3>
+
+<p>Details on the algorithm can be found <a href="https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/shape/sc_digits.html">here</a> and additional information on our python implementation is <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a>. The steps required are mainly two:</p>
+
+<p>1-. Find points along the silhouette of the shoe useful to define the shape.</p>
+
+<p>2-. Compute a Shape Context Matrix using radial and angular metrics that will effectively parameterise the shape of the shoe.</p>
+
+<h4 id="find-the-relevant-points">1-. FIND THE RELEVANT POINTS</h4>
+
+<p>Finding the relevant points to be used later to compute the Shape Context Matrix is relatively easy. If the background of the image is white, simply “slice” the image and find the initial and final points that are not background per slice. Note that due to the “convoluted” shapes of some shoes, techniques relying on contours might not work here.</p>
+
+<p>I have coded a <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/morphology_utils.py">series of functions</a> to make our lives easier. Here I show the results of using some of those functions.</p>
+
+<p><img src="/images/xgboots/Figure_1.png" /></p>
+
+<p>The figure shows 60 points of interest found as we move along the image horizontally.</p>
+
+<h4 id="shape-context-matrix">2-. SHAPE CONTEXT MATRIX</h4>
+
+<p>Once we have the points of interest we can compute the radial and angular metrics that will eventually lead to the Shape Context Matrix. The idea is the following: for a given point, compute the number of points that fall within a radial bin and an angular bin relative to that point.</p>
+
+<p>In a first instance, we computed 2 matrices, one containing radial information and one containing angular information, per point of interest. For example, if we select 120 points of interest around the silhouette of the shoe, these matrices will be of dim (120,120).</p>
+
+<p>Once we have these matrices, the next step consists in building the shape context matrix per point of interest. Eventually, all shape context matrices are flattened and concatenated resulting in what is referred to as Bin Histogram.</p>
+
+<p>Let’s have a look at one of these shape context matrices. For this particular example we used 6 radial bins and 12 angular bins. Code to generate this plot can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a>:</p>
+
+<p><img src="/images/xgboots/Figure_2.png" /></p>
+
+<p>This figure has been generated for the first point within our points-of-interest-array and is interpreted as follows: if we concentrate on the upper-right “bucket” we find that, relative to the first point in our array, there are 34 other points that fall within the largest radial bin (labelled 0 in the Figure) and within the first angular bin (labelled 0 in the Figure). More details on the interpretation can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a></p>
+
+<p>Once we have a matrix like the one in Figure 2 for every point of interest, we flatten and concatenate them resulting in an array of 12 $\times$ 6 $\times$ number of points (120 in this case), i.e. 8640 values. Overall, after all this process we will end up with a <code>numpy</code> array of dimensions (number of images, 8640). Now we just need to cluster these arrays.</p>
+
+<h2 id="results">RESULTS</h2>
+
+<p>A detailed discussion on how to pick the number of clusters and the potential caveats can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/clustering_shapes.ipynb">here</a>. In this post I will simply show the results of using <a href="http://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html">MiniBatchKMeans</a> to cluster the arrays using 15 clusters. For example, clusters 2,3 and 10 look like this.</p>
+
+<p><img src="/images/xgboots/Figure_3.png" />
+<img src="/images/xgboots/Figure_4.png" />
+<img src="/images/xgboots/Figure_5.png" /></p>
+
+<p>Interestingly cluster 1 is comprised of images with an non-white and/or structured background, images with a shape different than that of a shoe and some misclassifications. Some advise on how to deal with the images in that cluster can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/remove_background.ipynb">here</a></p>
+
+<p><img src="/images/xgboots/Figure_6.png" /></p>
+
+<h2 id="moving-forward">MOVING FORWARD</h2>
+
+<p>There are still a few aspects to cover to isolate the side views of the shoes with more certainty, but I will leave this for a future post (if I have the time!).</p>
+
+<p>In addition, there are some other features and techniques one could try to improve the quality of the clusters, such as <a href="http://www.quaero.org/media/files/bibliographie/inria_qpr6_douze_gist_evaluation.pdf">GIST indicators</a> or <a href="http://haralick.org/journals/TexturalFeatures.pdf">Halarick Textural Features</a>.</p>
+
+<p>Of course, if you have the budget, you can always pay for someone to label the entire dataset, turn this into a supervised problem and use Deep Learning. A series of convolutional layers should capture shapes, colours and patterns. Nonetheless, if you think for a second about the nature of this problem, you will see that even deciding the labelling is not a trivial task.</p>
+
+<p>Anyway, for now, I will leave it here!</p>
+
+<p>The code for the process described in this post can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier">here</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
       <h1 class="entry-title"><a href="/blog/2017/06/20/you-wont-believe-how-this-islington-single-dad-is-making-ps500-slash-day-working-from-home/">You Won't Believe How This Islington Single Dad Is Making £500/day While Working From Home</a></h1>
     
     
@@ -110,7 +215,7 @@
 <strong>Candidate:</strong> Grep. I would use grep to look for the string.<br />
 <strong>Me:</strong> <em>Terrific. Sorry, maybe I wasn’t clear, I’m NOT talking about finding a substring in a larger text… You know what, forget about the strings. There are no strings. You have 100k integers. What data structure would you put them in so you can quickly look up if a new integer (1743) belongs to the collection?</em><br />
 <strong>Candidate:</strong> For integers I would use an array.<br />
-Me: <em>And how do you find out if the new integer belongs to this array?</em><br />
+<strong>Me:</strong> <em>And how do you find out if the new integer belongs to this array?</em><br />
 <strong>Candidate:</strong> There is a method ‘contains’.<br />
 <strong>Me:</strong> <em>Ok. And for an array of n integers, what is the expected running time of this method in terms of n?</em><br />
 <strong>Candidate:</strong> …<br />
@@ -3316,200 +3421,6 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/06/13/deepwalking-with-companies/">Deepwalking With Companies</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-06-13T22:19:12+01:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>13</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:19 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I have blogged about the wide usefulness of <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">topic models</a> and I have <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">benchmarked</a> word-embedding-assisted classification on Reuter’s benchmark. This time I experiment with these ideas using a real world and decent sized dataset - the graph of UK/Irish companies. I have done this during my “10% time” at <a href="http://www.duedil.com">DueDil</a> (it’s like google’s “20% time”, except it <a href="http://uk.businessinsider.com/google-20-percent-time-policy-2015-4?r=US&amp;IR=T">exists</a>).</p>
-
-<h3 id="graph-of-companies">Graph of companies</h3>
-<p>There are 4 million active companies in the UK and Ireland. DueDil collects all kinds of information about them - financials, legal structures, contact info, company websites, blogs, news appearences etc. All of it is presented to our users and some of it also serves as input to machine learning tasks - like classifying companies into industries.</p>
-
-<p>One very interesting dataset that remains underutilised (AFAIK by anyone, not just DueDil) is the network of connections of companies and directors.</p>
-
-<p>You can tell a lot about a company just by looking at its directors. That is - if you know anything about these people. At DueDil we don’t know much more than just their identities. This would be rather useless in the context of a single company. But there are millions of companies and people who serve as their directors more often then not do it many times in their careers at different companies. Knowing that the director’s name is Jane Brown may be useless, but knowing that the director previously held similar positions at three different tech startups is highly relevant. And this is just one director out of many and one type of relationship.</p>
-
-<p>More generally, one can think about companies as nodes in a graph. Two companies are connected iff there is a person who has served as a director at both of them (not necessarily at the same time). I will call this the <strong>company graph</strong>. Here’s a part of the graph containing DueDil.</p>
-
-<p><img src="/images/comp_graph.png" /></p>
-
-<p>DueDil is connected to Founders For Good Ltd because our CEO Damian Kimmelman is also a director at the other company.</p>
-
-<p>It is intuitive that the position of a company in this graph tells us something about the company. It is however difficult to do anything with this information unless it is somehow encoded into numbers.</p>
-
-<h3 id="company2vec">Company2Vec</h3>
-<p>This is where word embeddings come in. As I mentioned previously, it is possible to apply Word2Vec to a graph to get an embedding of graph nodes as real-valued vectors in a procedure called <a href="http://arxiv.org/abs/1403.6652">DeepWalk</a>. The idea is very simple:</p>
-
-<ol>
-  <li>Construct a bunch of random walks on the graph</li>
-  <li>Feed the random walks into Word2Vec</li>
-</ol>
-
-<p>A random walk is just a sequence of nodes, where the next node is always one of the neighbours of the previous node, chosen at random. Think: Duedil -&gt; Founders For Good Ltd -&gt; Omio Limited.</p>
-
-<p>Word2Vec accepts a collection of documents - where every document is a list of tokens (strings). Here company Id’s play the role of tokens and random walks play the role of documents. It all checks out.</p>
-
-<p>To limit the size of the graph for this proof of concept, I have applied this procedure only to the 2.2 million companies that</p>
-
-<ol>
-  <li>are active</li>
-  <li>have at least one edge (director in common) to another active company</li>
-</ol>
-
-<p>I generated 10 random walks starting at every company, the length of each walk was 40. Training Word2Vec with <a href="https://radimrehurek.com/gensim/models/word2vec.html">gensim</a> on this corpus of $10 \times 40 \times 2200000 = 8.8 \times 10^8$ tokens took over 11h. It also took a machine with 40gb of RAM before it stopped crashing even though the random walks were generated on-line.</p>
-
-<p>Finally I got some vectors out of it - one per company. These vectors themselves were the goal of this project (they can serve as features in ML), but I also made some plots to verify that the algorithm is working as advertised.</p>
-
-<h3 id="pretty-pictures-with-t-sne-and-bokeh">Pretty pictures with t-SNE and Bokeh</h3>
-<p>The embedding produced by DeepWalk was 100-dimensional in this case, so I had to do some dimensionality reduction before trying to visualize the vectors. <a href="https://github.com/danielfrg/tsne">t-SNE</a> is perfect for this kind of thing. Here’s a sample of 40000 company vectors embedded in 2D with t-SNE. You can move or zoom in the plot or hover over the dots to see the names of the corresponding companies.</p>
-
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>Bokeh Plot</title>
-
-<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
-
-<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
-<script type="text/javascript">
-    Bokeh.set_log_level("info");
-</script>
-    </head>
-    <body>
-
-        <div class="plotdiv" id="7953daf6-6ca5-48d8-be1e-4cd0ab91f1f8"></div>
-
-        <script type="text/javascript" src="/javascripts/custom/deepwalk_bokeh/40k_black_g.js"></script>
-    </body>
-</html>
-
-<p>It worked! You can immediately see that there is some structure in the data and t-SNE has picked up on it (and this is only a tiny sample - 2% of all the datapoints). What does this structure mean? After the graph has beed transformed with DeepWalk and then t-SNE, the position of a company in this plot doesn’t have a simple interpretation but it’s clear that groups of highly interconnected companies will correspond to clusters of points in this plot. And it’s easy to verify just by looking at the names of the companies that this is the case.</p>
-
-<p>Take the big blob in the upper left corner - the companies there:</p>
-
-<ul>
-  <li>Edwards Macliammoir Dublin Gate Theatre Productions Limited</li>
-  <li>Humanist Association of Ireland Limited</li>
-  <li>Kildare Street Management Limited</li>
-  <li>Shannon Airport Authority Limited</li>
-</ul>
-
-<p>We have discovered the cluster of irish companies! And if you zoom in on the long, narrow appendage sticking out of this cluster towards bottom left - you’ll see companies like:</p>
-
-<ul>
-  <li>Tempelhof Aircraft Leasing (Ireland) Limited</li>
-  <li>Gallic Dragon Aviation Limited</li>
-  <li>Aergen Aircraft Ten Limited</li>
-</ul>
-
-<p>… and hundreds more. This is not even cherry-picked. I hereby declare the discoverery of the Irish Aviation Peninsula.</p>
-
-<p>Slightly up and to the right of center there is a smaller scottish cluster recognizable through such companies as</p>
-
-<ul>
-  <li>Caledonian Sausage Company</li>
-  <li>Edinburgh Tattoo Productions Limited</li>
-  <li>Dundee Ice Arena</li>
-</ul>
-
-<p>There are many other smaller clusters and it’s actually a fun exercise to try to pinpoint exactly what do the companies in a cluster have in common.</p>
-
-<h4 id="now-in-color">Now in color!</h4>
-<p>This was fun if somewhat grim looking. Let’s try to add some color to the plot. The original goal of this project was to get graph-derived features for industry classification. Let’s try using different colors to denote different industries (based on SIC codes). If DeepWalk coordinates are predictive of the industry a company is in, we should expect to see same-colored dots (companies in the same industry) clustering together in the plot. Does this actually happen?</p>
-
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>Bokeh Plot</title>
-
-<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
-
-<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
-<script type="text/javascript">
-    Bokeh.set_log_level("info");
-</script>
-    </head>
-    <body>
-
-        <div class="plotdiv" id="66d4a3dd-9a8a-4d0a-892f-4fd8be74f711"></div>
-        <script type="text/javascript" src="/javascripts/custom/deepwalk_bokeh/40k_ind_g.js"></script>
-    </body>
-</html>
-
-<p>A little bit, yes.</p>
-
-<p>Mostly everything is a big reddish mess (“services” is the most popular category). But there are indeed some clusters. Right of center we can see a medium sized pink blob of insurance companies:</p>
-
-<ul>
-  <li>US Risk (UK) Newco Limited</li>
-  <li>Zenith Insurance Management UK Limited</li>
-  <li>North Star Underwriting Limited</li>
-</ul>
-
-<p>Below it and to the left lies another, this one green:</p>
-
-<ul>
-  <li>Timeless Films Limited</li>
-  <li>Hercules Productions Ltd</li>
-  <li>Koninck studios PTE Limited</li>
-</ul>
-
-<p>Clearly this is a cluster of film companies (plus other media). If you look more closely you will discover that this is actually the cluster of <em>London based</em> film companies. Nearby there is a smaller green cluster of media companies from the rest of England and another one for Wales. These are less clearly delimited and partly obscured by the red dots of “Services” companies. There are many others, but they are sometimes so tight, they appear as a single dot in the plot.</p>
-
-<p>This is more noisy than I hoped for but it’s definitely working. Would definitely improve accuracy of industry classification if used with other stronger features. Plus you can learn interesting things from it just by looking at the plot. Like the fact that film production companies are closely connected to each other and relatively unconnected to the rest of the world. Or that London is a different country as far as media companies are concerned.</p>
-
-<h4 id="bonus-keyword-based-company-embedding">Bonus: keyword based company embedding</h4>
-<p>Having all this t-SNE and Bokeh niceness in place I couldn’t resist applying it to another interesting dataset - keywords. Keywords are a set of industry related tags that DueDil has for millions of companies. They are things like “fishing” or “management consulting” or “b2b”. A company usually has between a few and a few dozen of them.</p>
-
-<p>A byproduct of the pipeline that extracts keywords for companies is a Word2Vec embedding of the keywords. I used this embedding to create an embedding of companies. This was done simply by averaging all the vectors corresponding to a company’s keywords. I ran the resulting vectors through t-SNE and here’s what it looks like:</p>
-
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>Bokeh Plot</title>
-
-<link rel="stylesheet" href="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.css" type="text/css" />
-
-<script type="text/javascript" src="https://cdn.pydata.org/bokeh/release/bokeh-0.11.1.min.js"></script>
-<script type="text/javascript">
-    Bokeh.set_log_level("info");
-</script>
-    </head>
-    <body>
-
-        <div class="plotdiv" id="8fd1f452-080d-4d66-af86-a63a3b60f6dd"></div>
-        <script type="text/javascript" src="/javascripts/custom/deepwalk_bokeh/50k_ind_kw.js"></script>
-    </body>
-</html>
-
-<p>I shouldn’t be surprised that keywords - which were picked to be industry related - predict the industry really well. But I was blown away by the level of detail preserved by t-SNE. There are recognizable islands for everything. There is a golden Farmers Archipelago and a narrow blue Dentist Island south from Home Care Island. There is a separate Asian Island in the Restaurant Archipelago - go see for yourself.</p>
-
-<p>This was fun. Long live Word2Vec and t-SNE!</p>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -3525,6 +3436,10 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/06/20/you-wont-believe-how-this-islington-single-dad-is-making-ps500-slash-day-working-from-home/">You Won't Believe How This Islington Single Dad Is Making £500/day While Working From Home</a>
       </li>
     
@@ -3538,10 +3453,6 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
     
       <li class="post">
         <a href="/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/">Missing Data Imputation With Bayesian Networks in Pymc</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2016/09/17/text-generation-with-keras-char-rnns/">Text Generation With Keras char-RNNs</a>
       </li>
     
   </ul>

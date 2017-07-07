@@ -1,0 +1,379 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Loafing Around With XGBoots - DS lore</title>
+  <meta name="author" content="nadbor">
+
+  
+  <meta name="description" content="Loafing Around With XGBoots Jul 7th, 2017 9:00 pm This is a guest post by Javier Rodriguez Zaurin. My good friend Nadbor told me that he found on &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://nadbordrozd.github.io/blog/2017/07/07/loafing-around-with-xgboots/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-65624880-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">DS lore</a></h1>
+  
+    <h2>words about stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="nadbordrozd.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/interviews">Interviews</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Loafing Around With XGBoots</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-07-07T21:00:31+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:00 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><em>This is a guest post by <a href="https://www.linkedin.com/in/javier-rodriguez-zaurin-06277454/?ppe=1">Javier Rodriguez Zaurin</a>.</em></p>
+
+<p>My good friend Nadbor told me that he found on Reddit someone asking if data scientists end up doing boring tasks such as classifying shoes. As someone that has faced this problem in the past, I was committed to show that classifying shoes it is a challenging, entertaining task. Maybe the person who wrote that would find it more interesting if the objects to classify were space rockets, but whether rockets or shoes, the problem is of the same nature.</p>
+
+<h2 id="the-problem">THE PROBLEM</h2>
+
+<p>Imagine that you work at a fashion aggregator, and every day you receive hundreds of shoes in the daily feed. The retailers send you one identifier and multiple images (with different points of view) per shoe model. Sometimes, they send you additional information indicating whether one of the images is the default image to be displayed at the site, normally, the side-view of the shoe. However, this is not always the case. Of course, you want your website to look perfect, and you want to consistently show the same shoe perspective across the entire site. Therefore, here is the task: how do we find the side view of the shoes as they come through the feed?</p>
+
+<h2 id="the-solution">THE SOLUTION</h2>
+
+<p>Before I jump into the technical aspect of the solution, let me just add a few lines on team-work. Through the years in both <em>real</em> science and data science, I have learned that cool things don’t happen in isolation. The solution that I am describing here was part of a team effort and the process was very entertaining and rewarding.</p>
+
+<p>Let’s go into the details.</p>
+
+<p>The solution implemented comprised two steps:</p>
+
+<p>1-. Using the <a href="https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/shape/sc_digits.html">shape context</a> algorithm to parameterise shoe-shapes</p>
+
+<p>2-. Cluster the shapes and find those clusters that are comprised mostly by side-view shoes</p>
+
+<h3 id="the-shape-context-algorithm">THE SHAPE CONTEXT ALGORITHM</h3>
+
+<p>Details on the algorithm can be found <a href="https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/shape/sc_digits.html">here</a> and additional information on our python implementation is <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a>. The steps required are mainly two:</p>
+
+<p>1-. Find points along the silhouette of the shoe useful to define the shape.</p>
+
+<p>2-. Compute a Shape Context Matrix using radial and angular metrics that will effectively parameterise the shape of the shoe.</p>
+
+<h4 id="find-the-relevant-points">1-. FIND THE RELEVANT POINTS</h4>
+
+<p>Finding the relevant points to be used later to compute the Shape Context Matrix is relatively easy. If the background of the image is white, simply “slice” the image and find the initial and final points that are not background per slice. Note that due to the “convoluted” shapes of some shoes, techniques relying on contours might not work here.</p>
+
+<p>I have coded a <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/morphology_utils.py">series of functions</a> to make our lives easier. Here I show the results of using some of those functions.</p>
+
+<p><img src="/images/xgboots/Figure_1.png" /></p>
+
+<p>The figure shows 60 points of interest found as we move along the image horizontally.</p>
+
+<h4 id="shape-context-matrix">2-. SHAPE CONTEXT MATRIX</h4>
+
+<p>Once we have the points of interest we can compute the radial and angular metrics that will eventually lead to the Shape Context Matrix. The idea is the following: for a given point, compute the number of points that fall within a radial bin and an angular bin relative to that point.</p>
+
+<p>In a first instance, we computed 2 matrices, one containing radial information and one containing angular information, per point of interest. For example, if we select 120 points of interest around the silhouette of the shoe, these matrices will be of dim (120,120).</p>
+
+<p>Once we have these matrices, the next step consists in building the shape context matrix per point of interest. Eventually, all shape context matrices are flattened and concatenated resulting in what is referred to as Bin Histogram.</p>
+
+<p>Let’s have a look at one of these shape context matrices. For this particular example we used 6 radial bins and 12 angular bins. Code to generate this plot can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a>:</p>
+
+<p><img src="/images/xgboots/Figure_2.png" /></p>
+
+<p>This figure has been generated for the first point within our points-of-interest-array and is interpreted as follows: if we concentrate on the upper-right “bucket” we find that, relative to the first point in our array, there are 34 other points that fall within the largest radial bin (labelled 0 in the Figure) and within the first angular bin (labelled 0 in the Figure). More details on the interpretation can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a></p>
+
+<p>Once we have a matrix like the one in Figure 2 for every point of interest, we flatten and concatenate them resulting in an array of 12 $\times$ 6 $\times$ number of points (120 in this case), i.e. 8640 values. Overall, after all this process we will end up with a <code>numpy</code> array of dimensions (number of images, 8640). Now we just need to cluster these arrays.</p>
+
+<h2 id="results">RESULTS</h2>
+
+<p>A detailed discussion on how to pick the number of clusters and the potential caveats can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/clustering_shapes.ipynb">here</a>. In this post I will simply show the results of using <a href="http://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html">MiniBatchKMeans</a> to cluster the arrays using 15 clusters. For example, clusters 2,3 and 10 look like this.</p>
+
+<p><img src="/images/xgboots/Figure_3.png" />
+<img src="/images/xgboots/Figure_4.png" />
+<img src="/images/xgboots/Figure_5.png" /></p>
+
+<p>Interestingly cluster 1 is comprised of images with an non-white and/or structured background, images with a shape different than that of a shoe and some misclassifications. Some advise on how to deal with the images in that cluster can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/remove_background.ipynb">here</a></p>
+
+<p><img src="/images/xgboots/Figure_6.png" /></p>
+
+<h2 id="moving-forward">MOVING FORWARD</h2>
+
+<p>There are still a few aspects to cover to isolate the side views of the shoes with more certainty, but I will leave this for a future post (if I have the time!).</p>
+
+<p>In addition, there are some other features and techniques one could try to improve the quality of the clusters, such as <a href="http://www.quaero.org/media/files/bibliographie/inria_qpr6_douze_gist_evaluation.pdf">GIST indicators</a> or <a href="http://haralick.org/journals/TexturalFeatures.pdf">Halarick Textural Features</a>.</p>
+
+<p>Of course, if you have the budget, you can always pay for someone to label the entire dataset, turn this into a supervised problem and use Deep Learning. A series of convolutional layers should capture shapes, colours and patterns. Nonetheless, if you think for a second about the nature of this problem, you will see that even deciding the labelling is not a trivial task.</p>
+
+<p>Anyway, for now, I will leave it here!</p>
+
+<p>The code for the process described in this post can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier">here</a></p>
+</div>
+
+
+
+  <head>
+    
+  </head>
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">nadbor</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2017-07-07T21:00:31+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:00 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://nadbordrozd.github.io/blog/2017/07/07/loafing-around-with-xgboots/" data-via="" data-counturl="http://nadbordrozd.github.io/blog/2017/07/07/loafing-around-with-xgboots/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2017/06/20/you-wont-believe-how-this-islington-single-dad-is-making-ps500-slash-day-working-from-home/" title="Previous Post: You won't believe how this Islington single dad is making £500/day while working from home">&laquo; You won't believe how this Islington single dad is making £500/day while working from home</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/06/20/you-wont-believe-how-this-islington-single-dad-is-making-ps500-slash-day-working-from-home/">You Won't Believe How This Islington Single Dad Is Making £500/day While Working From Home</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/06/03/python-or-scala/">Python or Scala - Let the Neural Network Decide.</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/23/missing-data-imputation-with-pymc-part-2/">Missing Data Imputation With Pymc: Part 2</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/">Missing Data Imputation With Bayesian Networks in Pymc</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/nadbordrozd">@nadbordrozd</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'nadbordrozd',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/nadbordrozd?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2017 - nadbor -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ds-lore';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://nadbordrozd.github.io/blog/2017/07/07/loafing-around-with-xgboots/';
+        var disqus_url = 'http://nadbordrozd.github.io/blog/2017/07/07/loafing-around-with-xgboots/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+
+<!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+</html>
