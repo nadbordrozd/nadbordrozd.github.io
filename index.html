@@ -150,7 +150,7 @@
 
 <p><img src="/images/xgboots/Figure_2.png" /></p>
 
-<p>This figure has been generated for the first point within our points-of-interest-array and is interpreted as follows: if we concentrate on the upper-right “bucket” we find that, relative to the first point in our array, there are 34 other points that fall within the largest radial bin (labelled 0 in the Figure) and within the first angular bin (labelled 0 in the Figure). More details on the interpretation can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a></p>
+<p>This figure has been generated for the first point within our points-of-interest-array and is interpreted as follows: if we concentrate on the upper-left “bucket” we find that, relative to the first point in our array, there are 34 other points that fall within the largest radial bin (labelled 0 in the Figure) and within the first angular bin (labelled 0 in the Figure). More details on the interpretation can be found <a href="https://github.com/jrzaurin/Shoe-Shape-Classifier/blob/master/demo/shape_context_algo.ipynb">here</a></p>
 
 <p>Once we have a matrix like the one in Figure 2 for every point of interest, we flatten and concatenate them resulting in an array of 12 $\times$ 6 $\times$ number of points (120 in this case), i.e. 8640 values. Overall, after all this process we will end up with a <code>numpy</code> array of dimensions (number of images, 8640). Now we just need to cluster these arrays.</p>
 
@@ -1475,7 +1475,7 @@ $P(duck \mid \neg swims \land quacks)$<br />
 
 <h4 id="the-clean-way">The clean way</h4>
 
-<p>This was soul-crushingly tedious, I know. But it doesn’t have to be this way. I have created a few utility functions to get rid of the boilerplate - the creation of uniform priors for variables, the conditional probabilities, the trace, and so on. The utils can all be found <a href="https://github.com/nadbordrozd/ds-tools/blob/master/dstk/pymc_utils.py">here</a> (along with some other stuff).</p>
+<p>This was soul-crushingly tedious, I know. But it doesn’t have to be this way. I have created a few utility functions to get rid of the boilerplate - the creation of uniform priors for variables, the conditional probabilities, the trace, and so on. The utils can all be found <a href="https://github.com/nadbordrozd/flagpole">here</a> (along with some other stuff).</p>
 
 <p>This is how to define the network using these utils:</p>
 
