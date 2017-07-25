@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="This is a guest post by Javier Rodriguez Zaurin. My good friend Nadbor told me that he found on Reddit someone asking if data scientists end up doing &hellip;">
+  <meta name="description" content="TL;DR: I prepared 5 puzzles about statistics that should be accessible to anyone without being trivial. Scroll down for the puzzles. Data Science and &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,185 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-07-18T20:15:51+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>8:15 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>TL;DR: I prepared 5 puzzles about statistics that should be accessible to anyone without being trivial. Scroll down for the puzzles.</p>
+
+<h3 id="data-science-and-statistics">Data Science and Statistics</h3>
+
+<p><a href="https://twitter.com/bigdataborat/status/372350993255518208?lang=en"><em>“Data science is statistics on a Mac”</em></a></p>
+
+<p><a href="https://twitter.com/josh_wills/status/198093512149958656?lang=en-gb"><em>“Data Scientist (n.): Person who is better at statistics than any software engineer and better at software engineering than any statistician.”</em></a></p>
+
+<p>Then there is <a href="http://drewconway.com/zia/2013/3/26/the-data-science-venn-diagram">the famous Venn diagram</a> with data science on the intersection of statstics, hacking and substantive expertise.</p>
+
+<p>What the hell?</p>
+
+<p>Based on all those memes one would think that data scientists spend equal amounts of time writing code and writing integrals on whiteboards. Thinking about the right data structure and thinking about the right statistical test. Debugging pipelines and debugging equations.</p>
+
+<p>And yet, I can’t remember a single time when I got to solve an integral on the job (and <em>believe me</em>, it’s not for lack of trying). I spent a total of maybe a week in the last 3 years explicitly thinking about statistical tests. Sure, means and medians and variances come up on a daily basis but it would be setting the bar extremely low to call that ‘doing statistics’.</p>
+
+<p><img src="/images/so_you_think_you_can_stats/iwastold.jpg" /></p>
+
+<p>Someone is bound to comment that I’m doing data science wrong or that I’m not a true data scientist. Maybe. But if being a true data scientist involves doing proper statistics more than 10% of the time, then I’m yet to meet a true data scientist.</p>
+
+<h3 id="the-other-kind-of-statistics">The other kind of statistics</h3>
+
+<p>But maybe this is the wrong way to think about it. Maybe my problem is that I was expecting mathematical statistics where I should have been expecting real world statistics.</p>
+
+<p><em>Mathematical statistics</em> is a branch of mathematics. Data scientists like to pretend they do it, but they don’t.</p>
+
+<p><em>Real world statistics</em> is an applied science. It’s what people actually do to make sense of datasets. It requires a good intuitive understanding of the <em>basics</em> of mathematical statistics, a lot of common sense and only infrequently any <em>advanced knowledge</em> of mathematical statistics. Data scientists genuinely do it, a lot of the time.</p>
+
+<p>In my defense, it was an easy mistake to make. Mathematical statistics is what is taught in most courses and textbooks. If any statistics questions come up in a job interview for a data science role - it will be the mathematical variety.</p>
+
+<p>To illustrate what I mean by ‘real world statistics’, to show that this discipline is not trivial and interesting in its own right, I prepared a short quiz. There are 5 questions. None of them require any complicated math or any calculations. They do require a good mathematical intuition though.</p>
+
+<p>I encourage you to try to solve all of them yourself before checking the answers. It’s easy to convince yourself that a problem is trivial after you’ve read the solution! If you get stuck though, every questino has a hint below.</p>
+
+<h3 id="questions">Questions</h3>
+
+<h4 id="cancer">Cancer</h4>
+<p>According to CDC data, US counties with the lowest incidence of kidney cancer happen to all be rural, sparsely populated and located in traditionally Republican states. Can you explain this fact? What does it tell us about the causes of cancer?</p>
+
+<h4 id="bar-fights">Bar Fights</h4>
+<p>According to a series of interviews conducted with people who have been in a bar fight, 9 out of 10 times, when someone dies in a bar fight, he was the one who started it. How can you explain this remarkable finding?</p>
+
+<h4 id="competitions">Competitions</h4>
+<p>After Google measured on-the-job performance of their programmers, they found a negative correlation between being a former winner of a programming competition and being successful on the job. That’s right - champion coders did worse on average. That raises important questions for recruiters. Do programming competitions make you worse at 9-5 programming? Should employers start screening out champion coders?</p>
+
+<h4 id="exams">Exams</h4>
+<p>It is well documented that students from underprivileged backgrounds underperform academically at all levels of education. Two students enter a university - one of them comes from an underprivileged group, the other from a privileged one. They both scored exactly the same on the university admission exam. Should you expect the underprivileged student to do better, the same or worse in the next university exam compared to the other student? Bear in mind that while their numerical scores from the admissions test were the same, it means that the underprivileged student heavily outperformed expectations based on his/her background while the other student did as well as expected from his/her background.</p>
+
+<h4 id="sex-partners">Sex partners</h4>
+<p>According to studies the average number of sex partners Britons have had in their lives is 9.3 for men and 4.7 for women. How can those numbers possibly be different? After all, each time a man and a woman become sex partners, they increase the total sex partners tally for both sexes by +1. Find at least 5 different factors that could (at least in theory) account for the difference and rate them for plausibility.</p>
+
+<h3 id="hints">Hints</h3>
+
+<h4 id="cancer-1">Cancer</h4>
+<div id="spoiler2" style="display:none">
+The same thing is true of counties with the *highest* incidence of kidney cancer.
+</div>
+<p><button title="Click to show/hide content" type="button" onclick="if(document.getElementById('spoiler2') .style.display=='none') {document.getElementById('spoiler2') .style.display=''}else{document.getElementById('spoiler2') .style.display='none'}">Show/hide</button></p>
+
+<h4 id="bar-fights-1">Bar Fights</h4>
+<div id="spoiler1" style="display:none">
+According to interviews. Hint, Hint.
+</div>
+<p><button title="Click to show/hide content" type="button" onclick="if(document.getElementById('spoiler1') .style.display=='none') {document.getElementById('spoiler1') .style.display=''}else{document.getElementById('spoiler1') .style.display='none'}">Show/hide</button></p>
+
+<h4 id="competitions-1">Competitions</h4>
+<div id="spoiler3" style="display:none">
+Think about where did the sample come from.
+</div>
+<p><button title="Click to show/hide content" type="button" onclick="if(document.getElementById('spoiler3') .style.display=='none') {document.getElementById('spoiler3') .style.display=''}else{document.getElementById('spoiler3') .style.display='none'}">Show/hide</button></p>
+
+<h4 id="exams-1">Exams</h4>
+<div id="spoiler4" style="display:none">
+What if the students were sports teams from a weaker and a stronger league?
+</div>
+<p><button title="Click to show/hide content" type="button" onclick="if(document.getElementById('spoiler4') .style.display=='none') {document.getElementById('spoiler4') .style.display=''}else{document.getElementById('spoiler4') .style.display='none'}">Show/hide</button></p>
+
+<h4 id="sex-partners-1">Sex Partners</h4>
+<div id="spoiler5" style="display:none">
+Get your mind into the gutter for this one!
+</div>
+<p><button title="Click to show/hide content" type="button" onclick="if(document.getElementById('spoiler5') .style.display=='none') {document.getElementById('spoiler5') .style.display=''}else{document.getElementById('spoiler5') .style.display='none'}">Show/hide</button></p>
+
+<p><br /><br />
+<br /><br />
+<br /><br />
+<br /><br />
+<br /><br />
+<br /><br />
+<br /><br />
+<br /><br />
+<br /><br />
+<br /><br /></p>
+
+<h3 id="answers">Answers</h3>
+
+<h4 id="cancer-2">Cancer</h4>
+<p>It tells us nothing about causes of cancer, it’s a purely statistical effect and it has to be this way. Sparsely populated counties have less people in them, so sampling error is higher. That’s it. Think about an extreme case - a county with a population of 1. If the only inhabitant of this county gets kidney cancer, the county will have 100% kidney cancer rate! If this person remains healthy instead, the county will have cancer incidence rate of 0%. It’s easier for a small group of people to have extrmely high or extremely low rate of anything just by chance. Needless to say, republicanism has nothing to do with cancer (as far as we know) - it’s just that rural areas are both sparsely populated and tend to lean republican.</p>
+
+<p>This example comes from Daniel Kahneman’s awesome book <a href="https://www.amazon.co.uk/Thinking-Fast-Slow-Daniel-Kahneman/dp/0141033576">Thinking Fast And Slow</a>. <a href="http://dataremixed.com/2015/01/avoiding-data-pitfalls-part-2/">This blog post</a> has a really nice visualisation of the actual CDC data that illustrates this effect.</p>
+
+<h4 id="bar-fights-2">Bar Fights</h4>
+<p>People lie. Of course the dead one will be blamed for everything!</p>
+
+<h4 id="competitions-2">Competitions</h4>
+<p>This one is slightly more subtle. It is not inconceivable that being a Programming Competition Winner (PCW) makes one less likely to be a Good Engineer (GE). But this is not the only and IMO not the most plausible explanation of the data. It could very well be that in the general population there is no correlation between GE and PCW or a positive correlation and the observed negative correlation is purely due to Google’s hiring practices. Imagine a fictional hiring policy where Google only hires people who either won a competition (PCW) or are proven superstar engineers (GE) - based on their open source record. In that scenario any engineer working at Google who was not a PCW would automatically be GE - hence a negative correlation between GE and PCW among googlers. The correlation in the subpopulation of googlers may very well be the opposite of the correlation in the entire population. Treating PCW as a negative in hiring programmers would be premature.</p>
+
+<p>Erik Bernhardsson has a <a href="https://erikbern.com/2015/04/07/norvigs-claim-that-programming-competitions-correlate-negatively-with-being-good-on-the-job.html">post</a> with nice visual illustration of this phenomenon (which is an of <a href="https://en.wikipedia.org/wiki/Berkson%27s_paradox">Berkson’s Paradox</a>). The same principle also explains why all handsome men you date turn out to be such jerks.</p>
+
+<h4 id="exams-2">Exams</h4>
+<p>The underprivileged student should be expected to do worse. The reason is simple - the admissions test is a measure of ability but it’s not a perfect measure. Sometimes students score lower or higher than their average just by chance. When a student scores higher/lower than expected (based on demographics and whatever other information you have) it is likely that the student was lucky/unlucky in this particular test. The best estimate of the student’s ability lies somewhere between the actual test score and our prior estimate (which here is based on the demographics).</p>
+
+<p>To convince yourself that it must be so, consider an example from sports. If a third league football team like Luton Town plays a top club like Real Madrid and ties, you don’t conclude that Luton Town is as good as Real Madrid. You raise your opinion of Luton Town and lower your opinion of Real Madrid but not all the way to the same level. You still expect Real Madrid to win the rematch.</p>
+
+<p>This effect is an example of [regression to the mean]9https://en.wikipedia.org/wiki/Regression_toward_the_mean) and it is known as Kelley’s Paradox. <a href="http://www-stat.wharton.upenn.edu/~hwainer/Readings/3%20paradoxes%20-%20final%20copy.pdf">This paper</a> illustrates it with figures with actual data from SAT and MCAT exams. You will see that the effect is not subtle!</p>
+
+<h4 id="sex-partners-2">Sex Partners</h4>
+<p>Average number of sex partners for males is the sum of the numbers of sex partners for all the males divided by the number of all the males:</p>
+
+<script type="math/tex; mode=display">MSP = \frac{\sum_{m \in males}{\textrm{number of partners of m}}}{\textrm{number of males}}</script>
+
+<p>similarly for females:</p>
+
+<script type="math/tex; mode=display">FSP = \frac{\sum_{f \in females}{\textrm{number of partners of f}}}{\textrm{number of females}}</script>
+
+<p>The reason we think $MSP$ and $FSP$ should be equal is that every time a man and a woman become sex partners, the numerators of both $MSP$ and $FSP$ increase by $+1$. And the denominators are approximately equal too. Let’s list all the ways this tautology breaks down in real life:</p>
+
+<ol>
+  <li>People lie.</li>
+  <li>There are are more homosexual men than homosexual women and they tend to have more partners. A homosexual relationship between men contributes $+2$ to the numerator of $MSP$ but not to $FSP$.</li>
+  <li>Men and women may be using different definitions of sexual intercourse. I leave it to the reader to imagine all the situations that the male but not the female participand would describe as having had sex - without either of them technically lying. In such a situation only the numerator of $MSP$ increases. This may or may not be an issue depending on the exact phrasing of the survey.</li>
+  <li>There are actually more women then men, so the denominator of $FSP$ is higher. This effect is undoubtedly real but too tiny to explain anything.</li>
+</ol>
+
+<p>And there are other factors as well, although it’s not clear to me which way would they tend to bias the ratio:</p>
+
+<ol>
+  <li>Britons may be having sex partners outside UK. This may be either while they are travelling abroad or the sex partner may be a tourist visiting UK. Each such partner would only contribute to one of $MSP$, $FSP$ but not the other.</li>
+  <li>Immigration and emigration both lead to a situation where some of the sex partners of people who currently live in the UK don’t themselves (currently) live in the UK. Depending on the sex partner statistics of the people immgrating to/emgigrading from the UK, this may contribute to the $MSP$, $WSP$ discrepancy.</li>
+  <li>People are dropping out of the population by dying. This, combined with sex differences in the age people have sex, can result in a discrepancy between $MSP$ and $FSP$. Consider a country where every male finds 3 female sexual partners as soon as he turns 18 but those partners are exclusively women on their deathbeds. In such country almost every adult male would have had 3 sex partners and almost every female would have had 0 (except for a tiny fraction of females who are about to die).</li>
+</ol>
+
+<h3 id="conclusions">Conclusions</h3>
+<ul>
+  <li>random sampling error produces non-random seeming results (Cancer)</li>
+  <li>the measurement method affects the outcome (Bar Fights)</li>
+  <li>nonrepresentative samples lead to spurious correlations (Competitions)</li>
+  <li>measurements are never 100% reliable. An accurate estimate of a quantity must combine the measurement with prior distribution (Exams)</li>
+  <li>seemingly well defined concepts at closer inspection turn out to be slippery (Sex Partners)</li>
+</ul>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3251,176 +3430,6 @@ There will never be a normalisation function that does the right thing for every
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/06/15/dear-recruiter/">Dear Recruiter</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-06-15T11:22:10+01:00'><span class='date'><span class='date-month'>Jun</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>11:22 am</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I’ve had a lot of experience with tech interviews and recruiters in the past and I’m likely to have a lot more in the future. A non-negligible fraction of that experience ranged from “mildly annoying” to “exasperating”.</p>
-
-<p>Here’s a list of real examples of irritating recruiter behaviors together with guidlines on how I expect a reasonable person to act instead.</p>
-
-<p>Before we start you must understand where I’m coming from. I’m not constantly looking for new jobs. But when I do, I apply en masse and then I have to deal with many recruiters at once. Each one constantly calling me in the office or at home (what is it with your obsession with phone calls? Why not email?). This in itself can get annoying but on top of that there are other more serious offenses. I am usually extremely agreeable both in person and over the phone. A blog post is my way of expressing complaints that I wouldn’t dare make in a conversation with you. It’s also a form of catharsis so forgive me if I get somewhat snarky and don’t take offense if you personally are not guilty of the sins mentioned here.</p>
-
-<h3 id="when-you-contact-me-about-a-new-role">When you contact me about a new role</h3>
-<blockquote>
-  <p>I have an exciting opportunity with a global company, one of the leaders in its field. When can we arrange a call?</p>
-</blockquote>
-
-<p>This tells me nothing. Everyone is either a “leader in their field” or an “exciting startup” or a “global brand”. I’m getting 5 of these a day. If I am to commit any time to it I first need to know:</p>
-
-<ul>
-  <li>type of role (data scientist? developer? devops? junior? lead? manager?)</li>
-  <li>ballpark salary</li>
-  <li>skills they are looking for</li>
-</ul>
-
-<p>Ideally, if possible, also</p>
-
-<ul>
-  <li>what are they trying to build/do</li>
-</ul>
-
-<p>This information is typically enough for me to decide if I’m interested or not. I will let you know if I am. I really don’t need to listen to you talk about their nice offices and what fancy university has the CTO attended. If I’m interested in these things I will look them up myself. This conversation is not going to change my mind one way or the other.</p>
-
-<p>If you want to chat with me because you need to vet me before passing my CV on to the company <strong>please say so</strong> and <strong>indicate clearly</strong> what your decision is afterwards. And don’t do this bait-and-switch on me where I express interest in one position and you call me to discuss but only try to peddle another.</p>
-
-<p>In short, this is how it’s going to work:</p>
-
-<ol>
-  <li>you email me basic details of the role (or multiple roles)</li>
-  <li>I email you back with my latest CV if I’m interested or with questions if I have any</li>
-  <li>you send my details over the company and try to arrange an interview</li>
-</ol>
-
-<p>If you absolutely need to hear my voice and vet me, say so. If I’m interested in the role, we can get it over with <strong>once</strong>.</p>
-
-<h4 id="before-the-interview">Before the interview</h4>
-<blockquote>
-  <p>Let me know what is the best time to call you so that I can talk you through the interview process</p>
-</blockquote>
-
-<p>Why? It’s a job interview not open heart surgery. There will be a 20 minutes phone call with HR, then an hour with some technical person then 3 hours of technical on-site interviews then a brief chat with some higher-up. Or a homework assignment, then technical phone call, then on-site, then HR. Or some other configuration. Whatever the case, you could’ve explained it in the email and save us both time. Frankly, I don’t care what the format is. All I need from you is the time and place and it is definitely possible to send those by email.</p>
-
-<blockquote>
-  <p>I will call you before the interview to give you a heads up</p>
-</blockquote>
-
-<p>No.</p>
-
-<blockquote>
-  <p>Are you interviewing with any other companies? Tell me, so we can adjust the schedule so that you don’t miss this opportunity</p>
-</blockquote>
-
-<p>What you mean is “we can adjust the schedule so that you don’t get the chance to interview with anyone else” (more on that later). Thank you very much. I don’t want to lie to you, so I’m just not going to tell you anything. If I actually need to speed things up because of other interviews, I will let you know. By email.</p>
-
-<p>How it is going to work:</p>
-
-<ol>
-  <li>you give me time and place</li>
-  <li>I confirm that I will show up</li>
-</ol>
-
-<h3 id="after-the-interview">After the interview</h3>
-<blockquote>
-  <p>Please call me after the interview to tell me how did it go …</p>
-</blockquote>
-
-<p>It went well. Probably. Or maybe not. Either way it doesn’t really matter how <em>I</em> think it went, does it?</p>
-
-<blockquote>
-  <p>… what was it like …</p>
-</blockquote>
-
-<p>It was like every other interview I’ve been to. First they introduced themselves and the company, then we talked about my resume, then about my motivation and finally they gave me some vaguely job-related problems to solve and I solved them. What else did you expect?</p>
-
-<blockquote>
-  <p>… how did you like them</p>
-</blockquote>
-
-<p>I liked them fine. Or maybe I loved them. Or maybe I thought they were boring. You won’t find out by calling though, because I’m only gonna feed you some enthusiastic sounding platitudes because I want to get to the next stage in this process. There is no upside for me in telling you that I thought the interviewers were boring and dumb even if it was true. So just don’t ask. In the unlikely event that I hated the interview enough to make me want to withdraw my application, I promise to let you know. By - you guessed it - email.</p>
-
-<p>How it’s going to work:</p>
-
-<ol>
-  <li>if you have any feedback from the interviewers or a decision, you will email it to me</li>
-  <li>if I want to take myself out of the process I will inform you also by email</li>
-</ol>
-
-<h3 id="the-final-stretch">The final stretch</h3>
-<p>So I made it through all the rounds and I’m expecting to hear back from the company. You call me saying you have some positive initial feedback, then we have this conversation:</p>
-
-<blockquote>
-  <p>You: If they come back with an offer of £n are you going to accept?<br />
-Me: I don’t know. I’ll need a couple of days to think about it.<br />
-You: Why wouldn’t you accept it? What is wrong with the offer?<br />
-Me: Nothing is wrong with it. I just need some time to consider my options. Not very long, just the weekend.<br />
-You: If there is nothing wrong with the offer then you should take it. I need to get back to them and tell them that you are going to take the offer. Otherwise they will think that you are not really motivated to work with them and they will not make the offer.<br />
-Me: What are you talking about?! They know I’m motivated. But this is a serious decision and I will not make it without proper consideration.<br />
-You: They have deadlines, you know. They can’t wait forever.<br />
-Me: It’s only two days!<br />
-You: If I don’t tell them you will accept, they will keep interviewing and they can find someone else. This is a very buyoant market!<br />
-…</p>
-</blockquote>
-
-<p>This is <strong>bullshit</strong> and you know it. This is not a heist movie and you’re not looking for a last minute replacement safe cracker. The job ad has been out for months. I think they can wait two more days.</p>
-
-<p>One time this happened to me right after the interview. The recruiter didn’t even wait to hear from the company in question. He based this whole routine on my reporting that the interview went well and that we discussed money at the end. This was also a case of him putting me up for a job that paid 10% less than the one I held at the time even though I explicitly required that my new position pays 10% more. I only found out during the final interview.</p>
-
-<p>Another recruiter upon learning that I’m interviewing with other companies got my final interview cancelled. My first interview was on Monday and the final one was supposed to take place a week later. On Wednesday he asked me about other interviews, then we’ve had the bullshit “you’ve got to accept” conversation. When I didn’t budge, the recruiter got the company to make me an offer that evening, skipping the final interview. The offer came with an expiration date on 12am the following day! 4 days before the planned interview. He even blurted out that the insane timing was because they were afraid they would lose me, before covering up with the deadlines and buyoant markets bs. That they have to resort to this type of tactics is all the proof I need that the market for data scientists isn’t buyoant at all. <em>Obviously</em> they were afraid I would accept another offer. And the only reason they were afraid was that the recruiter tipped them off.</p>
-
-<p>I understand now that we’re not allies. We are not exactly oponents but you’re definitely playing for a different team.</p>
-
-<p>So I am not going to make it easy for your team. I will not get caught up in the false sense of urgency you’re trying to create (one recruiter tried to get me to come to the office and sign the contract on a Sunday) … ever again. I will not fall for scare tactics. I will not reveal any information about other interviews I may be having. Here’s what <em>will</em> happen:</p>
-
-<ol>
-  <li>you will only contact me when you have an offer</li>
-  <li>I will take my time considering that offer - and I will tell you how long exactly. Shorter if it’s a “start immediately” fixed term contract, longer if it’s a permanent position, but I will never be bullied into committing to a contract I haven’t even seen</li>
-  <li>I will ignore any exploding offer deadlines so don’t even bother. The only exception is if the deadline has been established up front before any interviews</li>
-</ol>
-
-<p>It’s worth noting that I have never experienced anything resembling the “bullshit conversation” when I dealt with a potential employer directly. When applying through recruiters it happened <em>every time</em>.</p>
-
-<h3 id="final-notes">Final notes</h3>
-
-<ul>
-  <li>no I will not have coffee with you. Why would you even think I’d like that?</li>
-  <li>I don’t need you to tell me that “if you like the job you should be flexible about the money” or that “these companies are not going to wait forever, better apply now”</li>
-  <li>in general I would appreciate if you keep your obviously-biased career advice to yourself</li>
-  <li>any tips regarding my resume or specific interviews are very welcome</li>
-  <li>if you can write an email to arrange a call to tell me X, you can just tell me X in the email</li>
-</ul>
-
-<p>If these ground rules seem unreasonable to you, then save us both the trouble and don’t contact me.</p>
-
-<p>Yours Exasperatedly<br />
-<em>nadbor</em></p>
-
-<h3 id="ps">P.S.</h3>
-<p>I didn’t intend to make it read like I’m bragging about all the offers I’m getting like I’m God’s gift to data science who can get any job he wants. It’s just that I’ve interviewed <em>a lot</em> over the years so in addition to dozens of rejections I have had several successes too. I’m only describing here the more successful examples because in case of rejection recruiters tend to mercifully leave me alone.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -3436,6 +3445,10 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
       </li>
     
@@ -3449,10 +3462,6 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
     
       <li class="post">
         <a href="/blog/2017/03/23/missing-data-imputation-with-pymc-part-2/">Missing Data Imputation With Pymc: Part 2</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/">Missing Data Imputation With Bayesian Networks in Pymc</a>
       </li>
     
   </ul>
