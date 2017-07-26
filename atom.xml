@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-07-26T22:22:48+01:00</updated>
+  <updated>2017-07-27T00:36:18+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -115,7 +115,7 @@ Get your mind into the gutter for this one!
 <h3 id="answers">Answers</h3>
 
 <h4 id="cancer-2">Cancer</h4>
-<p>It tells us nothing about causes of cancer, it’s a purely statistical effect and it has to be this way. Sparsely populated counties have less people in them, so sampling error is higher. That’s it. Think about an extreme case - a county with a population of 1. If the only inhabitant of this county gets kidney cancer, the county will have 100% kidney cancer rate! If this person remains healthy instead, the county will have cancer incidence rate of 0%. It’s easier for a small group of people to have extrmely high or extremely low rate of anything just by chance. Needless to say, republicanism has nothing to do with cancer (as far as we know) - it’s just that rural areas are both sparsely populated and tend to lean Republican.</p>
+<p>It tells us nothing about causes of cancer, it’s a purely statistical effect and it has to be this way. Sparsely populated counties have less people in them, so sampling error is higher. That’s it. Think about an extreme case - a county with a population of 1. If the only inhabitant of this county gets kidney cancer, the county will have 100% kidney cancer rate! If this person remains healthy instead, the county will have cancer incidence rate of 0%. It’s easier for a small group of people to have extremely high or extremely low rate of anything just by chance. Needless to say, republicanism has nothing to do with cancer (as far as we know) - it’s just that rural areas are both sparsely populated and tend to lean Republican.</p>
 
 <p><img src="http://nadbordrozd.github.io/images/so_you_think_you_can_stats/cancer.png" /></p>
 
@@ -152,6 +152,7 @@ Get your mind into the gutter for this one!
 <ol>
   <li>People lie.</li>
   <li>There are are more homosexual men than homosexual women and they tend to have more partners. A homosexual relationship between men contributes $+2$ to the numerator of $MSP$ but not to $FSP$.</li>
+  <li>Non-representative sample. If for example prostitutes are never polled or refuse to answer the survey, that could seriously lower the female average.</li>
   <li>Men and women may be using different definitions of sexual intercourse. I leave it to the reader to imagine all the situations that the male but not the female participant would describe as having had sex - without either of them technically lying. In such a situation only the numerator of $MSP$ increases. This may or may not be an issue depending on the exact phrasing of the survey.</li>
   <li>There are actually more women then men, so the denominator of $FSP$ is higher. This effect is undoubtedly real but too tiny to explain anything.</li>
 </ol>
