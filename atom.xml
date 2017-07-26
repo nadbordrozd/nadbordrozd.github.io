@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-07-25T21:29:31+01:00</updated>
+  <updated>2017-07-26T21:01:30+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -36,7 +36,7 @@
 
 <p><img src="http://nadbordrozd.github.io/images/so_you_think_you_can_stats/iwastold.jpg" /></p>
 
-<p>Someone is bound to comment that I’m doing data science wrong or that I’m not a true data scientist. Maybe. But if being a true data scientist involves doing proper statistics more than 10% of the time, then I’m yet to meet a true data scientist.</p>
+<p>Someone is bound to comment that I’m doing data science wrong or that I’m not a true data scientist. Maybe. But if true data scientist is someone who does statistics more than 10% of the time, then I’m yet to meet one.</p>
 
 <h3 id="the-other-kind-of-statistics">The other kind of statistics</h3>
 
@@ -48,9 +48,9 @@
 
 <p>In my defense, it was an easy mistake to make. Mathematical statistics is what is taught in most courses and textbooks. If any statistics questions come up in a job interview for a data science role - it will be the mathematical variety.</p>
 
-<p>To illustrate what I mean by ‘real world statistics’, to show that this discipline is not trivial and interesting in its own right, I prepared a short quiz. There are 5 questions. None of them require any complicated math or any calculations. They do require a good mathematical intuition though.</p>
+<p>To illustrate what I mean by ‘real world statistics’, to show that this discipline is not trivial and is interesting in its own right, I prepared a short quiz. There are 5 questions. None of them require any complicated math or any calculations. They do require a good mathematical intuition though.</p>
 
-<p>I encourage you to try to solve all of them yourself before checking the answers. It’s easy to convince yourself that a problem is trivial after you’ve read the solution! If you get stuck though, every questino has a hint below.</p>
+<p>I encourage you to try to solve all of them yourself before checking the answers. It’s easy to convince yourself that a problem is trivial after you’ve read the solution! If you get stuck though, every question has a hint below.</p>
 
 <h3 id="questions">Questions</h3>
 
@@ -115,7 +115,7 @@ Get your mind into the gutter for this one!
 <h3 id="answers">Answers</h3>
 
 <h4 id="cancer-2">Cancer</h4>
-<p>It tells us nothing about causes of cancer, it’s a purely statistical effect and it has to be this way. Sparsely populated counties have less people in them, so sampling error is higher. That’s it. Think about an extreme case - a county with a population of 1. If the only inhabitant of this county gets kidney cancer, the county will have 100% kidney cancer rate! If this person remains healthy instead, the county will have cancer incidence rate of 0%. It’s easier for a small group of people to have extrmely high or extremely low rate of anything just by chance. Needless to say, republicanism has nothing to do with cancer (as far as we know) - it’s just that rural areas are both sparsely populated and tend to lean republican.</p>
+<p>It tells us nothing about causes of cancer, it’s a purely statistical effect and it has to be this way. Sparsely populated counties have less people in them, so sampling error is higher. That’s it. Think about an extreme case - a county with a population of 1. If the only inhabitant of this county gets kidney cancer, the county will have 100% kidney cancer rate! If this person remains healthy instead, the county will have cancer incidence rate of 0%. It’s easier for a small group of people to have extrmely high or extremely low rate of anything just by chance. Needless to say, republicanism has nothing to do with cancer (as far as we know) - it’s just that rural areas are both sparsely populated and tend to lean Republican.</p>
 
 <p>This example comes from Daniel Kahneman’s awesome book <a href="https://www.amazon.co.uk/Thinking-Fast-Slow-Daniel-Kahneman/dp/0141033576">Thinking Fast And Slow</a>. <a href="http://dataremixed.com/2015/01/avoiding-data-pitfalls-part-2/">This blog post</a> has a really nice visualisation of the actual CDC data that illustrates this effect.</p>
 
@@ -125,14 +125,14 @@ Get your mind into the gutter for this one!
 <h4 id="competitions-2">Competitions</h4>
 <p>This one is slightly more subtle. It is not inconceivable that being a Programming Competition Winner (PCW) makes one less likely to be a Good Engineer (GE). But this is not the only and IMO not the most plausible explanation of the data. It could very well be that in the general population there is no correlation between GE and PCW or a positive correlation and the observed negative correlation is purely due to Google’s hiring practices. Imagine a fictional hiring policy where Google only hires people who either won a competition (PCW) or are proven superstar engineers (GE) - based on their open source record. In that scenario any engineer working at Google who was not a PCW would automatically be GE - hence a negative correlation between GE and PCW among googlers. The correlation in the subpopulation of googlers may very well be the opposite of the correlation in the entire population. Treating PCW as a negative in hiring programmers would be premature.</p>
 
-<p>Erik Bernhardsson has a <a href="https://erikbern.com/2015/04/07/norvigs-claim-that-programming-competitions-correlate-negatively-with-being-good-on-the-job.html">post</a> with nice visual illustration of this phenomenon (which is an of <a href="https://en.wikipedia.org/wiki/Berkson%27s_paradox">Berkson’s Paradox</a>). The same principle also explains why all handsome men you date turn out to be such jerks.</p>
+<p>Erik Bernhardsson has a <a href="https://erikbern.com/2015/04/07/norvigs-claim-that-programming-competitions-correlate-negatively-with-being-good-on-the-job.html">post</a> with nice visual illustration of this phenomenon (which is an of <a href="https://en.wikipedia.org/wiki/Berkson%27s_paradox">Berkson’s Paradox</a>). The same principle also <a href="http://www.slate.com/blogs/how_not_to_be_wrong/2014/06/03/berkson_s_fallacy_why_are_handsome_men_such_jerks.html">explains</a> why all handsome men you date turn out to be such jerks.</p>
 
 <h4 id="exams-2">Exams</h4>
 <p>The underprivileged student should be expected to do worse. The reason is simple - the admissions test is a measure of ability but it’s not a perfect measure. Sometimes students score lower or higher than their average just by chance. When a student scores higher/lower than expected (based on demographics and whatever other information you have) it is likely that the student was lucky/unlucky in this particular test. The best estimate of the student’s ability lies somewhere between the actual test score and our prior estimate (which here is based on the demographics).</p>
 
 <p>To convince yourself that it must be so, consider an example from sports. If a third league football team like Luton Town plays a top club like Real Madrid and ties, you don’t conclude that Luton Town is as good as Real Madrid. You raise your opinion of Luton Town and lower your opinion of Real Madrid but not all the way to the same level. You still expect Real Madrid to win the rematch.</p>
 
-<p>This effect is an example of [regression to the mean]9https://en.wikipedia.org/wiki/Regression_toward_the_mean) and it is known as Kelley’s Paradox. <a href="http://www-stat.wharton.upenn.edu/~hwainer/Readings/3%20paradoxes%20-%20final%20copy.pdf">This paper</a> illustrates it with figures with actual data from SAT and MCAT exams. You will see that the effect is not subtle!</p>
+<p>This effect is an example of <a href="https://en.wikipedia.org/wiki/Regression_toward_the_mean">regression to the mean</a> and it is known as Kelley’s Paradox. <a href="http://www-stat.wharton.upenn.edu/~hwainer/Readings/3%20paradoxes%20-%20final%20copy.pdf">This paper</a> illustrates it with figures with actual data from SAT and MCAT exams. You will see that the effect is not subtle!</p>
 
 <h4 id="sex-partners-2">Sex Partners</h4>
 <p>Average number of sex partners for males is the sum of the numbers of sex partners for all the males divided by the number of all the males:</p>
@@ -148,7 +148,7 @@ Get your mind into the gutter for this one!
 <ol>
   <li>People lie.</li>
   <li>There are are more homosexual men than homosexual women and they tend to have more partners. A homosexual relationship between men contributes $+2$ to the numerator of $MSP$ but not to $FSP$.</li>
-  <li>Men and women may be using different definitions of sexual intercourse. I leave it to the reader to imagine all the situations that the male but not the female participand would describe as having had sex - without either of them technically lying. In such a situation only the numerator of $MSP$ increases. This may or may not be an issue depending on the exact phrasing of the survey.</li>
+  <li>Men and women may be using different definitions of sexual intercourse. I leave it to the reader to imagine all the situations that the male but not the female participant would describe as having had sex - without either of them technically lying. In such a situation only the numerator of $MSP$ increases. This may or may not be an issue depending on the exact phrasing of the survey.</li>
   <li>There are actually more women then men, so the denominator of $FSP$ is higher. This effect is undoubtedly real but too tiny to explain anything.</li>
 </ol>
 
