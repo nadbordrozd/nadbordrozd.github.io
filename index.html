@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="TL;DR: I prepared 5 puzzles about statistics that should be accessible to anyone without being trivial. Scroll down for the puzzles. Data Science and &hellip;">
+  <meta name="description" content="Last year I wrote a post about using word embeddings likt word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,476 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/08/12/looking-for-the-text-top-model/">Looking for the Text Top Model</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-08-12T16:49:56+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>12</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>4:49 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last year I wrote a <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">post</a> about using word embeddings likt word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a very crude way - by averaging word vectors for all words in a document and then plugging the result into a Random Forest. Unfortunately, the resulting classifier turned out to be strictly inferior to a good old SVM except in some special circumstances (very few training examples but lots of unlabeled data).</p>
+
+<p>There are of course better ways of utilising word embeddings than averaging the vectors and last month I finally got around to try them. As far as I can tell from a brief survey of arxiv, most state of the art text classifiers use embeddings as inputs to a neural network. But what kind of neural network works best? <a href="https://arxiv.org/abs/1607.02501v2">LSTM</a>? [LSTM? <a href="https://arxiv.org/pdf/1408.5882v2.pdf">CNN</a>? <a href="https://arxiv.org/pdf/1611.06639.pdf">BLSTM with CNN</a>? To find this out for myself, I implemented several of those networks in Keras and created a benchmark where those algorithms compete with classics like SVM and Naive Bayes. <a href="https://github.com/nadbordrozd/text-top-model">Here it is</a>.</p>
+
+<p>I intend to keep adding new algorithms and dataset to the benchmark as I learn about them. I will update this post when that happens.</p>
+
+<h3 id="models">Models</h3>
+<p>All the models in the repository are wrapped in scikit-learn compatible classes with <code>.fit(X, y)</code>, <code>.predict(X)</code>, <code>.get_params(recursive)</code> and with all the layer sizes, dropout rates, n-gram ranges etc. parametrised. The snippets below are simplified for clarity.</p>
+
+<p>Since this was supposed to be a benchmark of classifiers, not of preprocessing methods, all datasets come already tokenised and the classifier is given a list of token ids, not a string.</p>
+
+<h4 id="naive-bayes">Naive Bayes</h4>
+<p>Naive Bayes comes in two varieties - Bernoulli and Multinomial. We can also use tf-idf weighting or simple counts and we can include n-grams. Since sklearn’s vectorizer expects a string and will be giving it a list of integer token ids, we will have to override the default preprocessor and tokenizer.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfVectorizer</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">BernoulliNB</span><span class="p">,</span> <span class="n">MultinomialNB</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+</span><span class="line">
+</span><span class="line"><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span>
+</span><span class="line">    <span class="n">preprocessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+</span><span class="line">    <span class="n">tokenizer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+</span><span class="line">    <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s">&#39;vectorizer&#39;</span><span class="p">,</span> <span class="n">vectorizer</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;model&#39;</span><span class="p">,</span> <span class="n">MultinomialNB</span><span class="p">())])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="svm">SVM</h4>
+<p>SVMs are a strong baseline for any text classification task. We can reuse the same vectorizer for this one.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s">&#39;vectorizer&#39;</span><span class="p">,</span> <span class="n">vectorizer</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;model&#39;</span><span class="p">,</span> <span class="n">SVC</span><span class="p">())])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="multi-layer-perceptron">Multi Layer Perceptron</h4>
+<p>In other words - a vanilla feed forward neural network. This model doesn’t use word embeddings, the input to the model is a bag of words.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Dropout</span><span class="p">,</span> <span class="n">Activation</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.preprocessing.text</span> <span class="kn">import</span> <span class="n">Tokenizer</span>
+</span><span class="line">
+</span><span class="line"><span class="n">vocab_size</span> <span class="o">=</span> <span class="mi">20000</span>
+</span><span class="line"><span class="n">num_classes</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,)))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">&#39;relu&#39;</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,)))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">&#39;relu&#39;</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">num_classes</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">&#39;softmax&#39;</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">&#39;categorical_crossentropy&#39;</span><span class="p">,</span>
+</span><span class="line">              <span class="n">optimizer</span><span class="o">=</span><span class="s">&#39;adam&#39;</span><span class="p">,</span>
+</span><span class="line">              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;accuracy&#39;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Inputs to this model need to be one-hot encoded, same goes for labels.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">keras</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.preprocessing.text</span> <span class="kn">import</span> <span class="n">Tokenizer</span>
+</span><span class="line">
+</span><span class="line"><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">(</span><span class="n">num_words</span><span class="o">=</span><span class="n">vocab_size</span><span class="p">)</span>
+</span><span class="line"><span class="n">X</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">sequences_to_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;binary&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="n">y</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">to_categorical</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="bidirectional-lstm">(Bidirectional) LSTM</h4>
+<p>This is where things start to get interesting. The input to this model is not a bag of words but instead a sequence word ids. First thing to do is construct an embedding layer that will translate this sequence into a matrix of d-dimensional vectors.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Embedding</span>
+</span><span class="line">
+</span><span class="line"><span class="n">max_seq_len</span> <span class="o">=</span> <span class="mi">100</span>
+</span><span class="line"><span class="n">embedding_dim</span> <span class="o">=</span> <span class="mi">37</span>
+</span><span class="line"><span class="c"># we will initialise the embedding layer with random values and set trainable=True</span>
+</span><span class="line"><span class="c"># we could also initialise with GloVe and set trainable=False</span>
+</span><span class="line"><span class="n">embedding_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">))</span>
+</span><span class="line"><span class="n">embedding_layer</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">(</span>
+</span><span class="line">    <span class="n">vocab_size</span><span class="p">,</span>
+</span><span class="line">    <span class="n">embedding_dim</span><span class="p">,</span>
+</span><span class="line">    <span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="n">embedding_matrix</span><span class="p">],</span>
+</span><span class="line">    <span class="n">input_length</span><span class="o">=</span><span class="n">max_seq_len</span><span class="p">,</span>
+</span><span class="line">    <span class="n">trainable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now for the model proper:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">LSTM</span><span class="p">,</span> <span class="n">Bidirectional</span>
+</span><span class="line"><span class="n">units</span> <span class="o">=</span> <span class="mi">64</span>
+</span><span class="line"><span class="n">sequence_input</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">max_seq_len</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;int32&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">embedded_sequences</span> <span class="o">=</span> <span class="n">embedding_layer</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">)</span>
+</span><span class="line"><span class="n">layer1</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="n">units</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">recurrent_dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="line"><span class="c"># for bidirectional LSTM do:</span>
+</span><span class="line"><span class="c"># layer = Bidirectional(layer)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">layer1</span><span class="p">(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">layer2</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="n">units</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">recurrent_dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># last of LSTM layers must have return_sequences=False</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">layer2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">final_layer</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;softmax&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="n">predictions</span> <span class="o">=</span> <span class="n">final_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This and all the other models using embeddings requires that labels are one-hot encoded and word id sequences are padded to fixed length with zeros:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.preprocessing.sequence</span> <span class="kn">import</span> <span class="n">pad_sequences</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.utils</span> <span class="kn">import</span> <span class="n">to_categorical</span>
+</span><span class="line">
+</span><span class="line"><span class="n">X</span> <span class="o">=</span> <span class="n">pad_sequences</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">max_seq_len</span><span class="p">)</span>
+</span><span class="line"><span class="n">y</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">class_count</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="franois-chollets-cnn">François Chollet’s CNN</h4>
+<p>This is the (slightly modified) architecture from <a href="https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html">Keras tutorial</a>. It’s specifically designed for texts of length 1000, so I only used it for document classification, not for sentence classification.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Conv1D</span><span class="p">,</span> <span class="n">MaxPooling1D</span>
+</span><span class="line">
+</span><span class="line"><span class="n">units</span> <span class="o">=</span> <span class="mi">35</span>
+</span><span class="line"><span class="n">dropout_rate</span> <span class="o">=</span> <span class="mf">0.2</span>
+</span><span class="line">
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="mi">5</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="mi">5</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="mi">35</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">preds</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;softmax&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="yoon-kims-cnn">Yoon Kim’s CNN</h4>
+<p>This is the architecture from the <a href="https://arxiv.org/abs/1408.5882v2.pdf">Yoon Kim’s paper</a>, my implementation is based on <a href="https://github.com/alexander-rakhlin/CNN-for-Sentence-Classification-in-Keras">Alexander Rakhlin’s</a>. This one doesn’t rely on text being exactly 1000 words long and is better suited for sentences.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Conv1D</span><span class="p">,</span> <span class="n">MaxPooling1D</span><span class="p">,</span> <span class="n">Concatenate</span>
+</span><span class="line">
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">num_filters</span> <span class="o">=</span> <span class="mi">8</span>
+</span><span class="line"><span class="n">filter_sizes</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+</span><span class="line"><span class="n">conv_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="line"><span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="n">filter_sizes</span><span class="p">:</span>
+</span><span class="line">    <span class="n">conv</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span>
+</span><span class="line">        <span class="n">filters</span><span class="o">=</span><span class="n">num_filters</span><span class="p">,</span>
+</span><span class="line">        <span class="n">kernel_size</span><span class="o">=</span><span class="n">sz</span><span class="p">,</span>
+</span><span class="line">        <span class="n">padding</span><span class="o">=</span><span class="s">&quot;valid&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="n">activation</span><span class="o">=</span><span class="s">&quot;relu&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="n">strides</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line">    <span class="n">conv</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)(</span><span class="n">conv</span><span class="p">)</span>
+</span><span class="line">    <span class="n">conv</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">conv</span><span class="p">)</span>
+</span><span class="line">    <span class="n">conv_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Concatenate</span><span class="p">()(</span><span class="n">conv_blocks</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conv_blocks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">conv_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class="line">
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&quot;relu&quot;</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line"><span class="n">predictions</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&quot;softmax&quot;</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="blstm2dcnn">BLSTM2DCNN</h4>
+<p>Authors of the <a href="https://arxiv.org/abs/1611.06639v1">paper</a> claim that combining BLSTM with CNN gives even better results than using either of them alone. Weirdly, unlike previous 2 models, this one uses 2D convolutions. This means that the receptive fields of neurons run not just across neighbouring words in the text but also across neighbouring coordinates in the embedding vector. This is suspicious because there is no relation between consecutive coordinates in e.g. GloVe embedding which they use. If one neuron learns a pattern involving coordinates 5 and 6, there is no reason to think that the same pattern will generalise to coordinates 22 and 23 - which makes convolution pointless. But what do I know.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Conv2D</span><span class="p">,</span> <span class="n">MaxPool2D</span><span class="p">,</span> <span class="n">Reshape</span>
+</span><span class="line">
+</span><span class="line"><span class="n">units</span> <span class="o">=</span> <span class="mi">128</span>
+</span><span class="line"><span class="n">conv_filters</span> <span class="o">=</span> <span class="mi">32</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Bidirectional</span><span class="p">(</span><span class="n">LSTM</span><span class="p">(</span>
+</span><span class="line">    <span class="n">units</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">recurrent_dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Reshape</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">max_seq_len</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="mi">1</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv2D</span><span class="p">(</span><span class="n">conv_filters</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPool2D</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">preds</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;softmax&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="stacking">Stacking</h4>
+<p>In addition to all those base models, I implemented <a href="https://github.com/nadbordrozd/text-top-model/blob/master/ttm/stacking_classifier.py">stacking classifier</a> to combine predictions of all those very different models. I used 2 versions of stacking. One where base models return probabilities, and those are combined by a simple logistic regression. The other, where base models return labels, and XGBoost is used to combine those.</p>
+
+<h3 id="datasets">Datasets</h3>
+<p>For the document classification benchmark I used all the datasets from <a href="http://www.cs.umb.edu/~smimarog/textmining/datasets/">here</a>. This includes the 20 Newsgroups, Reuters-21578 and WebKB datasets in all their different versions (stemmed, lemmatised, etc.).</p>
+
+<p>For the sentence classification benchmark I used the <a href="http://www.cs.cornell.edu/people/pabo/movie-review-data/">movie review</a> polarity dataset and the <a href="http://nlp.stanford.edu/~socherr/stanfordSentimentTreebank.zip">Stanford sentiment treebank</a> dataset.</p>
+
+<h3 id="results">Results</h3>
+<p>Some models were only included in document classification or only in sentence classification - because they either performed terribly on the other or took too long to train. Hyperparameters of the neural models were (somewhat) tuned on one of the datasets before including them in the benchmark. The ratio of training to test examples was 0.7 : 0.3. This split was done 10 times on every dataset and each model was tested 10 time. The tables below show average accuracies across the 10 splits.</p>
+
+<p>Without further ado:</p>
+
+<h4 id="document-classification-benchmark">Document classification benchmark</h4>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">model             r8-all-terms.txt    r52-all-terms.txt    20ng-all-terms.txt    webkb-stemmed.txt
+</span><span class="line">--------------  ------------------  -------------------  --------------------  -------------------
+</span><span class="line">MLP 1x360                    0.966                0.935                 0.924                0.930
+</span><span class="line">SVM tfidf 2-gr               0.966                0.932                 0.920                0.911
+</span><span class="line">SVM tfidf                    0.969                0.941                 0.912                0.906
+</span><span class="line">MLP 2x180                    0.961                0.886                 0.914                0.927
+</span><span class="line">MLP 3x512                    0.966                0.927                 0.875                0.915
+</span><span class="line">CNN glove                    0.964                0.920                 0.840                0.892
+</span><span class="line">SVM 2-gr                     0.953                0.910                 0.816                0.879
+</span><span class="line">SVM                          0.955                0.917                 0.802                0.868
+</span><span class="line">MNB                          0.933                0.848                 0.877                0.841
+</span><span class="line">CNN 37d                      0.931                0.854                 0.764                0.879
+</span><span class="line">MNB bi                       0.919                0.817                 0.850                0.823
+</span><span class="line">MNB tfidf                    0.811                0.687                 0.843                0.779
+</span><span class="line">MNB tfidf 2-gr               0.808                0.685                 0.861                0.763
+</span><span class="line">BNB                          0.774                0.649                 0.705                0.741
+</span><span class="line">BNB tfidf                    0.774                0.649                 0.705                0.741
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><img src="/images/text_top_model/doc_accuracy_stripplot.png" /></p>
+
+<p><a href="https://github.com/nadbordrozd/text-top-model/blob/master/ttm/document_results.csv">Full results csv.</a></p>
+
+<h4 id="sentence-classification-benchmark">Sentence classification benchmark</h4>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">model               subjectivity_10k.txt    polarity.txt
+</span><span class="line">----------------  ----------------------  --------------
+</span><span class="line">Stacker LogReg                     0.935           0.807
+</span><span class="line">Stacker XGB                        0.932           0.793
+</span><span class="line">MNB 2-gr                           0.921           0.782
+</span><span class="line">MNB tfidf 2-gr                     0.917           0.785
+</span><span class="line">MNB tfidf 3-gr                     0.916           0.781
+</span><span class="line">MNB tfidf                          0.919           0.777
+</span><span class="line">MNB                                0.918           0.772
+</span><span class="line">LSTM GloVe                         0.921           0.765
+</span><span class="line">BLSTM Glove                        0.917           0.766
+</span><span class="line">SVM tfidf 2-gr                     0.911           0.772
+</span><span class="line">MLP 1x360                          0.910           0.769
+</span><span class="line">MLP 2x180                          0.907           0.766
+</span><span class="line">MLP 3x512                          0.907           0.761
+</span><span class="line">SVM tfidf                          0.905           0.763
+</span><span class="line">BLSTM2DCNN GloVe                   0.894           0.746
+</span><span class="line">CNN GloVe                          0.901           0.734
+</span><span class="line">SVM                                0.887           0.743
+</span><span class="line">LSTM 12D                           0.891           0.734
+</span><span class="line">CNN 45D                            0.893           0.682
+</span><span class="line">LSTM 24D                           0.869           0.703
+</span><span class="line">BLSTM2dCNN 15D                     0.867           0.656
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p><img src="/images/text_top_model/sent_accuracy_stripplot.png" /></p>
+
+<p><a href="https://github.com/nadbordrozd/text-top-model/blob/master/ttm/sentence_results.csv">Full results csv.</a></p>
+
+<h4 id="conclusions">Conclusions</h4>
+<p>None of the fancy neural networks with embeddings managed to beat Naive Bayes and SVM, at least not consistently. A simple feed forward neural network with a single layer, did better than any other architecture.</p>
+
+<p>I blame my hyperparameters. Didn’t tune them enough. In particular, the number of epochs to train. It was determined once for each model, but different datasets and different splits probably require different settings.</p>
+
+<p>And yet, the neural models are clearly doing something right because adding them to the ensemble and stacking significantly improves accuracy.</p>
+
+<p>When I find out what exactly is the secret sauce that makes the neural models achieve the state of the art accuracies that papers claim they do, I will update my implementations and this post.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -234,7 +704,7 @@ Get your mind into the gutter for this one!
 <ol>
   <li>People lie.</li>
   <li>There are are more homosexual men than homosexual women and they tend to have more partners. A homosexual relationship between men contributes $+2$ to the numerator of $MSP$ but not to $FSP$.</li>
-  <li>Non-representative sample. If for example prostitutes are never polled or refuse to answer the survey, that could seriously lower the female average.</li>
+  <li>Non-representative sample. If for example prostitutes are never polled or refuse to answer the survey, that could seriously lower the estimate (but not the real value) of the female average.</li>
   <li>Men and women may be using different definitions of sexual intercourse. I leave it to the reader to imagine all the situations that the male but not the female participant would describe as having had sex - without either of them technically lying. In such a situation only the numerator of $MSP$ increases. This may or may not be an issue depending on the exact phrasing of the survey.</li>
   <li>There are actually more women then men, so the denominator of $FSP$ is higher. This effect is undoubtedly real but too tiny to explain anything.</li>
 </ol>
@@ -3213,228 +3683,6 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/07/20/datamatching-part-1/">Datamatching Part 1: Algorithm</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-07-20T21:59:14+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>20</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>9:59 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In this and the next post I will explain the basics of datamatching and give an implementation of a bare-bones datamatching pipeline in pyspark.</p>
-
-<h3 id="datamatching">Datamatching</h3>
-<p>You have a dataset of - let’s say - names and addresses of some group of people. You want to enrich it with information scraped from e.g. linkedin or wikipedia. How do you figure out which scraped profiles match wich records in your database?</p>
-
-<p>Or you have two datasets of sales leads maintained by different teams and you need to merge them. You know that there is some overlap between the records but there is no unique identifier that you can join the datasets on. You have to look at the the records themselves to decide if they match.</p>
-
-<p>Or you have a dataset that over that years has collected some duplicate records. How do you dedup it, given that the data format is not consistent and there may be errors in the records?</p>
-
-<p>All of the above are specific cases of a problem that can be described as:
- <em>Finding all the pairs (groups) of records in a dataset(s) that correspond to the same real-world entity.</em></p>
-
-<p>This is what I will mean by datamatching in this post.</p>
-
-<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is datamatching. Nevertheless for many usecases a DIY datamatching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
-
-<h3 id="an-example">An example</h3>
-<p>The general problem of datamatching will be easier to discuss with a specific example in mind. Here goes:</p>
-
-<p>You work at a company selling insurance to comic book characters. You have a database of 50.000 potential clients (these are the first 3):</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">  Id  address                       company                     name                phone
-</span><span class="line">----  ----------------------------  --------------------------  ------------  -----------
-</span><span class="line">   1  1007 Mountain Drive, Ogtham   Wayne Enterprises           Bruce Wayne   01234567890
-</span><span class="line">   2  Gotham Cemetery               Wayne Enterprises           Thomas Wayne
-</span><span class="line">   3  56431 Some Place, New Mexico  U.S. Department of Defense  Bruce Banner
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>and you just acquired 400.000 new leads:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">Id    business phone     name                  personal phone    postcode
-</span><span class="line">----  -----------------  ------------------  ----------------  ----------
-</span><span class="line">a     +735-123-456-7890  Wayne, Burce
-</span><span class="line">b                        B. Banner                  897654322       56431
-</span><span class="line">c                        Pennyworth, Alfred                          1007
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>You need to reconcile the two tables - find which (if any) records from the second table correspond to records in the first. Unfortunately data in both tables is formatted differently and there are some typos in both (“Burce”, “Ogtham”). Nevertheless it is easy for a human being to figure out who is who just by eyeballing the two datasets. <script type="math/tex">Id = 1</script> from the first table and <script type="math/tex">Id = a</script> from the second clearly refer to the same person - Bruce Wayne. And <script type="math/tex">Id = 3</script> matches <script type="math/tex">Id =  b</script> - Bruce Banner. The remaining records - Thomas Wayne and Alfred Pennyworth don’t have any matches.</p>
-
-<p>Now, how to do the same automatically and at scale? Comparing every record from one table to every one in the other - <script type="math/tex">50k \times 400k = 2 \times 10^9</script> comparisons - is out of the question.</p>
-
-<h3 id="the-impatient-programmer-approach">The impatient programmer approach</h3>
-<p>Like any red-blooded programmer, when I see a list of things to be matched to other things, I immediately think: hashmaps. My internal dialogue goes something like this:</p>
-
-<ul>
-  <li><em>Let’s make a lookup {name -&gt; Id} using the first table and iterate over the second table</em></li>
-  <li>But the names are in a different format, they won’t match</li>
-  <li><em>OK, let’s normalize the names first, strip punctuation, put the words in alphabetical order</em></li>
-  <li>Still won’t match - Bruce Banner is abbreviated to B. Banner in one of the tables</li>
-  <li><em>Fair enough. Let’s have two separate entries in the lookup for ‘Bruce’ and ‘Banner’ both pointing to Id = 3</em></li>
-  <li>but we don’t want to match just any ‘Bruce’ or  any ‘Banner’ to this guy</li>
-  <li><em>Yeah, will have to use the remaining attributes to verify if a match is legit. Generate potential matches by looking up every word in the ‘name’ field, and validate by checking if the other fields look similar. This should work</em></li>
-  <li>what if the name is empty or misspeled, but all other fields match up perfectly? Shouldn’t this be still considered a match?</li>
-  <li><em>Now you’re being difficult on purpose! FINE. Let’s have multiple lookups - name -&gt; Id, phone -&gt; Id, etc. A pair of records will be considered a potential match if they have at least one of those in common</em></li>
-</ul>
-
-<p>This is beginning to sound unwieldy, but it’s basically the correct approach and - I strongly suspect - the only workable approach. At least as long as we’re not taking the hashmaps too literally. But let’s reformulate it in slightly more abstract terms before diving into implementation.</p>
-
-<h3 id="generalising">Generalising</h3>
-<p>Datamatching must consist of two stages:</p>
-
-<ol>
-  <li>Generate candidate matches</li>
-  <li>For every record, pick the best match among the candidates</li>
-</ol>
-
-<p>In this post I will assume that we have a good way of evaluating candidate matches (step 2) and concentrate only on step 1. In fact 2 is crucial and usually harder than 1 but it’s very case-specific. More on that topic next time.</p>
-
-<h4 id="generating-candidates">Generating candidates</h4>
-<p>When is a pair of records a good candidate for a match? When the records have something in common. What? For example one of the fields - like phone number or name or address. That would definitely suffice but it’s too restrictive. Consider Bruce Wayne from our example. In the first table:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
-</span><span class="line">    <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bruce Wayne&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;1007 Mountain Drive, Gotham&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&quot;01234567890&quot;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&quot;Wayne Enterprises&quot;</span>
-</span><span class="line"><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And in the second table:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
-</span><span class="line">    <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="s">&#39;a&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne, Burce&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;postcode&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;personal phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-</span><span class="line">    <span class="s">&#39;business phone&#39;</span><span class="p">:</span> <span class="s">&#39;+735-123-456-7890&#39;</span><span class="p">,</span>
-</span><span class="line"><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Not a single field in common between these two records and yet they clearly represent the same person.</p>
-
-<p>It is tempting to try to normalise phone numbers by stripping area extensions, fix misspeled names, normalise order of first-, middle-, last name, etc. And sometimes this may be the way to go. But in general it’s ambiguous and lossy. 
-There will never be a normalisation function that does the right thing for every possible version of the name:</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Wayne&quot;
-</span><span class="line">&quot;Bruce T. Wayne&quot;
-</span><span class="line">&quot;B.T. Wayne&quot;
-</span><span class="line">&quot;Wayne, Burce&quot;
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>What we can do instead is extract <em>multiple</em> tokens (think: multiple hashes) from the name. A pair of records will be considered a candidate match if they have at least one token in common.</p>
-
-<p>We can for example just split the name on whitespaces:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;Bruce&quot;, &quot;Thomas&quot;, &quot;Wayne&quot;]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>and have this record be matched with every “Bruce” every “Thomas” and every “Wayne” in the dataset. This may or may not be a good idea depending on how many “Bruces” there are in this specific dataset. But tokens don’t have to be words. We can try bigrams:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;Bruce Thomas&quot;, &quot;Thomas Wayne&quot;]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Or we can try forming initials:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;B.T. Wayne&quot;, &quot;B. Wayne&quot;, &quot;B.T.W&quot;]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>If we did that, then for instance both “Bruce Wayne” and “Burce T. Wayne” would get “B. Wayne” as one of the tokens and would end up matched as a result.</p>
-
-<p>If we tokenize by removing vowels, that would go a long way toward fixing typos and alternative spellings while introducing few false positives:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Wayne&quot; -&gt; [&quot;Brc Wyn&quot;]
-</span><span class="line">&quot;Burcee Wayn&quot; -&gt; [&quot;Brc Wyn&quot;]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>There are also algorithms like <a href="https://en.wikipedia.org/wiki/Soundex">Soundex</a> that tokenize based on how a word <em>sounds</em> regardless of how it’s spelled. Soundex gives the same result for “Bruce” and “Broose” and “Bruise” or for “John” and “Jon”. Very useful given that a lot data entry is done by marketers who talk to people (and ask their names) over the phone.</p>
-
-<p>Finally, nothing stops us from using all of the above at the same time:</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;Bruce Thomas Wayne&quot; -&gt; [&quot;Bruce Thomas&quot;, &quot;Thomas Wayne&quot;, &quot;B.T. Wayne&quot;, &quot;B. Wayne&quot;, &quot;B.T.W&quot;, &quot;Brc Wyn&quot;, ...]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>With this, all the different ways of spelling “Bruce Wayne” should get at least one token in common and if we’re lucky few other names will.</p>
-
-<p>This was an overview of name tokenization. Other types of data will require their own tokenization rules. The choice of tokenization logic necessarily depends on the specific data type and dataset but these the general principles:</p>
-
-<ul>
-  <li>tokenization should try to fix ambiguities in the data. If there are multiple ways a real world entity can be represented in the dataset, good tokenizer would give all of them the same token</li>
-  <li>tokens should be specific enough records representing different real world entities only rarely get a token in common</li>
-</ul>
-
-<p>One not name-related example: phone numbers. Since people enter phone numbers in databases in one thousand different formats with all kinds of rubbish area codes and extensions you shouldn’t count on raw phone numbers matching perfectly. An example of a sensible tokenizer is one that first strips all non-digit characters from the phone number then returns the last 8 digits.</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;+44-1-800-123-4567-890 and ask for Mary&quot; -&gt; [&quot;34567890&quot;]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>Or to guard against people putting extensions at the end of phone numbers, we can extract <em>every</em> consecutive 8 digits:</p>
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&quot;800-555-2222,123&quot; -&gt; [&quot;80055522&quot;, &quot;00555222&quot;&quot;, &quot;05552222&quot;, &quot;55522221&quot;, &quot;55222212&quot;, &quot;52222123&quot;]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-<p>This should catch any reasonable way of writing the number while still having very low likelihood of a collision.</p>
-
-<h4 id="tldr">TL;DR</h4>
-<p>To match two datasets:</p>
-
-<ol>
-  <li>Tokenize corresponding fields in both datasets</li>
-  <li>Group records having a token in common (think SQL join)</li>
-  <li>Compare records withing a group and choose the closest match</li>
-</ol>
-
-<p>Coming up: how to implement this in spark.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -3450,6 +3698,10 @@ There will never be a normalisation function that does the right thing for every
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/08/12/looking-for-the-text-top-model/">Looking for the Text Top Model</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
       </li>
     
@@ -3463,10 +3715,6 @@ There will never be a normalisation function that does the right thing for every
     
       <li class="post">
         <a href="/blog/2017/06/03/python-or-scala/">Python or Scala - Let the Neural Network Decide.</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/03/23/missing-data-imputation-with-pymc-part-2/">Missing Data Imputation With Pymc: Part 2</a>
       </li>
     
   </ul>

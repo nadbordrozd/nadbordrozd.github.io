@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-07-27T00:36:18+01:00</updated>
+  <updated>2017-08-13T18:27:03+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -12,6 +12,456 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Looking for the Text Top Model]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2017/08/12/looking-for-the-text-top-model/"/>
+    <updated>2017-08-12T16:49:56+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2017/08/12/looking-for-the-text-top-model</id>
+    <content type="html"><![CDATA[<p>Last year I wrote a <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">post</a> about using word embeddings likt word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a very crude way - by averaging word vectors for all words in a document and then plugging the result into a Random Forest. Unfortunately, the resulting classifier turned out to be strictly inferior to a good old SVM except in some special circumstances (very few training examples but lots of unlabeled data).</p>
+
+<p>There are of course better ways of utilising word embeddings than averaging the vectors and last month I finally got around to try them. As far as I can tell from a brief survey of arxiv, most state of the art text classifiers use embeddings as inputs to a neural network. But what kind of neural network works best? <a href="https://arxiv.org/abs/1607.02501v2">LSTM</a>? [LSTM? <a href="https://arxiv.org/pdf/1408.5882v2.pdf">CNN</a>? <a href="https://arxiv.org/pdf/1611.06639.pdf">BLSTM with CNN</a>? To find this out for myself, I implemented several of those networks in Keras and created a benchmark where those algorithms compete with classics like SVM and Naive Bayes. <a href="https://github.com/nadbordrozd/text-top-model">Here it is</a>.</p>
+
+<p>I intend to keep adding new algorithms and dataset to the benchmark as I learn about them. I will update this post when that happens.</p>
+
+<h3 id="models">Models</h3>
+<p>All the models in the repository are wrapped in scikit-learn compatible classes with <code>.fit(X, y)</code>, <code>.predict(X)</code>, <code>.get_params(recursive)</code> and with all the layer sizes, dropout rates, n-gram ranges etc. parametrised. The snippets below are simplified for clarity.</p>
+
+<p>Since this was supposed to be a benchmark of classifiers, not of preprocessing methods, all datasets come already tokenised and the classifier is given a list of token ids, not a string.</p>
+
+<h4 id="naive-bayes">Naive Bayes</h4>
+<p>Naive Bayes comes in two varieties - Bernoulli and Multinomial. We can also use tf-idf weighting or simple counts and we can include n-grams. Since sklearn’s vectorizer expects a string and will be giving it a list of integer token ids, we will have to override the default preprocessor and tokenizer.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span><span class="p">,</span> <span class="n">TfidfVectorizer</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">BernoulliNB</span><span class="p">,</span> <span class="n">MultinomialNB</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+</span><span class="line">
+</span><span class="line"><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span>
+</span><span class="line">    <span class="n">preprocessor</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span>
+</span><span class="line">    <span class="n">tokenizer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span>
+</span><span class="line">    <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s">&#39;vectorizer&#39;</span><span class="p">,</span> <span class="n">vectorizer</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;model&#39;</span><span class="p">,</span> <span class="n">MultinomialNB</span><span class="p">())])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="svm">SVM</h4>
+<p>SVMs are a strong baseline for any text classification task. We can reuse the same vectorizer for this one.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s">&#39;vectorizer&#39;</span><span class="p">,</span> <span class="n">vectorizer</span><span class="p">),</span> <span class="p">(</span><span class="s">&#39;model&#39;</span><span class="p">,</span> <span class="n">SVC</span><span class="p">())])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="multi-layer-perceptron">Multi Layer Perceptron</h4>
+<p>In other words - a vanilla feed forward neural network. This model doesn’t use word embeddings, the input to the model is a bag of words.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">Dropout</span><span class="p">,</span> <span class="n">Activation</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.preprocessing.text</span> <span class="kn">import</span> <span class="n">Tokenizer</span>
+</span><span class="line">
+</span><span class="line"><span class="n">vocab_size</span> <span class="o">=</span> <span class="mi">20000</span>
+</span><span class="line"><span class="n">num_classes</span> <span class="o">=</span> <span class="mi">3</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,)))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">&#39;relu&#39;</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,)))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">&#39;relu&#39;</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">num_classes</span><span class="p">))</span>
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Activation</span><span class="p">(</span><span class="s">&#39;softmax&#39;</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line"><span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">&#39;categorical_crossentropy&#39;</span><span class="p">,</span>
+</span><span class="line">              <span class="n">optimizer</span><span class="o">=</span><span class="s">&#39;adam&#39;</span><span class="p">,</span>
+</span><span class="line">              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;accuracy&#39;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Inputs to this model need to be one-hot encoded, same goes for labels.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">keras</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.preprocessing.text</span> <span class="kn">import</span> <span class="n">Tokenizer</span>
+</span><span class="line">
+</span><span class="line"><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">(</span><span class="n">num_words</span><span class="o">=</span><span class="n">vocab_size</span><span class="p">)</span>
+</span><span class="line"><span class="n">X</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">sequences_to_matrix</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s">&#39;binary&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="n">y</span> <span class="o">=</span> <span class="n">keras</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">to_categorical</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="bidirectional-lstm">(Bidirectional) LSTM</h4>
+<p>This is where things start to get interesting. The input to this model is not a bag of words but instead a sequence word ids. First thing to do is construct an embedding layer that will translate this sequence into a matrix of d-dimensional vectors.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Embedding</span>
+</span><span class="line">
+</span><span class="line"><span class="n">max_seq_len</span> <span class="o">=</span> <span class="mi">100</span>
+</span><span class="line"><span class="n">embedding_dim</span> <span class="o">=</span> <span class="mi">37</span>
+</span><span class="line"><span class="c"># we will initialise the embedding layer with random values and set trainable=True</span>
+</span><span class="line"><span class="c"># we could also initialise with GloVe and set trainable=False</span>
+</span><span class="line"><span class="n">embedding_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">))</span>
+</span><span class="line"><span class="n">embedding_layer</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">(</span>
+</span><span class="line">    <span class="n">vocab_size</span><span class="p">,</span>
+</span><span class="line">    <span class="n">embedding_dim</span><span class="p">,</span>
+</span><span class="line">    <span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="n">embedding_matrix</span><span class="p">],</span>
+</span><span class="line">    <span class="n">input_length</span><span class="o">=</span><span class="n">max_seq_len</span><span class="p">,</span>
+</span><span class="line">    <span class="n">trainable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Now for the model proper:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span><span class="p">,</span> <span class="n">LSTM</span><span class="p">,</span> <span class="n">Bidirectional</span>
+</span><span class="line"><span class="n">units</span> <span class="o">=</span> <span class="mi">64</span>
+</span><span class="line"><span class="n">sequence_input</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">max_seq_len</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="s">&#39;int32&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line"><span class="n">embedded_sequences</span> <span class="o">=</span> <span class="n">embedding_layer</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">)</span>
+</span><span class="line"><span class="n">layer1</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="n">units</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">recurrent_dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</span><span class="line"><span class="c"># for bidirectional LSTM do:</span>
+</span><span class="line"><span class="c"># layer = Bidirectional(layer)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">layer1</span><span class="p">(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">layer2</span> <span class="o">=</span> <span class="n">LSTM</span><span class="p">(</span><span class="n">units</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">recurrent_dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c"># last of LSTM layers must have return_sequences=False</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">layer2</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">final_layer</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;softmax&#39;</span><span class="p">)</span>
+</span><span class="line"><span class="n">predictions</span> <span class="o">=</span> <span class="n">final_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This and all the other models using embeddings requires that labels are one-hot encoded and word id sequences are padded to fixed length with zeros:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.preprocessing.sequence</span> <span class="kn">import</span> <span class="n">pad_sequences</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">keras.utils</span> <span class="kn">import</span> <span class="n">to_categorical</span>
+</span><span class="line">
+</span><span class="line"><span class="n">X</span> <span class="o">=</span> <span class="n">pad_sequences</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">max_seq_len</span><span class="p">)</span>
+</span><span class="line"><span class="n">y</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="n">class_count</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="franois-chollets-cnn">François Chollet’s CNN</h4>
+<p>This is the (slightly modified) architecture from <a href="https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html">Keras tutorial</a>. It’s specifically designed for texts of length 1000, so I only used it for document classification, not for sentence classification.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Conv1D</span><span class="p">,</span> <span class="n">MaxPooling1D</span>
+</span><span class="line">
+</span><span class="line"><span class="n">units</span> <span class="o">=</span> <span class="mi">35</span>
+</span><span class="line"><span class="n">dropout_rate</span> <span class="o">=</span> <span class="mf">0.2</span>
+</span><span class="line">
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="mi">5</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="mi">5</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="mi">35</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;relu&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">preds</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;softmax&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="yoon-kims-cnn">Yoon Kim’s CNN</h4>
+<p>This is the architecture from the <a href="https://arxiv.org/abs/1408.5882v2.pdf">Yoon Kim’s paper</a>, my implementation is based on <a href="https://github.com/alexander-rakhlin/CNN-for-Sentence-Classification-in-Keras">Alexander Rakhlin’s</a>. This one doesn’t rely on text being exactly 1000 words long and is better suited for sentences.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Conv1D</span><span class="p">,</span> <span class="n">MaxPooling1D</span><span class="p">,</span> <span class="n">Concatenate</span>
+</span><span class="line">
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">num_filters</span> <span class="o">=</span> <span class="mi">8</span>
+</span><span class="line"><span class="n">filter_sizes</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">),</span>
+</span><span class="line"><span class="n">conv_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="line"><span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="n">filter_sizes</span><span class="p">:</span>
+</span><span class="line">    <span class="n">conv</span> <span class="o">=</span> <span class="n">Conv1D</span><span class="p">(</span>
+</span><span class="line">        <span class="n">filters</span><span class="o">=</span><span class="n">num_filters</span><span class="p">,</span>
+</span><span class="line">        <span class="n">kernel_size</span><span class="o">=</span><span class="n">sz</span><span class="p">,</span>
+</span><span class="line">        <span class="n">padding</span><span class="o">=</span><span class="s">&quot;valid&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="n">activation</span><span class="o">=</span><span class="s">&quot;relu&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="n">strides</span><span class="o">=</span><span class="mi">1</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line">    <span class="n">conv</span> <span class="o">=</span> <span class="n">MaxPooling1D</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="mi">2</span><span class="p">)(</span><span class="n">conv</span><span class="p">)</span>
+</span><span class="line">    <span class="n">conv</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">conv</span><span class="p">)</span>
+</span><span class="line">    <span class="n">conv_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">conv</span><span class="p">)</span>
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Concatenate</span><span class="p">()(</span><span class="n">conv_blocks</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conv_blocks</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">conv_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</span><span class="line">
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line"><span class="n">z</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&quot;relu&quot;</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line"><span class="n">predictions</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&quot;softmax&quot;</span><span class="p">)(</span><span class="n">z</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="blstm2dcnn">BLSTM2DCNN</h4>
+<p>Authors of the <a href="https://arxiv.org/abs/1611.06639v1">paper</a> claim that combining BLSTM with CNN gives even better results than using either of them alone. Weirdly, unlike previous 2 models, this one uses 2D convolutions. This means that the receptive fields of neurons run not just across neighbouring words in the text but also across neighbouring coordinates in the embedding vector. This is suspicious because there is no relation between consecutive coordinates in e.g. GloVe embedding which they use. If one neuron learns a pattern involving coordinates 5 and 6, there is no reason to think that the same pattern will generalise to coordinates 22 and 23 - which makes convolution pointless. But what do I know.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Conv2D</span><span class="p">,</span> <span class="n">MaxPool2D</span><span class="p">,</span> <span class="n">Reshape</span>
+</span><span class="line">
+</span><span class="line"><span class="n">units</span> <span class="o">=</span> <span class="mi">128</span>
+</span><span class="line"><span class="n">conv_filters</span> <span class="o">=</span> <span class="mi">32</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Dropout</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)(</span><span class="n">embedded_sequences</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Bidirectional</span><span class="p">(</span><span class="n">LSTM</span><span class="p">(</span>
+</span><span class="line">    <span class="n">units</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">recurrent_dropout</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+</span><span class="line">    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Reshape</span><span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">max_seq_len</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="mi">1</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Conv2D</span><span class="p">(</span><span class="n">conv_filters</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">MaxPool2D</span><span class="p">(</span><span class="n">pool_size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">x</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">preds</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="n">class_count</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">&#39;softmax&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+</span><span class="line"><span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">sequence_input</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h4 id="stacking">Stacking</h4>
+<p>In addition to all those base models, I implemented <a href="https://github.com/nadbordrozd/text-top-model/blob/master/ttm/stacking_classifier.py">stacking classifier</a> to combine predictions of all those very different models. I used 2 versions of stacking. One where base models return probabilities, and those are combined by a simple logistic regression. The other, where base models return labels, and XGBoost is used to combine those.</p>
+
+<h3 id="datasets">Datasets</h3>
+<p>For the document classification benchmark I used all the datasets from <a href="http://www.cs.umb.edu/~smimarog/textmining/datasets/">here</a>. This includes the 20 Newsgroups, Reuters-21578 and WebKB datasets in all their different versions (stemmed, lemmatised, etc.).</p>
+
+<p>For the sentence classification benchmark I used the <a href="http://www.cs.cornell.edu/people/pabo/movie-review-data/">movie review</a> polarity dataset and the <a href="http://nlp.stanford.edu/~socherr/stanfordSentimentTreebank.zip">Stanford sentiment treebank</a> dataset.</p>
+
+<h3 id="results">Results</h3>
+<p>Some models were only included in document classification or only in sentence classification - because they either performed terribly on the other or took too long to train. Hyperparameters of the neural models were (somewhat) tuned on one of the datasets before including them in the benchmark. The ratio of training to test examples was 0.7 : 0.3. This split was done 10 times on every dataset and each model was tested 10 time. The tables below show average accuracies across the 10 splits.</p>
+
+<p>Without further ado:</p>
+
+<h4 id="document-classification-benchmark">Document classification benchmark</h4>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">model             r8-all-terms.txt    r52-all-terms.txt    20ng-all-terms.txt    webkb-stemmed.txt
+</span><span class="line">--------------  ------------------  -------------------  --------------------  -------------------
+</span><span class="line">MLP 1x360                    0.966                0.935                 0.924                0.930
+</span><span class="line">SVM tfidf 2-gr               0.966                0.932                 0.920                0.911
+</span><span class="line">SVM tfidf                    0.969                0.941                 0.912                0.906
+</span><span class="line">MLP 2x180                    0.961                0.886                 0.914                0.927
+</span><span class="line">MLP 3x512                    0.966                0.927                 0.875                0.915
+</span><span class="line">CNN glove                    0.964                0.920                 0.840                0.892
+</span><span class="line">SVM 2-gr                     0.953                0.910                 0.816                0.879
+</span><span class="line">SVM                          0.955                0.917                 0.802                0.868
+</span><span class="line">MNB                          0.933                0.848                 0.877                0.841
+</span><span class="line">CNN 37d                      0.931                0.854                 0.764                0.879
+</span><span class="line">MNB bi                       0.919                0.817                 0.850                0.823
+</span><span class="line">MNB tfidf                    0.811                0.687                 0.843                0.779
+</span><span class="line">MNB tfidf 2-gr               0.808                0.685                 0.861                0.763
+</span><span class="line">BNB                          0.774                0.649                 0.705                0.741
+</span><span class="line">BNB tfidf                    0.774                0.649                 0.705                0.741
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><img src="http://nadbordrozd.github.io/images/text_top_model/doc_accuracy_stripplot.png" /></p>
+
+<p><a href="https://github.com/nadbordrozd/text-top-model/blob/master/ttm/document_results.csv">Full results csv.</a></p>
+
+<h4 id="sentence-classification-benchmark">Sentence classification benchmark</h4>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">model               subjectivity_10k.txt    polarity.txt
+</span><span class="line">----------------  ----------------------  --------------
+</span><span class="line">Stacker LogReg                     0.935           0.807
+</span><span class="line">Stacker XGB                        0.932           0.793
+</span><span class="line">MNB 2-gr                           0.921           0.782
+</span><span class="line">MNB tfidf 2-gr                     0.917           0.785
+</span><span class="line">MNB tfidf 3-gr                     0.916           0.781
+</span><span class="line">MNB tfidf                          0.919           0.777
+</span><span class="line">MNB                                0.918           0.772
+</span><span class="line">LSTM GloVe                         0.921           0.765
+</span><span class="line">BLSTM Glove                        0.917           0.766
+</span><span class="line">SVM tfidf 2-gr                     0.911           0.772
+</span><span class="line">MLP 1x360                          0.910           0.769
+</span><span class="line">MLP 2x180                          0.907           0.766
+</span><span class="line">MLP 3x512                          0.907           0.761
+</span><span class="line">SVM tfidf                          0.905           0.763
+</span><span class="line">BLSTM2DCNN GloVe                   0.894           0.746
+</span><span class="line">CNN GloVe                          0.901           0.734
+</span><span class="line">SVM                                0.887           0.743
+</span><span class="line">LSTM 12D                           0.891           0.734
+</span><span class="line">CNN 45D                            0.893           0.682
+</span><span class="line">LSTM 24D                           0.869           0.703
+</span><span class="line">BLSTM2dCNN 15D                     0.867           0.656
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p><img src="http://nadbordrozd.github.io/images/text_top_model/sent_accuracy_stripplot.png" /></p>
+
+<p><a href="https://github.com/nadbordrozd/text-top-model/blob/master/ttm/sentence_results.csv">Full results csv.</a></p>
+
+<h4 id="conclusions">Conclusions</h4>
+<p>None of the fancy neural networks with embeddings managed to beat Naive Bayes and SVM, at least not consistently. A simple feed forward neural network with a single layer, did better than any other architecture.</p>
+
+<p>I blame my hyperparameters. Didn’t tune them enough. In particular, the number of epochs to train. It was determined once for each model, but different datasets and different splits probably require different settings.</p>
+
+<p>And yet, the neural models are clearly doing something right because adding them to the ensemble and stacking significantly improves accuracy.</p>
+
+<p>When I find out what exactly is the secret sauce that makes the neural models achieve the state of the art accuracies that papers claim they do, I will update my implementations and this post.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[So You Think You Can Stats]]></title>
@@ -152,7 +602,7 @@ Get your mind into the gutter for this one!
 <ol>
   <li>People lie.</li>
   <li>There are are more homosexual men than homosexual women and they tend to have more partners. A homosexual relationship between men contributes $+2$ to the numerator of $MSP$ but not to $FSP$.</li>
-  <li>Non-representative sample. If for example prostitutes are never polled or refuse to answer the survey, that could seriously lower the female average.</li>
+  <li>Non-representative sample. If for example prostitutes are never polled or refuse to answer the survey, that could seriously lower the estimate (but not the real value) of the female average.</li>
   <li>Men and women may be using different definitions of sexual intercourse. I leave it to the reader to imagine all the situations that the male but not the female participant would describe as having had sex - without either of them technically lying. In such a situation only the numerator of $MSP$ increases. This may or may not be an issue depending on the exact phrasing of the survey.</li>
   <li>There are actually more women then men, so the denominator of $FSP$ is higher. This effect is undoubtedly real but too tiny to explain anything.</li>
 </ol>
