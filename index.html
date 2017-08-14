@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="Last year I wrote a post about using word embeddings likt word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a &hellip;">
+  <meta name="description" content="TL;DR: I tested a bunch of neural network architectures plus SVM + NB on several text clasification datasets. Results at the bottom of the post. Last &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -100,9 +100,13 @@
   </header>
 
 
-  <div class="entry-content"><p>Last year I wrote a <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">post</a> about using word embeddings likt word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a very crude way - by averaging word vectors for all words in a document and then plugging the result into a Random Forest. Unfortunately, the resulting classifier turned out to be strictly inferior to a good old SVM except in some special circumstances (very few training examples but lots of unlabeled data).</p>
+  <div class="entry-content"><p><em>TL;DR: I tested a bunch of neural network architectures plus SVM + NB on several text clasification datasets. Results at the bottom of the post.</em></p>
 
-<p>There are of course better ways of utilising word embeddings than averaging the vectors and last month I finally got around to try them. As far as I can tell from a brief survey of arxiv, most state of the art text classifiers use embeddings as inputs to a neural network. But what kind of neural network works best? <a href="https://arxiv.org/abs/1607.02501v2">LSTM</a>? [LSTM? <a href="https://arxiv.org/pdf/1408.5882v2.pdf">CNN</a>? <a href="https://arxiv.org/pdf/1611.06639.pdf">BLSTM with CNN</a>? To find this out for myself, I implemented several of those networks in Keras and created a benchmark where those algorithms compete with classics like SVM and Naive Bayes. <a href="https://github.com/nadbordrozd/text-top-model">Here it is</a>.</p>
+<p>Last year I wrote a <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">post</a> about using word embeddings like word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a very crude way - by averaging word vectors for all words in a document and then plugging the result into a Random Forest. Unfortunately, the resulting classifier turned out to be strictly inferior to a good old SVM except in some special circumstances (very few training examples but lots of unlabeled data).</p>
+
+<p>There are of course better ways of utilising word embeddings than averaging the vectors and last month I finally got around to try them. As far as I can tell from a brief survey of arxiv, most state of the art text classifiers use embeddings as inputs to a neural network. But what kind of neural network works best? <a href="https://arxiv.org/abs/1607.02501v2">LSTM</a>? LSTM? <a href="https://arxiv.org/pdf/1408.5882v2.pdf">CNN</a>? <a href="https://arxiv.org/pdf/1611.06639.pdf">BLSTM with CNN</a>? There are doezens of tutorials on the internet showing how to implement this of that neural classfier and testing it on some dataset. The problem with them is that they usually give metrics without a context. Someone says that their achieved 0.85 accuracy on some dataset. Is that good? Should I be impressed? Is it better than Naive Bayes, SVM? Than other neural architectures? Was it a fluke? Does it work as well on other datasets?</p>
+
+<p>To answer those questions, I implemented several network architectures in Keras and created a benchmark where those algorithms compete with classics like SVM and Naive Bayes. <a href="https://github.com/nadbordrozd/text-top-model">Here it is</a>.</p>
 
 <p>I intend to keep adding new algorithms and dataset to the benchmark as I learn about them. I will update this post when that happens.</p>
 
@@ -535,6 +539,8 @@
 <p><a href="https://github.com/nadbordrozd/text-top-model/blob/master/ttm/sentence_results.csv">Full results csv.</a></p>
 
 <h4 id="conclusions">Conclusions</h4>
+<p>Well, this was underwhelming.</p>
+
 <p>None of the fancy neural networks with embeddings managed to beat Naive Bayes and SVM, at least not consistently. A simple feed forward neural network with a single layer, did better than any other architecture.</p>
 
 <p>I blame my hyperparameters. Didn’t tune them enough. In particular, the number of epochs to train. It was determined once for each model, but different datasets and different splits probably require different settings.</p>
