@@ -298,7 +298,7 @@ Unlike the MAP approach, this result is reliable. As long as you give MCMC enoug
 
 #### The clean way
 
-This was soul-crushingly tedious, I know. But it doesn't have to be this way. I have created a few utility functions to get rid of the boilerplate - the creation of uniform priors for variables, the conditional probabilities, the trace, and so on. The utils can all be found [here](https://github.com/nadbordrozd/ds-tools/blob/master/dstk/pymc_utils.py) (along with some other stuff).
+This was soul-crushingly tedious, I know. But it doesn't have to be this way. I have created a few utility functions to get rid of the boilerplate - the creation of uniform priors for variables, the conditional probabilities, the trace, and so on. The utils can all be found [here](https://github.com/nadbordrozd/flagpole) (along with some other stuff).
 
 This is how to define the network using these utils:
 

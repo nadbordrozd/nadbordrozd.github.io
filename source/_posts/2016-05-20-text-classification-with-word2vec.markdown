@@ -32,7 +32,7 @@ or we can train a Word2Vec model from scratch with gensim:
 import gensim
 # let X be a list of tokenized texts (i.e. list of lists of tokens)
 model = gensim.models.Word2Vec(X, size=100)
-w2v = dict(zip(model.index2word, model.syn0))
+w2v = dict(zip(model.wv.index2word, model.wv.syn0))
 ```
 
 #### The (python) meat
@@ -119,13 +119,13 @@ model                score
 -----------------  -------
 svc_tfidf           0.9656
 svc                 0.9562
-w2v_tfidf           0.9554
-w2v                 0.9516
+w2v_tfidf           0.9544
+w2v                 0.9510
 mult_nb             0.9467
-glove_big           0.9279
-glove_big_tfidf     0.9273
-glove_small         0.9250
-glove_small_tfidf   0.9061
+glove_big           0.9274
+glove_small         0.9262
+glove_small_tfidf   0.9075
+glove_big_tfidf     0.9038
 mult_nb_tfidf       0.8615
 bern_nb             0.7954
 bern_nb_tfidf       0.7954
@@ -153,6 +153,8 @@ This time pretrained embeddings do better than Word2Vec and Naive Bayes does rea
 3. but they only seem to have a clear advantage when there is ridiculously little labeled training data
 
 At this point I have to note that averaging vectors is only the easiest way of leveraging word embeddings in classification but not the only one. You could also try embedding whole documents directly with [Doc2Vec](https://radimrehurek.com/gensim/models/doc2vec.html). Or use Multinomial Gaussian Naive Bayes on word vectors. I have tried the [latter approach](https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/multi_multi_kernel_nb.py) but it was too slow to include in the benchmark. 
+
+_Update 2017: actually, the best way to utilise the pretrained embeddings would probably be this https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html I shall add this approach to the benchmark when I have some time._
 
 4. Sometimes pretrained embeddings give clearly superior results to word2vec trained on the specific benchmark, sometimes it's the opposite. Not sure what is going on here.
 
