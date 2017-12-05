@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="TL;DR: I tested a bunch of neural network architectures plus SVM + NB on several text clasification datasets. Results at the bottom of the post. Last &hellip;">
+  <meta name="description" content="A popular meme places data science at the intersection of hacking, statistics and domain knowledge. It isn’t exactly untrue but it may give an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,75 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/12/05/data-science-advice-part-1-you-are-a-software-engineer-first/">Data Science Advice. Part 1: You Are a Software Engineer First</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-12-05T21:18:31+00:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>5</span><span class='date-suffix'>th</span>, <span class='date-year'>2017</span></span> <span class='time'>9:18 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A popular meme places data science at the intersection of hacking, statistics and domain knowledge. It isn’t exactly untrue but it may give an aspiring data scientist the mistaken impression that those three areas are equally important. They’re not.</p>
+
+<p>I’m leaving domain knowledge out of this discussion because, while it’s absolutely necessary to have it to get anything done at all, it usually doesn’t have to be very deep and you’re almost always expected to pick it up on the job.</p>
+
+<p>First of all, hacking is something that we do every day while we can go months or years without touching any statistics. Of course, statistics and probability are baked into much of the software we use but we no more need to think about them daily than a pilot needs to think about the equations of aerodynamics.</p>
+
+<p>Secondly, on those rare occasions when you do come up with some brilliant probabilistic model or business insight, it will still have to be implemented as a piece of software before it creates any value. And make no mistake - it will be implemented by you or not at all. A theoretical data scientist who dictates equations to engineers for implementation is not - and will never be - a thing.</p>
+
+<p>Data science is a subset of software engineering. You design and implement software. It’s a peculiar kind of software and the design process is unusual but ultimately this is what you do. It is imperative that you get good at it.</p>
+
+<p>Your colleagues will cut you a lot of slack with respect to programming on account of you bringing other skillsets to the table. As a result it is entirely possible for someone to be doing data science for years without picking up good engineering practices and modern technologies. Don’t let this happen to you.</p>
+
+<p>The purely technological part of data science - installing things, getting things in and out of databases, version control, db and cluster administration etc. - may seem like a boring chore to you (I know it did to me) - best left to vanilla engineers who are into this stuff. This type of thinking is a mistake. Becoming better at engineering will:</p>
+
+<ul>
+  <li>cause you to spend less time on the routine data preparation tasks and let you focus on models (have the data cleaned and ready in a week rather than a month)</li>
+  <li>allow you to iterate more rapidly, test more ideas in the same amount of time</li>
+  <li>give you access to new datasets (data too big for your laptop? No problem, you can spin up a spark cluster and munge it in minutes)</li>
+  <li>… and modeling techniques (new crazy model described on arXiv? Or a cutting edge library released? You will skim the docs and get it working in no time.)</li>
+  <li>make it more likely that your code will end up in production (because you write it production-ready)</li>
+  <li>open doors to more interesting jobs</li>
+</ul>
+
+<p>That doesn’t mean that you have to be an expert coder to start working as a data scientist. You don’t even have to be an expert coder to start working as a coder. But you do need to have the basics and be willing to learn.</p>
+
+<p>A trained engineer with no knowledge of statistics is one online course away from being able to perform a majority of data science jobs. A trained statistician with no tech skills won’t be able to do any data science at all. They may still be a useful person to have around (as a data analyst maybe) but would be completely unable to do any data science on their own.</p>
+
+<p>Why do we even have data scientists then? Why aren’t vanilla engineers taking all the data science jobs?</p>
+
+<p>Data science may not require much in terms of hard maths/stats knowledge but it does require that you’re interested in data and models. And most engineers simply aren’t. The good ones are too busy and too successful as it is to put any serious effort into learning something else. And the mediocre simply lack the kind of curiosity that makes someone excited about reinforcement learning or tweaking a shoe reccomender.</p>
+
+<p>Moreover, <em>there is</em> a breed of superstar software engineers doing drive-by data science. I know a few engineers each of whom can run circles around your average data scientist. They can read all the latest papers on a given AI/ML topic, then implement, test and productionise a state of the art recommender/classifier/whatever - all without breaking a sweat - and then move on to non-data related projects where they can make more impact. One well known example of such a person is <a href="https://erikbern.com">Erik Bernhardsson</a> - the author of Annoy and Luigi.</p>
+
+<p>These people don’t call themselves ‘data scientists’ because they don’t have to - they already work wherever they want, on whatever projects they want, making lots of money - they don’t need the pretense. No, ‘data scientist’ is a term invented so all the failed scientists - the bored particle physicists and disenchanted neurobiologists - can make themselves look useful to employers.</p>
+
+<p>There is no denying,
+&gt; “I’m a data scientist with a strong academic background”
+Does sound more employable than
+&gt; “I’m have wasted 10 best years of my life on theoretical physics but I also took a Python course online, please hire me”</p>
+
+<p>I’m being facetious here but of course I do think a smart science grads can be productive data scientists. And they will become immensely more productive if they make sure to steer away from ‘academic with a python course’ and towards ‘software professional who can also do advanced maths’.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3074,621 +3143,6 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/">Datamatching Part 2: Spark Pipeline</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2016-07-22T22:57:45+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2016</span></span> <span class='time'>10:57 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of datamatching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
-
-<p>To match two datasets:</p>
-
-<ol>
-  <li>Tokenize corresponding fields in both datasets</li>
-  <li>Group records having a token in common (think SQL join)</li>
-  <li>Compare records withing a group and choose the closest match</li>
-</ol>
-
-<h3 id="why-spark">Why spark</h3>
-<p>This datamatching algorithm could easily be implemented in the traditional single-machine, single-threaded way using a collection of hashmaps. In fact this is what I have done on more than one occasion and it worked. The advantage of spark here is built-in scalability. If your datasets get ten times bigger, just invoke spark requesting ten times as many cores. If matching is taking too long - throw some more resources at it again. In the single-threaded model all you can do is up the RAM as your data grows but the computation is taking longer and longer and there is nothing you can do about it.</p>
-
-<p>As an added bonus, I discovered that the abstractions Spark forces on you - maps, joins, reduces - are actually appropriate for this problem and encourage a better design than the naive implementation.</p>
-
-<h3 id="example-data">Example data</h3>
-<p>In the spirit of TDD, let’s start by creating a test case. It will consist of two RDDs that we are going to match. Spark’s dataframes would be even more natural choice if not for the fact that they are completely fucked up.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-<span class="line-number">28</span>
-<span class="line-number">29</span>
-<span class="line-number">30</span>
-<span class="line-number">31</span>
-<span class="line-number">32</span>
-<span class="line-number">33</span>
-<span class="line-number">34</span>
-<span class="line-number">35</span>
-<span class="line-number">36</span>
-<span class="line-number">37</span>
-<span class="line-number">38</span>
-<span class="line-number">39</span>
-<span class="line-number">40</span>
-<span class="line-number">41</span>
-<span class="line-number">42</span>
-<span class="line-number">43</span>
-<span class="line-number">44</span>
-<span class="line-number">45</span>
-<span class="line-number">46</span>
-<span class="line-number">47</span>
-<span class="line-number">48</span>
-<span class="line-number">49</span>
-<span class="line-number">50</span>
-<span class="line-number">51</span>
-<span class="line-number">52</span>
-<span class="line-number">53</span>
-<span class="line-number">54</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># the first dataset from now on refered to as &quot;left&quot;</span>
-</span><span class="line"><span class="n">left</span> <span class="o">=</span> <span class="p">[</span>
-</span><span class="line">    <span class="p">{</span>
-</span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bruce Wayne&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;1007 Mountain Drive, Gotham&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="s">&#39;01234567890&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne Enterprises&#39;</span>
-</span><span class="line">    <span class="p">},</span>
-</span><span class="line">    <span class="p">{</span>
-</span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Thomas Wayne&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;Gotham Cemetery&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne Enterprises&#39;</span>
-</span><span class="line">    <span class="p">},</span>
-</span><span class="line">    <span class="p">{</span>
-</span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Bruce Banner&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;address&#39;</span><span class="p">:</span> <span class="s">&#39;56431 Some Place, New Mexico&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;company&#39;</span><span class="p">:</span> <span class="s">&#39;U.S. Department of Defense&#39;</span>
-</span><span class="line">    <span class="p">}</span>
-</span><span class="line"><span class="p">]</span>
-</span><span class="line">
-</span><span class="line"><span class="c"># and the second &quot;right&quot;</span>
-</span><span class="line"><span class="n">right</span> <span class="o">=</span> <span class="p">[</span>
-</span><span class="line">    <span class="p">{</span>
-</span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="s">&#39;a&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Wayne, Burce&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;postcode&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;personal phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;business phone&#39;</span><span class="p">:</span> <span class="s">&#39;+735-123-456-7890&#39;</span><span class="p">,</span>
-</span><span class="line">    <span class="p">},</span>
-</span><span class="line">    <span class="p">{</span>
-</span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="s">&#39;b&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;B. Banner&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;postcode&#39;</span><span class="p">:</span> <span class="s">&#39;56431&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;personal phone&#39;</span><span class="p">:</span> <span class="s">&#39;897654322&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;business phone&#39;</span><span class="p">:</span> <span class="bp">None</span>
-</span><span class="line">
-</span><span class="line">    <span class="p">},</span>
-</span><span class="line">    <span class="p">{</span>
-</span><span class="line">        <span class="s">&#39;Id&#39;</span><span class="p">:</span> <span class="s">&#39;c&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;name&#39;</span><span class="p">:</span> <span class="s">&#39;Pennyworth, Alfred&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;postcode&#39;</span><span class="p">:</span> <span class="s">&#39;1007&#39;</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;personal phone&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">,</span>
-</span><span class="line">        <span class="s">&#39;business phone&#39;</span><span class="p">:</span> <span class="bp">None</span>
-</span><span class="line">    <span class="p">}</span>
-</span><span class="line"><span class="p">]</span>
-</span><span class="line">
-</span><span class="line"><span class="c"># sc is an instance of pyspark.SparkContext</span>
-</span><span class="line"><span class="n">left_rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
-</span><span class="line"><span class="n">right_rdd</span> <span class="o">=</span> <span class="n">sc</span><span class="o">.</span><span class="n">parallelize</span><span class="p">(</span><span class="n">right</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h3 id="tokenizers">Tokenizers</h3>
-<p>First step in the algorithm - tokenize the fields. After all this talk in the last post about fancy tokenizers, for our particular toy datasets we will use extremely simplistic ones:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># lowercase the name and split on spaces, remove non-alphanumeric chars</span>
-</span><span class="line"><span class="k">def</span> <span class="nf">tokenize_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-</span><span class="line">    <span class="n">clean_name</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">isalnum</span><span class="p">()</span> <span class="k">else</span> <span class="s">&#39; &#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">name</span><span class="p">)</span>
-</span><span class="line">    <span class="k">return</span> <span class="n">clean_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-</span><span class="line">
-</span><span class="line"><span class="c"># same tokenizers as for names, meh, good enough</span>
-</span><span class="line"><span class="k">def</span> <span class="nf">tokenize_address</span><span class="p">(</span><span class="n">address</span><span class="p">):</span>
-</span><span class="line">    <span class="k">return</span> <span class="n">tokenize_name</span><span class="p">(</span><span class="n">address</span><span class="p">)</span>
-</span><span class="line">
-</span><span class="line"><span class="c"># last 10 digits of phone number</span>
-</span><span class="line"><span class="k">def</span> <span class="nf">tokenize_phone</span><span class="p">(</span><span class="n">phone</span><span class="p">):</span>
-</span><span class="line">    <span class="k">return</span> <span class="p">[</span><span class="s">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">phone</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="s">&#39;1234567890&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]]</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Now we have to specify which tokenizer should be applied to which field. You don’t want to use the phone tokenizer on a person’s name or vice versa. Also, tokens extracted from name shouldn’t mix with tokens from address or phone number. On the other hand, there may be multiple fields that you want to extract e.g. phone numbers from - and these tokens <em>should</em> mix. Here’s minimalistic syntax for specifying these things:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># original column name goes first, then token type, then tokenizer function</span>
-</span><span class="line"><span class="c"># for the left dataset</span>
-</span><span class="line"><span class="n">left_tokenizers</span> <span class="o">=</span> <span class="p">[</span>
-</span><span class="line">    <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;name_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_name</span><span class="p">),</span>
-</span><span class="line">    <span class="p">(</span><span class="s">&#39;address&#39;</span><span class="p">,</span> <span class="s">&#39;address_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_address</span><span class="p">),</span>
-</span><span class="line">    <span class="p">(</span><span class="s">&#39;phone&#39;</span><span class="p">,</span> <span class="s">&#39;phone_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_phone</span><span class="p">)</span>
-</span><span class="line"><span class="p">]</span>
-</span><span class="line">
-</span><span class="line"><span class="c"># and right</span>
-</span><span class="line"><span class="n">right_tokenizers</span> <span class="o">=</span> <span class="p">[</span>
-</span><span class="line">    <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;name_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_name</span><span class="p">),</span>
-</span><span class="line">    <span class="p">(</span><span class="s">&#39;postcode&#39;</span><span class="p">,</span> <span class="s">&#39;address_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_address</span><span class="p">),</span>
-</span><span class="line">    <span class="p">(</span><span class="s">&#39;personal phone&#39;</span><span class="p">,</span> <span class="s">&#39;phone_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_phone</span><span class="p">),</span>
-</span><span class="line">    <span class="p">(</span><span class="s">&#39;business phone&#39;</span><span class="p">,</span> <span class="s">&#39;phone_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_phone</span><span class="p">)</span>
-</span><span class="line"><span class="p">]</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And here’s how they are applied:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">id_key</span> <span class="o">=</span> <span class="s">&#39;Id&#39;</span>
-</span><span class="line"><span class="k">def</span> <span class="nf">prepare_join_keys</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">tokenizers</span><span class="p">):</span>
-</span><span class="line">    <span class="k">for</span> <span class="n">source_column</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="ow">in</span> <span class="n">tokenizers</span><span class="p">:</span>
-</span><span class="line">        <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_column</span><span class="p">):</span>
-</span><span class="line">            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_column</span><span class="p">))):</span>
-</span><span class="line">                <span class="k">yield</span> <span class="p">((</span><span class="n">token</span><span class="p">,</span> <span class="n">key_name</span><span class="p">),</span> <span class="n">record</span><span class="p">[</span><span class="n">id_key</span><span class="p">])</span>
-</span><span class="line">
-</span><span class="line"><span class="c"># Ids of records in the left dataset keyed by tokens extracted from the record</span>
-</span><span class="line"><span class="n">left_keyed</span> <span class="o">=</span> <span class="n">left_rdd</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">prepare_join_keys</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">left_tokenizers</span><span class="p">))</span>
-</span><span class="line"><span class="c"># and same for the right dataset</span>
-</span><span class="line"><span class="n">right_keyed</span> <span class="o">=</span> <span class="n">right_rdd</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">prepare_join_keys</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">right_tokenizers</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The result is a mapping of token -&gt; Id in the form of an RDD. One for each dataset:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-<span class="line-number">28</span>
-<span class="line-number">29</span>
-<span class="line-number">30</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&gt;&gt;&gt; left_keyed.collect()
-</span><span class="line">[((&#39;bruce&#39;, &#39;name_tokens&#39;), 1),
-</span><span class="line"> ((&#39;wayne&#39;, &#39;name_tokens&#39;), 1),
-</span><span class="line"> ((&#39;1007&#39;, &#39;address_tokens&#39;), 1),
-</span><span class="line"> ((&#39;mountain&#39;, &#39;address_tokens&#39;), 1),
-</span><span class="line"> ((&#39;gotham&#39;, &#39;address_tokens&#39;), 1),
-</span><span class="line"> ((&#39;drive&#39;, &#39;address_tokens&#39;), 1),
-</span><span class="line"> ((&#39;1234567890&#39;, &#39;phone_tokens&#39;), 1),
-</span><span class="line"> ((&#39;thomas&#39;, &#39;name_tokens&#39;), 2),
-</span><span class="line"> ((&#39;wayne&#39;, &#39;name_tokens&#39;), 2),
-</span><span class="line"> ((&#39;gotham&#39;, &#39;address_tokens&#39;), 2),
-</span><span class="line"> ((&#39;cemetery&#39;, &#39;address_tokens&#39;), 2),
-</span><span class="line"> ((&#39;bruce&#39;, &#39;name_tokens&#39;), 3),
-</span><span class="line"> ((&#39;banner&#39;, &#39;name_tokens&#39;), 3),
-</span><span class="line"> ((&#39;place&#39;, &#39;address_tokens&#39;), 3),
-</span><span class="line"> ((&#39;mexico&#39;, &#39;address_tokens&#39;), 3),
-</span><span class="line"> ((&#39;some&#39;, &#39;address_tokens&#39;), 3),
-</span><span class="line"> ((&#39;56431&#39;, &#39;address_tokens&#39;), 3),
-</span><span class="line"> ((&#39;new&#39;, &#39;address_tokens&#39;), 3)]
-</span><span class="line">&gt;&gt;&gt; right_keyed.collect()
-</span><span class="line">[((&#39;wayne&#39;, &#39;name_tokens&#39;), &#39;a&#39;),
-</span><span class="line"> ((&#39;burce&#39;, &#39;name_tokens&#39;), &#39;a&#39;),
-</span><span class="line"> ((&#39;1234567890&#39;, &#39;phone_tokens&#39;), &#39;a&#39;),
-</span><span class="line"> ((&#39;b&#39;, &#39;name_tokens&#39;), &#39;b&#39;),
-</span><span class="line"> ((&#39;banner&#39;, &#39;name_tokens&#39;), &#39;b&#39;),
-</span><span class="line"> ((&#39;56431&#39;, &#39;address_tokens&#39;), &#39;b&#39;),
-</span><span class="line"> ((&#39;897654322&#39;, &#39;phone_tokens&#39;), &#39;b&#39;),
-</span><span class="line"> ((&#39;pennyworth&#39;, &#39;name_tokens&#39;), &#39;c&#39;),
-</span><span class="line"> ((&#39;alfred&#39;, &#39;name_tokens&#39;), &#39;c&#39;),
-</span><span class="line"> ((&#39;1007&#39;, &#39;address_tokens&#39;), &#39;c&#39;)]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h3 id="generating-candidate-matches">Generating candidate matches</h3>
-<p>Now comes the time to generate candidate matches. We do that by joining records that have a token in common:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">candidates</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class="line">    <span class="n">left_keyed</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">right_keyed</span><span class="p">)</span>
-</span><span class="line">    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">((</span><span class="n">token</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="p">(</span><span class="n">l_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">)):</span> <span class="p">((</span><span class="n">l_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">),</span> <span class="p">{</span><span class="n">key</span><span class="p">}))</span>
-</span><span class="line">    <span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
-</span><span class="line"><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Result:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&gt;&gt;&gt; candidates.collect()
-</span><span class="line">[((2, &#39;a&#39;), {&#39;name_tokens&#39;}),
-</span><span class="line"> ((1, &#39;c&#39;), {&#39;address_tokens&#39;}),
-</span><span class="line"> ((1, &#39;a&#39;), {&#39;name_tokens&#39;, &#39;phone_tokens&#39;}),
-</span><span class="line"> ((3, &#39;b&#39;), {&#39;address_tokens&#39;, &#39;name_tokens&#39;})]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>With every match we have retained the information about what it was joined on for later use. We have 4 candidate matches here - 2 correct and 2 wrong ones. The spurious matches are <code>(1, 'c')</code> - Bruce Wayne and Alfred Pennyworth matched due to shared address; <code>(2, 'a')</code> - Bruce Wayne and Thomas Wayne matched because of the shared last name.</p>
-
-<p>Joining the original records back to the matches, so they can be compared:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="c"># let&#39;s join back </span>
-</span><span class="line"><span class="n">cand_matches</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class="line">    <span class="n">candidates</span>
-</span><span class="line">    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">((</span><span class="n">l_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">),</span> <span class="n">keys</span><span class="p">):</span> <span class="p">(</span><span class="n">l_id</span><span class="p">,</span> <span class="p">(</span><span class="n">r_id</span><span class="p">,</span> <span class="n">keys</span><span class="p">)))</span>
-</span><span class="line">    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">left_rdd</span><span class="o">.</span><span class="n">keyBy</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">id_key</span><span class="p">]))</span>
-</span><span class="line">    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">l_id</span><span class="p">,</span> <span class="p">((</span><span class="n">r_id</span><span class="p">,</span> <span class="n">keys</span><span class="p">),</span> <span class="n">l_rec</span><span class="p">)):</span> <span class="p">(</span><span class="n">r_id</span><span class="p">,</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">)))</span>
-</span><span class="line">    <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">right_rdd</span><span class="o">.</span><span class="n">keyBy</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">id_key</span><span class="p">]))</span>
-</span><span class="line">    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">r_id</span><span class="p">,</span> <span class="p">((</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">),</span> <span class="n">r_rec</span><span class="p">)):</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)))</span>
-</span><span class="line"><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<h3 id="finding-the-best-match">Finding the best match</h3>
-<p>We’re almost there. Now we need to define a function to evaluate goodness of a match. Take a pair of records and say how similar they are. We will cop out of this by just using the join keys that were retained with every match. The more different types of tokens were matched, the better:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">def</span> <span class="nf">score_match</span><span class="p">(</span><span class="n">left_rec</span><span class="p">,</span> <span class="n">right_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
-</span><span class="line">    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>We also need a function that will say: a match must be scored at least this high to qualify.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">def</span> <span class="nf">is_good_enough_match</span><span class="p">(</span><span class="n">match_score</span><span class="p">):</span>
-</span><span class="line">    <span class="k">return</span> <span class="n">match_score</span> <span class="o">&gt;=</span> <span class="mi">2</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>And now, finally we use those functions to evaluate and filter candidate matches and return the matched dataset:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">final_matches</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class="line">    <span class="n">cand_matches</span>
-</span><span class="line">    <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
-</span><span class="line">         <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">score_match</span><span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">)))</span>
-</span><span class="line">    <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span> <span class="n">is_good_enough_match</span><span class="p">(</span><span class="n">score</span><span class="p">))</span>
-</span><span class="line"><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>The result:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-</pre></td><td class="code"><pre><code class="text"><span class="line">&gt;&gt;&gt; final_matches.collect()
-</span><span class="line">[({&#39;Id&#39;: 1,
-</span><span class="line">   &#39;address&#39;: &#39;1007 Mountain Drive, Gotham&#39;,
-</span><span class="line">   &#39;company&#39;: &#39;Wayne Enterprises&#39;,
-</span><span class="line">   &#39;name&#39;: &#39;Bruce Wayne&#39;,
-</span><span class="line">   &#39;phone&#39;: &#39;01234567890&#39;},
-</span><span class="line">  {&#39;Id&#39;: &#39;a&#39;,
-</span><span class="line">   &#39;business phone&#39;: &#39;+735-123-456-7890&#39;,
-</span><span class="line">   &#39;name&#39;: &#39;Wayne, Burce&#39;,
-</span><span class="line">   &#39;personal phone&#39;: None,
-</span><span class="line">   &#39;postcode&#39;: None},
-</span><span class="line">  2),
-</span><span class="line"> ({&#39;Id&#39;: 3,
-</span><span class="line">   &#39;address&#39;: &#39;56431 Some Place, New Mexico&#39;,
-</span><span class="line">   &#39;company&#39;: &#39;U.S. Department of Defense&#39;,
-</span><span class="line">   &#39;name&#39;: &#39;Bruce Banner&#39;,
-</span><span class="line">   &#39;phone&#39;: None},
-</span><span class="line">  {&#39;Id&#39;: &#39;b&#39;,
-</span><span class="line">   &#39;business phone&#39;: None,
-</span><span class="line">   &#39;name&#39;: &#39;B. Banner&#39;,
-</span><span class="line">   &#39;personal phone&#39;: &#39;897654322&#39;,
-</span><span class="line">   &#39;postcode&#39;: &#39;56431&#39;},
-</span><span class="line">  2)]
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Glorious.</p>
-
-<h3 id="putting-it-all-together">Putting it all together</h3>
-<p>Now is the time to put “generic” back in the “generic datamatching pipeline in spark”.</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-<span class="line-number">20</span>
-<span class="line-number">21</span>
-<span class="line-number">22</span>
-<span class="line-number">23</span>
-<span class="line-number">24</span>
-<span class="line-number">25</span>
-<span class="line-number">26</span>
-<span class="line-number">27</span>
-<span class="line-number">28</span>
-<span class="line-number">29</span>
-<span class="line-number">30</span>
-<span class="line-number">31</span>
-<span class="line-number">32</span>
-<span class="line-number">33</span>
-<span class="line-number">34</span>
-<span class="line-number">35</span>
-<span class="line-number">36</span>
-<span class="line-number">37</span>
-<span class="line-number">38</span>
-<span class="line-number">39</span>
-<span class="line-number">40</span>
-<span class="line-number">41</span>
-<span class="line-number">42</span>
-<span class="line-number">43</span>
-<span class="line-number">44</span>
-<span class="line-number">45</span>
-<span class="line-number">46</span>
-<span class="line-number">47</span>
-<span class="line-number">48</span>
-<span class="line-number">49</span>
-<span class="line-number">50</span>
-<span class="line-number">51</span>
-<span class="line-number">52</span>
-<span class="line-number">53</span>
-<span class="line-number">54</span>
-<span class="line-number">55</span>
-<span class="line-number">56</span>
-<span class="line-number">57</span>
-<span class="line-number">58</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">class</span> <span class="nc">DataMatcher</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-</span><span class="line">    <span class="k">def</span> <span class="nf">score_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_rec</span><span class="p">,</span> <span class="n">right_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
-</span><span class="line">        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">is_good_enough_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">match_score</span><span class="p">):</span>
-</span><span class="line">        <span class="k">return</span> <span class="n">match_score</span> <span class="o">&gt;=</span> <span class="mi">2</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">get_left_tokenizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class="line">        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">get_right_tokenizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class="line">        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">match_rdds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">left_rdd</span><span class="p">,</span> <span class="n">right_rdd</span><span class="p">):</span>
-</span><span class="line">        <span class="n">left_tokenizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_left_tokenizers</span><span class="p">()</span>
-</span><span class="line">        <span class="n">right_tokenizers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_right_tokenizers</span><span class="p">()</span>
-</span><span class="line">
-</span><span class="line">        <span class="n">id_key</span> <span class="o">=</span> <span class="s">&#39;Id&#39;</span>
-</span><span class="line">
-</span><span class="line">        <span class="k">def</span> <span class="nf">prepare_join_keys</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="n">tokenizers</span><span class="p">):</span>
-</span><span class="line">            <span class="k">for</span> <span class="n">source_column</span><span class="p">,</span> <span class="n">key_name</span><span class="p">,</span> <span class="n">tokenizer</span> <span class="ow">in</span> <span class="n">tokenizers</span><span class="p">:</span>
-</span><span class="line">                <span class="k">if</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_column</span><span class="p">):</span>
-</span><span class="line">                    <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">source_column</span><span class="p">))):</span>
-</span><span class="line">                        <span class="k">yield</span> <span class="p">((</span><span class="n">token</span><span class="p">,</span> <span class="n">key_name</span><span class="p">),</span> <span class="n">record</span><span class="p">[</span><span class="n">id_key</span><span class="p">])</span>
-</span><span class="line">
-</span><span class="line">        <span class="n">left_keyed</span> <span class="o">=</span> <span class="n">left_rdd</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">prepare_join_keys</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">left_tokenizers</span><span class="p">))</span>
-</span><span class="line">        <span class="n">right_keyed</span> <span class="o">=</span> <span class="n">right_rdd</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">prepare_join_keys</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">right_tokenizers</span><span class="p">))</span>
-</span><span class="line">
-</span><span class="line">        <span class="n">candidates</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class="line">            <span class="n">left_keyed</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">right_keyed</span><span class="p">)</span>
-</span><span class="line">            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">((</span><span class="n">token</span><span class="p">,</span> <span class="n">key</span><span class="p">),</span> <span class="p">(</span><span class="n">l_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">)):</span> <span class="p">((</span><span class="n">l_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">),</span> <span class="p">{</span><span class="n">key</span><span class="p">}))</span>
-</span><span class="line">            <span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">a</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
-</span><span class="line">        <span class="p">)</span>
-</span><span class="line">
-</span><span class="line">        <span class="c"># joining back original records so they can be compared</span>
-</span><span class="line">        <span class="n">cand_matches</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class="line">            <span class="n">candidates</span>
-</span><span class="line">            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">((</span><span class="n">l_id</span><span class="p">,</span> <span class="n">r_id</span><span class="p">),</span> <span class="n">keys</span><span class="p">):</span> <span class="p">(</span><span class="n">l_id</span><span class="p">,</span> <span class="p">(</span><span class="n">r_id</span><span class="p">,</span> <span class="n">keys</span><span class="p">)))</span>
-</span><span class="line">            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">left_rdd</span><span class="o">.</span><span class="n">keyBy</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">id_key</span><span class="p">]))</span>
-</span><span class="line">            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">l_id</span><span class="p">,</span> <span class="p">((</span><span class="n">r_id</span><span class="p">,</span> <span class="n">keys</span><span class="p">),</span> <span class="n">l_rec</span><span class="p">)):</span> <span class="p">(</span><span class="n">r_id</span><span class="p">,</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">)))</span>
-</span><span class="line">            <span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">right_rdd</span><span class="o">.</span><span class="n">keyBy</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">id_key</span><span class="p">]))</span>
-</span><span class="line">            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">r_id</span><span class="p">,</span> <span class="p">((</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">),</span> <span class="n">r_rec</span><span class="p">)):</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">keys</span><span class="p">)))</span>
-</span><span class="line">        <span class="p">)</span>
-</span><span class="line">
-</span><span class="line">        <span class="k">def</span> <span class="nf">score_match</span><span class="p">(</span><span class="n">left_rec</span><span class="p">,</span> <span class="n">right_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
-</span><span class="line">            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
-</span><span class="line">
-</span><span class="line">        <span class="k">def</span> <span class="nf">is_good_enough_match</span><span class="p">(</span><span class="n">match_score</span><span class="p">):</span>
-</span><span class="line">            <span class="k">return</span> <span class="n">match_score</span> <span class="o">&gt;=</span> <span class="mi">2</span>
-</span><span class="line">
-</span><span class="line">        <span class="n">final_matches</span> <span class="o">=</span> <span class="p">(</span>
-</span><span class="line">            <span class="n">cand_matches</span>
-</span><span class="line">            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
-</span><span class="line">                 <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">score_match</span><span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">keys</span><span class="p">)))</span>
-</span><span class="line">            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="p">(</span><span class="n">l_rec</span><span class="p">,</span> <span class="n">r_rec</span><span class="p">,</span> <span class="n">score</span><span class="p">):</span> <span class="n">is_good_enough_match</span><span class="p">(</span><span class="n">score</span><span class="p">))</span>
-</span><span class="line">        <span class="p">)</span>
-</span><span class="line">
-</span><span class="line">        <span class="k">return</span> <span class="n">final_matches</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>To use it, you have to inherit from <code>DataMatcher</code> and override at a minimum the <code>get_left_tokenizers</code> and <code>get_right_tokenizers</code> functions. You will probably want to override <code>score_match</code> and <code>is_good_enough_match</code> as well, but the default should work in simple cases.</p>
-
-<p>Now we can match our toy datasets in a few lines oc code, like this:</p>
-
-<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
-<span class="line-number">2</span>
-<span class="line-number">3</span>
-<span class="line-number">4</span>
-<span class="line-number">5</span>
-<span class="line-number">6</span>
-<span class="line-number">7</span>
-<span class="line-number">8</span>
-<span class="line-number">9</span>
-<span class="line-number">10</span>
-<span class="line-number">11</span>
-<span class="line-number">12</span>
-<span class="line-number">13</span>
-<span class="line-number">14</span>
-<span class="line-number">15</span>
-<span class="line-number">16</span>
-<span class="line-number">17</span>
-<span class="line-number">18</span>
-<span class="line-number">19</span>
-</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">class</span> <span class="nc">ComicBookMatcher</span><span class="p">(</span><span class="n">DataMatcher</span><span class="p">):</span>
-</span><span class="line">    <span class="k">def</span> <span class="nf">get_left_tokenizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class="line">        <span class="k">return</span> <span class="p">[</span>
-</span><span class="line">            <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;name_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_name</span><span class="p">),</span>
-</span><span class="line">            <span class="p">(</span><span class="s">&#39;address&#39;</span><span class="p">,</span> <span class="s">&#39;address_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_address</span><span class="p">),</span>
-</span><span class="line">            <span class="p">(</span><span class="s">&#39;phone&#39;</span><span class="p">,</span> <span class="s">&#39;phone_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_phone</span><span class="p">)</span>
-</span><span class="line">        <span class="p">]</span>
-</span><span class="line">
-</span><span class="line">    <span class="k">def</span> <span class="nf">get_right_tokenizers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span class="line">        <span class="k">return</span> <span class="p">[</span>
-</span><span class="line">            <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;name_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_name</span><span class="p">),</span>
-</span><span class="line">            <span class="p">(</span><span class="s">&#39;postcode&#39;</span><span class="p">,</span> <span class="s">&#39;address_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_address</span><span class="p">),</span>
-</span><span class="line">            <span class="p">(</span><span class="s">&#39;personal phone&#39;</span><span class="p">,</span> <span class="s">&#39;phone_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_phone</span><span class="p">),</span>
-</span><span class="line">            <span class="p">(</span><span class="s">&#39;business phone&#39;</span><span class="p">,</span> <span class="s">&#39;phone_tokens&#39;</span><span class="p">,</span> <span class="n">tokenize_phone</span><span class="p">)</span>
-</span><span class="line">        <span class="p">]</span>
-</span><span class="line">
-</span><span class="line"><span class="n">cbm</span> <span class="o">=</span> <span class="n">ComicBookMatcher</span><span class="p">()</span>
-</span><span class="line">
-</span><span class="line"><span class="n">final_matches</span> <span class="o">=</span> <span class="n">cbm</span><span class="o">.</span><span class="n">match_rdds</span><span class="p">(</span><span class="n">left_rdd</span><span class="p">,</span> <span class="n">right_rdd</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure></notextile></div>
-
-<p>Short and sweet.</p>
-
-<p>There are some optimisations that can be done to improve speed of the pipeline, I omitted them here for clarity. More importantly, in any nontrivial usecase you will want to use a more sophisticated evaluation function than the default one. This will be the subject of the next post.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -3704,6 +3158,10 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2017/12/05/data-science-advice-part-1-you-are-a-software-engineer-first/">Data Science Advice. Part 1: You Are a Software Engineer First</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/08/12/looking-for-the-text-top-model/">Looking for the Text Top Model</a>
       </li>
     
@@ -3717,10 +3175,6 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
     
       <li class="post">
         <a href="/blog/2017/06/20/you-wont-believe-how-this-islington-single-dad-is-making-ps500-slash-day-working-from-home/">You Won't Believe How This Islington Single Dad Is Making £500/day While Working From Home</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/06/03/python-or-scala/">Python or Scala - Let the Neural Network Decide.</a>
       </li>
     
   </ul>
