@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-12-06T20:25:28+00:00</updated>
+  <updated>2017-12-06T20:45:21+00:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[What They Don't Tell You About Data Science. 1: You Are a Software Engineer First]]></title>
-    <link href="http://nadbordrozd.github.io/blog/2017/12/05/data-science-advice-part-1-you-are-a-software-engineer-first/"/>
+    <link href="http://nadbordrozd.github.io/blog/2017/12/05/what-they-dont-tell-you-about-data-science-1/"/>
     <updated>2017-12-05T21:18:31+00:00</updated>
-    <id>http://nadbordrozd.github.io/blog/2017/12/05/data-science-advice-part-1-you-are-a-software-engineer-first</id>
+    <id>http://nadbordrozd.github.io/blog/2017/12/05/what-they-dont-tell-you-about-data-science-1</id>
     <content type="html"><![CDATA[<p><em>This is the first of a planned series of posts about things I wish someone had told me when I was first considering a career in data science.</em></p>
 
 <p>A popular meme places data science at the intersection of hacking, statistics and domain knowledge. It isn’t exactly untrue but it may give an aspiring data scientist the mistaken impression that those three areas are equally important. They’re not.</p>
@@ -69,7 +69,7 @@ Does sound more employable than
     <link href="http://nadbordrozd.github.io/blog/2017/08/12/looking-for-the-text-top-model/"/>
     <updated>2017-08-12T16:49:56+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2017/08/12/looking-for-the-text-top-model</id>
-    <content type="html"><![CDATA[<p><em>TL;DR: I tested a bunch of neural network architectures plus SVM + NB on several text clasification datasets. Results at the bottom of the post.</em></p>
+    <content type="html"><![CDATA[<p><em>TL;DR: I tested a bunch of neural network architectures plus SVM + NB on several text classification datasets. Results at the bottom of the post.</em></p>
 
 <p>Last year I wrote a <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">post</a> about using word embeddings like word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a very crude way - by averaging word vectors for all words in a document and then plugging the result into a Random Forest. Unfortunately, the resulting classifier turned out to be strictly inferior to a good old SVM except in some special circumstances (very few training examples but lots of unlabeled data).</p>
 
