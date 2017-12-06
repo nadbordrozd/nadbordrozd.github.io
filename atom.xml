@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-12-05T21:33:12+00:00</updated>
+  <updated>2017-12-06T20:25:28+00:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -14,11 +14,13 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Data Science Advice. Part 1: You Are a Software Engineer First]]></title>
+    <title type="html"><![CDATA[What They Don't Tell You About Data Science. 1: You Are a Software Engineer First]]></title>
     <link href="http://nadbordrozd.github.io/blog/2017/12/05/data-science-advice-part-1-you-are-a-software-engineer-first/"/>
     <updated>2017-12-05T21:18:31+00:00</updated>
     <id>http://nadbordrozd.github.io/blog/2017/12/05/data-science-advice-part-1-you-are-a-software-engineer-first</id>
-    <content type="html"><![CDATA[<p>A popular meme places data science at the intersection of hacking, statistics and domain knowledge. It isn’t exactly untrue but it may give an aspiring data scientist the mistaken impression that those three areas are equally important. They’re not.</p>
+    <content type="html"><![CDATA[<p><em>This is the first of a planned series of posts about things I wish someone had told me when I was first considering a career in data science.</em></p>
+
+<p>A popular meme places data science at the intersection of hacking, statistics and domain knowledge. It isn’t exactly untrue but it may give an aspiring data scientist the mistaken impression that those three areas are equally important. They’re not.</p>
 
 <p>I’m leaving domain knowledge out of this discussion because, while it’s absolutely necessary to have it to get anything done at all, it usually doesn’t have to be very deep and you’re almost always expected to pick it up on the job.</p>
 
