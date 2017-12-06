@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Network Science | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/network-science/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-12-06T20:45:21+00:00</updated>
+  <updated>2017-12-06T21:45:24+00:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -29,7 +29,7 @@
 
 <p>More generally, one can think about companies as nodes in a graph. Two companies are connected iff there is a person who has served as a director at both of them (not necessarily at the same time). I will call this the <strong>company graph</strong>. Here’s a part of the graph containing DueDil.</p>
 
-<p><img src="/images/comp_graph.png"></p>
+<p>{% img /images/comp_graph.png %}</p>
 
 <p>DueDil is connected to Founders For Good Ltd because our CEO Damian Kimmelman is also a director at the other company.</p>
 
