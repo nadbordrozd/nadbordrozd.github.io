@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-12-06T21:46:29+00:00</updated>
+  <updated>2017-12-10T22:15:44+00:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -12,6 +12,171 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/"/>
+    <updated>2017-12-10T11:46:40+00:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison</id>
+    <content type="html"><![CDATA[<p><em>This is part 2 of my list of things aspiring data scientists need to know. <a href="http://nadbordrozd.github.io/blog/2017/12/05/what-they-dont-tell-you-about-data-science-1/">Part 1</a>.</em></p>
+
+<p>For the purposes of this post I define a data analyst as someone who uses tools like Excel and SQL to interrogate data to produce reports, plots, recommendations but crucially doesn’t <em>deliver code</em>. If you work in online retail and create an algorithm recommending tiaras for pets - I call you a data scientist. If you query a database and discover that chihuahua owners prefer pink tiaras and share this finding with the advertising team - you are a data analyst.</p>
+
+<p>Let me get one thing out of the way first: this post is not bashing analysts.  <strong>Of course</strong> data analyst’s work is useful and rewarding in its own right. And there is more demand for it (under various names) than there is for data science. But that is beside the point. The point is that a lot of people will tell you that taking a job as a data analyst is a good way to prepare for data science and that is a lie. In terms of transferable skills you may as well be working as a dentist.</p>
+
+<h4 id="misconception-1-you-can-take-a-job-as-a-data-analyst-and-evolve-it-into-data-science-as-you-become-more-experienced">Misconception 1: you can take a job as a data analyst and evolve it into data science as you become more experienced</h4>
+
+<p>A data analyst is not a larval stage of a data scientist. They are completely different species.</p>
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:bold;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+
+</style>
+
+<table class="tg">
+<tr>
+<th bgcolor="#99FF99">Data Analyst</th>
+<th bgcolor="#9999FF">Data Scientist</th>
+</tr>
+
+<tr>
+<td bgcolor="#CCFFCC">Sits with the business</td>
+<td bgcolor="#CCCCFF">Sits with engineers (but talks to the business)</td>
+</tr>
+
+<tr>
+<td bgcolor="#CCFFCC">Produces reports, presentations</td>
+<td bgcolor="#CCCCFF">Produces software</td>
+</tr>
+</table>
+
+<p>Interestingly, the part about sitting in a different place (often a different floor or a different building!) is the bigger obstacle to moving into data science. Independent of having or not having the right skills, a data analyst can’t just up and start doing data science because they don’t have the physical means to do it! They don’t have:</p>
+
+<ul>
+  <li>access to full production data</li>
+  <li>access to tools to do something with that data (hadoop, spark, compute instances)</li>
+  <li>access to code repositories</li>
+</ul>
+
+<p>While those things can be eventually gotten hold of with enough perseverance, there are other deficits that even harder to make up for:</p>
+
+<ul>
+  <li>lack of familiarity with the company’s technological stack</li>
+  <li>lack of mandate to make necessary changes to that stack/implement features etc.</li>
+</ul>
+
+<p>This should be obvious to anyone who has ever worked in a big company. You don’t simply walk into an software team and start making changes. It sometimes takes months of training for a new developer on the team make first real contribution. For an outsider from a different business unit to do it remotely is unheard of.</p>
+
+<h4 id="misconception-2-data-analysis-is-good-training-for-data-science">Misconception 2: data analysis is good training for data science</h4>
+
+<p>As a data analyst:</p>
+
+<ul>
+  <li>you will not be gaining <a href="http://nadbordrozd.github.io/blog/2017/12/05/what-they-dont-tell-you-about-data-science-1/">the most important kind of experience</a> - in software engineering</li>
+  <li>you will not be learning about modern machine learning/statistical techniques either - because they are optimised for accuracy and efficiency, not interpretability (which is the analyst’s concern)</li>
+</ul>
+
+<p>You will on the other hand do:</p>
+
+<ul>
+  <li>exploratory data analysis</li>
+  <li>excel, SQL, maybe some one-off R and python scripts</li>
+</ul>
+
+<p>So that doesn’t sound all bad, right? Wrong.</p>
+
+<p>I think a case can be made that the little technical work a data analysts do actually does more harm than good to their data science education. A data scientist and an analyst may be using some of the same tools, but what they do with them is very, very different.</p>
+
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;}
+
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:bold;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+
+</style>
+
+<table class="tg">
+<tr>
+<th bgcolor="#99FF99">Data analyst’s code</th>
+<th bgcolor="#9999FF">Data Scientist's code</th>
+</tr>
+
+<tr>
+<td bgcolor="#CCFFCC">Manually operated sequence of scripts, clicking through GUIs etc.</td>
+<td bgcolor="#CCCCFF">Fully automated pipelines</td>
+</tr>
+
+<tr>
+<td bgcolor="#CCFFCC">Code that only you will ever see</td>
+<td bgcolor="#CCCCFF">Code that will be used and maintained by other people</td>
+</tr>
+
+<tr>
+<td bgcolor="#CCFFCC">One-off, throwaway scripts</td>
+<td bgcolor="#CCCCFF">Code that is a part of an live app or a scheduled pipeline</td>
+</tr>
+
+<tr>
+<td bgcolor="#CCFFCC">Code tweaked until it runs this one time</td>
+<td bgcolor="#CCCCFF">Code optimised for performance, maintainability and reusability</td>
+</tr>
+</table>
+
+<p>Doing things a certain way may make sense from a data analyst’s perspective, but the needs of data science are different. When former analysts are thrown into data science projects and start applying the patterns they have developed through the years, the results are not pretty.</p>
+
+<h4 id="horror-story-time">Horror story time</h4>
+
+<p>Let me illustrate with an example which I promise is not cherry-picked and a fairly typical in my experience.</p>
+
+<p>I joined a project led by analysts-turned-data scientists. We were building prototype of a pipeline doing some machine learning on the client’s data and displaying pretty plots. One of my first questions when I joined was: how are you getting your data from the client? (we needed a new batch of data at that time). The answer was:</p>
+
+<ol>
+  <li>Email X in Sweden with a query that he runs on the client’s database. X downloads a csv with results and puts it on an ftp server.</li>
+  <li>Download the csv from ftp to your laptop.</li>
+  <li>Upload it to the server where we have Python.</li>
+  <li>Run a python script on the server to clean the data (the script is in Y’s home directory).</li>
+  <li>Download the results on your laptop.</li>
+  <li>Upload results to our database through a GUI.</li>
+  <li>Run a SQL script in the GUI to join with our other tables (you will find the script in an attachement to some old email).</li>
+  <li>Download the results.</li>
+  <li>Upload to our dev MySQL database.</li>
+  <li>Run another SQL (Y has the script on her laptop).</li>
+  <li>Pull the data from MySQL into RStudio on the server.</li>
+  <li>Do actual analytics on the server in R (all of it consists of a single gigantic R script).</li>
+</ol>
+
+<p>Needless to say, this workflow made it impossible to get anything done whatsoever. To even run the pipeline again on fresher data would take weeks (when it should be seconds) and the results were junk anyway because the technologies they used forced them to only use 1% of available data.</p>
+
+<p>On top of that, every single script in the pipeline was extremely hacky and brittle - and here’s why:</p>
+
+<p>When faced with a task, an analyst would start writing code. If it doesn’t work at first, they add to it and tweak it until it does. As soon as a result is produced (a csv file usually), they move on to the next step. No effort is made to ensure reproducibility, reusability, maintainability, scalability. The piece of code gets you from A to B and that is that. A script made this way is full of hard-coded database passwords, paths to local directories, magic constants and untested assumptions about the input data. It resembles a late-game Jenga tower - weird and misshapen, with many blocks missing and others sticking out in weird directions. It is standing for now but you know that it will come crashing down if you as much as touch it.</p>
+
+<p>The tragic part is that none of the people involved in this mess were dumb. No, they were smart and experienced, just not the right kind of experienced. This spaghetti of manual steps, hacky scripts and big data on old laptops is not the result of not enough cleverness. Way too much cleverness if anything. It’s the result of intelligent people with no experience in making software realising too late that they’re out of their depth.</p>
+
+<p>If only my colleagues were completely non-technical - never having written a SAS or SQL script in their lives - they would have had to hire an engineer to do the coding and they themselves would have focused on preparing the spec. This kind of arrangement is not ideal but I guarantee that the result would have been much better. This is why I believe that the data analyst’s experience is not just useless but actively harmful to data science.</p>
+
+<p>Ultimately though the fault doesn’t lie with the analysts but with the management for mismatching people and tasks. It’s time managers understood that:</p>
+
+<ol>
+  <li>Data science is software engineering</li>
+  <li>Software engineering is hard</li>
+  <li>Software engineering community has developed tools and practices to make it less hard</li>
+  <li>You need a software professional to wield those tools</li>
+  <li>Having written a script in SAS doesn’t make one a software professional</li>
+</ol>
+
+<h4 id="closing-remarks">Closing remarks</h4>
+<p>I want to clear a potential misunderstanding: I am emphatically <strong>not</strong> saying that analysts can’t learn proper software engineering and data science. If <a href="https://www.theguardian.com/us-news/2017/apr/21/tech-industry-coding-kentucky-hillbillies">miners can do it</a>, so can analysts. It’s just that an analyst’s experience makes it harder for them (and their managers!) to realise that they are missing something and easier to get by without learning a thing.</p>
+
+<p>If you’re an analyst and want to switch to data science (And I’m not saying that you should! The world needs analysts too!) I recommend that you forget everything you have learned about coding and start over, like the miners.</p>
+
+<p>If you’re a grad considering a data analyst role as training for data science I strongly recommend that you find a junior software developer job instead. If you’re lucky, you may get to do some machine learning and graduate into full-on data science. But even if not, practically everything you learn in an entry-level engineering position will make you a better data scientist when you finally become one.</p>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[What They Don't Tell You About Data Science. 1: You Are a Software Engineer First]]></title>
@@ -64,7 +229,7 @@
 <p>Does sound more employable than</p>
 
 <blockquote>
-  <p>“I’m have wasted 10 best years of my life on theoretical physics but I also took a Python course online, please hire me”</p>
+  <p>“I’m have wasted 10 best years of my life on theoretical physics but I also took a Python course online, can I have jobs now plz”</p>
 </blockquote>
 
 <p>I’m being facetious here but of course I do think a smart science grads can be productive data scientists. And they will become immensely more productive if they make sure to steer away from ‘academic with a python course’ and towards ‘software professional who can also do advanced maths’.</p>
@@ -1508,7 +1673,7 @@ Since I don’t have access to a labeled dataset with phone numbers and emails, 
     <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/">last post</a> I presented a way to do Bayesian networks with pymc and use them to impute missing data. This time I benchmark the accuracy of this method on some artificial datasets.</p>
 
 <h3 id="datasets">Datasets</h3>
-<p>In the previous posts I showed the imputation of boolean missing data, but the same method works for categorical features of any cardinality as well as continues ones (except in the continues case additional prior knowledge is required to specify the likelihood). Nevertheless, I decided to test the imputers on purely boolean datasets because it makes the scores easy to interpret and the models quick to train.</p>
+<p>In the previous posts I showed the imputation of boolean missing data, but the same method works for categorical features of any cardinality as well as continuous ones (except in the continues case additional prior knowledge is required to specify the likelihood). Nevertheless, I decided to test the imputers on purely boolean datasets because it makes the scores easy to interpret and the models quick to train.</p>
 
 <p>To make it really easy on the Bayesian imputer, I created a few artificial datasets by the following process:</p>
 
