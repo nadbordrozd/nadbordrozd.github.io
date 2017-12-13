@@ -9,7 +9,7 @@ In the [last post](http://nadbordrozd.github.io/blog/2017/03/05/missing-data-imp
 
 
 ### Datasets
-In the previous posts I showed the imputation of boolean missing data, but the same method works for categorical features of any cardinality as well as continues ones (except in the continues case additional prior knowledge is required to specify the likelihood). Nevertheless, I decided to test the imputers on purely boolean datasets because it makes the scores easy to interpret and the models quick to train.
+In the previous posts I showed the imputation of boolean missing data, but the same method works for categorical features of any cardinality as well as continuous ones (except in the continues case additional prior knowledge is required to specify the likelihood). Nevertheless, I decided to test the imputers on purely boolean datasets because it makes the scores easy to interpret and the models quick to train.
 
 To make it really easy on the Bayesian imputer, I created a few artificial datasets by the following process:
 

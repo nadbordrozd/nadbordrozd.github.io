@@ -5,7 +5,7 @@ date: 2017-08-12 16:49:56 +0100
 comments: true
 categories: 
 ---
-_TL;DR: I tested a bunch of neural network architectures plus SVM + NB on several text clasification datasets. Results at the bottom of the post._
+_TL;DR: I tested a bunch of neural network architectures plus SVM + NB on several text classification datasets. Results at the bottom of the post._
 
 Last year I wrote a [post](http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/) about using word embeddings like word2vec or GloVe for text classification. The embeddings in my benchmarks were used in a very crude way - by averaging word vectors for all words in a document and then plugging the result into a Random Forest. Unfortunately, the resulting classifier turned out to be strictly inferior to a good old SVM except in some special circumstances (very few training examples but lots of unlabeled data).
 
