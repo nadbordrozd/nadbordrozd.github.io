@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-12-10T22:19:59+00:00</updated>
+  <updated>2017-12-13T22:35:19+00:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -4469,7 +4469,7 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
     <link href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/"/>
     <updated>2016-05-20T18:18:58+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec</id>
-    <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">here</a>.</p>
+    <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found here: <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">python2 version</a> and <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking_python3.ipynb">python3 version</a> by Marcelo Beckmann (thank you!).</p>
 
 <h4 id="motivation">Motivation</h4>
 <p>The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones.</p>
