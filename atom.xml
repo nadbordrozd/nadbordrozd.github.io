@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2019-08-11T13:50:38+01:00</updated>
+  <updated>2019-08-11T14:14:59+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -18,16 +18,16 @@
     <link href="http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/"/>
     <updated>2019-08-11T12:22:57+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science</id>
-    <content type="html"><![CDATA[<p>I recently came across several articles about failing data science projects (according to Gartner 85% big data projects are never fully productionised). The articles blame misaligned objectives, management resistance, unrealistic expectations, poor communication with stakeholders, poor data infrastructure. I think this is basically correct but it stops short of stating the ugly truth:</p>
+    <content type="html"><![CDATA[<p>I recently came across several articles about failing data science projects (according to Gartner 85% big data projects are never fully productionised). The articles blame misaligned objectives, management resistance, unrealistic expectations, poor communication with stakeholders, poor data infrastructure. I think this is basically correct but too diplomatic. Here’s what I think:</p>
 
 <blockquote>
   <p>The typical data science project doesn’t make any sense whatsoever and should never have been attempted.</p>
 </blockquote>
 
 <hr />
-<p>Data science has a huge solution-looking-for-a-problem situation going on. Enterprise managers trying to appear data-driven, startup founders wanting to impress investors with cool buzzwords and proprietary IP, young data scientists themselves itching to try the newest technique from a paper - there are a lot of people looking for an excuse to do ML/AI/DL. When they finally find it, they (or rather - <em>we</em>) don’t try too hard to see if it makes business sense. As a result, majority of data science projects never move beyond the stage of slides and jupyter notebooks.</p>
+<p>Data science has a huge solution-looking-for-a-problem situation going on. Enterprise managers trying to appear data-driven, startup founders wanting to impress investors with cool buzzwords and proprietary IP, young data scientists themselves itching to try the newest technique from a paper - there are a lot of people looking for an excuse to do ML/AI/DL. When they finally find it, they (or rather - <em>we</em>) don’t try too hard to see if it makes business sense. As a result, the majority of data science projects never move beyond the stage of slides and jupyter notebooks.</p>
 
-<p>Here is a non-exhaustive list ways how it happens:</p>
+<p>Here is my non-exhaustive classification of nonsense data sciece:</p>
 
 <h3 id="vanity-data-science">1. Vanity data science</h3>
 <p>By far the most common failure mode for a data science project is to never be productionised because of lack of infrastructure or lack of interest on the business side. These projects were only attempted because thought they sounded cool, in the complete absence of a realistic business case. This could have been avoided by asking a simple question before starting the project:</p>
