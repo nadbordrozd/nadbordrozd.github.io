@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2019-08-11T14:14:59+01:00</updated>
+  <updated>2019-08-11T14:19:53+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -27,7 +27,7 @@
 <hr />
 <p>Data science has a huge solution-looking-for-a-problem situation going on. Enterprise managers trying to appear data-driven, startup founders wanting to impress investors with cool buzzwords and proprietary IP, young data scientists themselves itching to try the newest technique from a paper - there are a lot of people looking for an excuse to do ML/AI/DL. When they finally find it, they (or rather - <em>we</em>) don’t try too hard to see if it makes business sense. As a result, the majority of data science projects never move beyond the stage of slides and jupyter notebooks.</p>
 
-<p>Here is my non-exhaustive classification of nonsense data sciece:</p>
+<p>Here is my subjective, non-exhaustive list of types of nonsense data science:</p>
 
 <h3 id="vanity-data-science">1. Vanity data science</h3>
 <p>By far the most common failure mode for a data science project is to never be productionised because of lack of infrastructure or lack of interest on the business side. These projects were only attempted because thought they sounded cool, in the complete absence of a realistic business case. This could have been avoided by asking a simple question before starting the project:</p>
