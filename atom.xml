@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2017-12-13T22:35:19+00:00</updated>
+  <updated>2019-08-11T13:50:38+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -12,6 +12,96 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[5 Types of Nonsense Data Science]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/"/>
+    <updated>2019-08-11T12:22:57+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science</id>
+    <content type="html"><![CDATA[<p>I recently came across several articles about failing data science projects (according to Gartner 85% big data projects are never fully productionised). The articles blame misaligned objectives, management resistance, unrealistic expectations, poor communication with stakeholders, poor data infrastructure. I think this is basically correct but it stops short of stating the ugly truth:</p>
+
+<blockquote>
+  <p>The typical data science project doesn’t make any sense whatsoever and should never have been attempted.</p>
+</blockquote>
+
+<hr />
+<p>Data science has a huge solution-looking-for-a-problem situation going on. Enterprise managers trying to appear data-driven, startup founders wanting to impress investors with cool buzzwords and proprietary IP, young data scientists themselves itching to try the newest technique from a paper - there are a lot of people looking for an excuse to do ML/AI/DL. When they finally find it, they (or rather - <em>we</em>) don’t try too hard to see if it makes business sense. As a result, majority of data science projects never move beyond the stage of slides and jupyter notebooks.</p>
+
+<p>Here is a non-exhaustive list ways how it happens:</p>
+
+<h3 id="vanity-data-science">1. Vanity data science</h3>
+<p>By far the most common failure mode for a data science project is to never be productionised because of lack of infrastructure or lack of interest on the business side. These projects were only attempted because thought they sounded cool, in the complete absence of a realistic business case. This could have been avoided by asking a simple question before starting the project:</p>
+
+<p><em>‘And then what?’</em></p>
+
+<p>So you apply your DBSCAN on top of your vectors from Word2Vec to assign your customers to clusters - <em>and then what?</em><br />
+Or you run sentiment analysis on all the comments on your website - <em>and then what?</em><br />
+Or you train a GAN on all the images in your database - <em>and then what?</em></p>
+
+<p><em>‘How do we productionise the result? Do we have the infrastructure for it? What will the benefit be if we manage to do it?’</em></p>
+
+<p>If the only answer is <em>‘and then we prepare slides to show to stakeholders’</em> - I suggest that we skip the ‘train the neural network’ bit and prepare the slides already. In the unlikely event that the stakeholders have a real use case for the classifier, we can start working on the use case immediately. Otherwise we move on to the next task having saved ourselves weeks, maybe months of unnecessary work.</p>
+
+<h3 id="busywork">2. Busywork</h3>
+<p>Another, less blatant way for a data science project to not make sense is for it to be sort of useful but completely not worth the effort. Like training a bespoke deep learning model to analyse 20 pages of text. Or an image quality assessment tool that saves a real estate agent 5 seconds per 1h house visit.</p>
+
+<p>The question I ask stakeholders (sometimes that means asking myself) to address this problem is:</p>
+
+<p><em>‘How much is the solution to this problem worth to you? If it’s so valuable, why haven’t you paid people to do it manually before?’</em></p>
+
+<p>The set of good answers to this question includes:</p>
+
+<p><span style="font-family:Papyrus;"><em><strong>we have</strong> been doing it manually, automating it would save us £X/year</em></span></p>
+
+<p>and</p>
+
+<p><span style="font-family:Papyrus;"> <em>we could do it manually but being able to do it in real time would be a game-changer, worth £X.</em></span></p>
+
+<h3 id="reinventing-the-wheel">3. Reinventing the wheel</h3>
+<p>A special subcategory of ‘obviously not worth it’ projects contains ones where a solution already exists in a commoditised form on AWS, GCP, Azure etc. Examples include OCR, speech to text, generic text and image classification, object detection, named entity recognition and more.</p>
+
+<p>Trying to build (for instance) a better or cheaper OCR than the one Google is selling is first of all hopeless but more importantly a distraction from your actual business (unless you’re business is selling OCR, in which case good luck!).</p>
+
+<p>I sometimes hear data scientists complaining that it’s no fun calling APIs for everything and they would rather build ML models themselves. I disagree. For one, I find solving an already solved problem depressing. Secondly, outsourcing the most generic ML tasks frees up your time to do higher-level tasks and tasks specific to your business. If you really have nothing to do in your company except for reinventing the wheel then you’re in the wrong company.</p>
+
+<h3 id="wishful-thinking">4. Wishful thinking</h3>
+<p>The flipside of Busywork Data Science is Wishful Thinking Data Science. Attacking problems that it would be fantastic to have solved but which are obviously not solvable with the given data.</p>
+
+<p>I most often see this kind of thing with predicting the future (which is the hardest period to predict).</p>
+
+<p><span style="font-family:Papyrus;">Wouldn’t it be great to know the house price index/traffic on the website/demand for a product a year in advance? Can you fit your neural network/hidden markov model to the chart with historical data to make a forecast?</span></p>
+
+<p>I can fit anything to anything but that won’t tell you much a hand-drawn trend line wouldn’t reveal. Next year’s house prices depend on a million different external political, economic and demographic factors that are either unpredictable or not predictable from price data alone. How the Prime Minister is going to handle Brexit is simply not something that can be divined from squiggly line of past house prices.</p>
+
+<p>Sometimes projects like these are pitched by naive managers and CEOs who think AI is a magic dust you can sprinkle over a problem and make the impossible possible. More often it involves people who either know the prediction won’t work or don’t care enough to find out, their only concern being whether the technology will impress the customer.</p>
+
+<h3 id="if-you-dont-know-where-youre-going-any-road-will-take-you-there">5. If you don’t know where you’re going, any road will take you there</h3>
+<p>This is when the client has a vaguely data-sciencey task but adamantly refuses to specify the objective or acceptance criteria.</p>
+
+<p>- <span style="font-family:Papyrus;">We need you to calculate a score for every company.</span><br />
+- Ok. What do you what this score to measure or predict?<br />
+- <span style="font-family:Papyrus;">Dunno. Like, how good they are?</span><br />
+- Good in what way? Good to work at? Good to invest in? A credit rating maybe?<br />
+- <span style="font-family:Papyrus;"> No, nothing mundane like that.</span><br />
+- Then what?<br />
+- <span style="font-family:Papyrus;"> You’re the data scientist, we were hoping you would tell us.</span><br />
+- …<br />
+- <span style="font-family:Papyrus;"> Be sure to include Twitter data!</span></p>
+
+<p>It’s a normal part of a data scientist’s job to act as a psychoanalyst helping the client discover and articulate what they actually want. But sometimes there is just nothing there to discover because the whole project is just an empty marketing gimmick or an exercise in bureaucratic box-checking.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>In 1985 sci-fi comedy movie Weird Science a pair of teenagers make a simulation of a perfect woman on their <a href="https://en.wikipedia.org/wiki/Memotech_MTX">home computer</a>. After they hook the computer to a plastic doll and hack into a government system, a power surge which causes the magical dream woman to <a href="https://www.youtube.com/watch?v=-UJ9K8lMxPA">come to life</a>.</p>
+
+<p>Today even small children and the elderly are familiar enough with computers to know they don’t work like that. But replace the government system with the cloud, throw in some deep learning references and you’ve got yourself a plausible 2019 movie premise.</p>
+
+<p>Bullshit data science happens because decision makers have the level of understanding of and attitude towards data science the 1980s audiences had for computers. They have unrealistic expectations, are easily bamboozled by it, don’t know how to use it and don’t trust it enough to use where it would make a real difference.</p>
+
+<p>This will eventually change the same way it did with computers in general. The current generation of data scientists will start graduating into management roles, founding their own startups, eventually retiring - same as happened with the programmers from the 1980s.</p>
+
+<p>Until then, we are going to have to fight the bullshit however we can. For data scientists themselves that entails paying more attention to the ‘why’ of what they’re doing, not just the ‘how’. And for the of clients the first step would be to involve an experienced and business savvy data scientist from the get go, to help shape what needs to be done instead of just carrying out (potentially nonsensical) orders.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison]]></title>
@@ -2873,11 +2963,11 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Datamatching Part 3: Match Scoring]]></title>
+    <title type="html"><![CDATA[Data Matching Part 3: Match Scoring]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/07/29/datamatching-part-3-match-scoring/"/>
     <updated>2016-07-29T20:39:30+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/07/29/datamatching-part-3-match-scoring</id>
-    <content type="html"><![CDATA[<p>In this post I will share some tips on the final aspect of datamatching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
+    <content type="html"><![CDATA[<p>In this post I will share some tips on the final aspect of data matching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
 
 <h3 id="recap">Recap</h3>
 <p>In the previous posts we started with two datasets “left” and “right”. Using tokenization and the magic of spark we generated for every left record a small bunch of right records that maybe correspond to it. For example this record:</p>
@@ -3014,7 +3104,7 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 
 <p>One more improvement that can take accuracy to the next level is iterative learning. You train your model, apply it and see in what situations is the classifier least confident (probability ~50%). Then you pick some of those ambiguous examples, hand-label them and add to the training set, rinse and repeat. If everything goes right, now the classifier has learned to crack previously uncrackable cases.</p>
 
-<p>This concludes my tutorial on datamatching but there is one more tip that I want to share.</p>
+<p>This concludes my tutorial on data matching but there is one more tip that I want to share.</p>
 
 <h3 id="name-similarity-trick">Name similarity trick</h3>
 <p>Levenshtein distance, Yaro-Winkler distnce etc. are great measures of edit distance but not much else. If the variation in the string you’re comparing is due to typos (<code>"Bruce Wayne"</code> -&gt; <code>"Burce Wanye"</code>) then Levenshtein is the way to go. Frequently though the variation in names has nothing to do with typos at all, there are just multiple ways people refer to the same entity. If we’re talking about companies <code>"Tesco"</code> is clearly <code>"Tesco PLC"</code> and <code>"Manchester United F.C."</code> is the same as <code>"Manchester United"</code>. Even <code>"Nadbor Consulting Company"</code> is very likely at least related to <code>"Nadbor Limited"</code> given how unique the word <code>"Nadbor"</code> is and how <code>"Limited"</code>, <code>"Company"</code> and <code>"Consulting"</code> are super common to the point of meaninglessness. No edit distance would ever figure that out because it doesn’t know anything about the nature of the strings it receives or about their frequency in the dataset.</p>
@@ -3052,11 +3142,11 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Datamatching Part 2: Spark Pipeline]]></title>
+    <title type="html"><![CDATA[Data Matching Part 2: Spark Pipeline]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/"/>
     <updated>2016-07-22T22:57:45+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline</id>
-    <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of datamatching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
+    <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of data matching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for data matching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
 
 <p>To match two datasets:</p>
 
@@ -3067,7 +3157,7 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 </ol>
 
 <h3 id="why-spark">Why spark</h3>
-<p>This datamatching algorithm could easily be implemented in the traditional single-machine, single-threaded way using a collection of hashmaps. In fact this is what I have done on more than one occasion and it worked. The advantage of spark here is built-in scalability. If your datasets get ten times bigger, just invoke spark requesting ten times as many cores. If matching is taking too long - throw some more resources at it again. In the single-threaded model all you can do is up the RAM as your data grows but the computation is taking longer and longer and there is nothing you can do about it.</p>
+<p>This data matching algorithm could easily be implemented in the traditional single-machine, single-threaded way using a collection of hashmaps. In fact this is what I have done on more than one occasion and it worked. The advantage of spark here is built-in scalability. If your datasets get ten times bigger, just invoke spark requesting ten times as many cores. If matching is taking too long - throw some more resources at it again. In the single-threaded model all you can do is up the RAM as your data grows but the computation is taking longer and longer and there is nothing you can do about it.</p>
 
 <p>As an added bonus, I discovered that the abstractions Spark forces on you - maps, joins, reduces - are actually appropriate for this problem and encourage a better design than the naive implementation.</p>
 
@@ -3476,7 +3566,7 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 <p>Glorious.</p>
 
 <h3 id="putting-it-all-together">Putting it all together</h3>
-<p>Now is the time to put “generic” back in the “generic datamatching pipeline in spark”.</p>
+<p>Now is the time to put “generic” back in the “generic data matching pipeline in spark”.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -3647,11 +3737,11 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Datamatching Part 1: Algorithm]]></title>
+    <title type="html"><![CDATA[Data Matching Part 1: Algorithm]]></title>
     <link href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/"/>
     <updated>2016-07-20T21:59:14+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1</id>
-    <content type="html"><![CDATA[<p>In this and the next post I will explain the basics of datamatching and give an implementation of a bare-bones datamatching pipeline in pyspark.</p>
+    <content type="html"><![CDATA[<p>In this and the next post I will explain the basics of data matching and give an implementation of a bare-bones data matching pipeline in pyspark.</p>
 
 <h3 id="datamatching">Datamatching</h3>
 <p>You have a dataset of - let’s say - names and addresses of some group of people. You want to enrich it with information scraped from e.g. linkedin or wikipedia. How do you figure out which scraped profiles match wich records in your database?</p>
@@ -3663,12 +3753,12 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
 <p>All of the above are specific cases of a problem that can be described as:
  <em>Finding all the pairs (groups) of records in a dataset(s) that correspond to the same real-world entity.</em></p>
 
-<p>This is what I will mean by datamatching in this post.</p>
+<p>This is what I will mean by data matching in this post.</p>
 
-<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is datamatching. Nevertheless for many usecases a DIY datamatching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
+<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is data matching. Nevertheless for many usecases a DIY data matching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
 
 <h3 id="an-example">An example</h3>
-<p>The general problem of datamatching will be easier to discuss with a specific example in mind. Here goes:</p>
+<p>The general problem of data matching will be easier to discuss with a specific example in mind. Here goes:</p>
 
 <p>You work at a company selling insurance to comic book characters. You have a database of 50.000 potential clients (these are the first 3):</p>
 
@@ -4469,7 +4559,7 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
     <link href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/"/>
     <updated>2016-05-20T18:18:58+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec</id>
-    <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found here: <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">python2 version</a> and <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking_python3.ipynb">python3 version</a> by Marcelo Beckmann (thank you!).</p>
+    <content type="html"><![CDATA[<p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found here: <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">python 2 version</a> and <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking_python3.ipynb">python 3 version</a> by Marcelo Beckmann (thank you!).</p>
 
 <h4 id="motivation">Motivation</h4>
 <p>The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones.</p>
@@ -4871,22 +4961,6 @@ Unknown are:</p>
   post</p>
 
 <p>** if there is prior knowledge regarding how the contacted companies were chosen, it can be easily incorporated</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Test Post]]></title>
-    <link href="http://nadbordrozd.github.io/blog/2015/07/26/test-post/"/>
-    <updated>2015-07-26T22:20:42+01:00</updated>
-    <id>http://nadbordrozd.github.io/blog/2015/07/26/test-post</id>
-    <content type="html"><![CDATA[<p>This is my first post. pls work pls
-This is code span (hopefully)
-<code>def fibo(n):
-	if n &lt; 2:
-		return 1
-	else:
-		return fibo(n - 1) + fibo(n - 2)
-</code></p>
 ]]></content>
   </entry>
   

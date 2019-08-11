@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Datamatching Part 3: Match Scoring - DS lore</title>
+  <title>Data Matching Part 3: Match Scoring - DS lore</title>
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="Datamatching Part 3: Match Scoring Jul 29th, 2016 8:39 pm In this post I will share some tips on the final aspect of datamatching that was glossed &hellip;">
+  <meta name="description" content="Data Matching Part 3: Match Scoring Jul 29th, 2016 8:39 pm In this post I will share some tips on the final aspect of data matching that was glossed &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">Datamatching Part 3: Match Scoring</h1>
+      <h1 class="entry-title">Data Matching Part 3: Match Scoring</h1>
     
     
       <p class="meta">
@@ -97,7 +97,7 @@
   </header>
 
 
-<div class="entry-content"><p>In this post I will share some tips on the final aspect of datamatching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
+<div class="entry-content"><p>In this post I will share some tips on the final aspect of data matching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
 
 <h3 id="recap">Recap</h3>
 <p>In the previous posts we started with two datasets “left” and “right”. Using tokenization and the magic of spark we generated for every left record a small bunch of right records that maybe correspond to it. For example this record:</p>
@@ -234,7 +234,7 @@
 
 <p>One more improvement that can take accuracy to the next level is iterative learning. You train your model, apply it and see in what situations is the classifier least confident (probability ~50%). Then you pick some of those ambiguous examples, hand-label them and add to the training set, rinse and repeat. If everything goes right, now the classifier has learned to crack previously uncrackable cases.</p>
 
-<p>This concludes my tutorial on datamatching but there is one more tip that I want to share.</p>
+<p>This concludes my tutorial on data matching but there is one more tip that I want to share.</p>
 
 <h3 id="name-similarity-trick">Name similarity trick</h3>
 <p>Levenshtein distance, Yaro-Winkler distnce etc. are great measures of edit distance but not much else. If the variation in the string you’re comparing is due to typos (<code>"Bruce Wayne"</code> -&gt; <code>"Burce Wanye"</code>) then Levenshtein is the way to go. Frequently though the variation in names has nothing to do with typos at all, there are just multiple ways people refer to the same entity. If we’re talking about companies <code>"Tesco"</code> is clearly <code>"Tesco PLC"</code> and <code>"Manchester United F.C."</code> is the same as <code>"Manchester United"</code>. Even <code>"Nadbor Consulting Company"</code> is very likely at least related to <code>"Nadbor Limited"</code> given how unique the word <code>"Nadbor"</code> is and how <code>"Limited"</code>, <code>"Company"</code> and <code>"Consulting"</code> are super common to the point of meaninglessness. No edit distance would ever figure that out because it doesn’t know anything about the nature of the strings it receives or about their frequency in the dataset.</p>
@@ -307,7 +307,7 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/" title="Previous Post: datamatching part 2: spark pipeline">&laquo; datamatching part 2: spark pipeline</a>
+        <a class="basic-alignment left" href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/" title="Previous Post: data matching part 2: spark pipeline">&laquo; data matching part 2: spark pipeline</a>
       
       
         <a class="basic-alignment right" href="/blog/2016/09/17/text-generation-with-keras-char-rnns/" title="Next Post: Text generation with Keras char-RNNs">Text generation with Keras char-RNNs &raquo;</a>
@@ -331,6 +331,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/08/11/5-types-of-nonsense-data-science/">5 Types of Nonsense Data Science</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/">What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison</a>
       </li>
     
@@ -344,10 +348,6 @@
     
       <li class="post">
         <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
       </li>
     
   </ul>
@@ -402,7 +402,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - nadbor -
+  Copyright &copy; 2019 - nadbor -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

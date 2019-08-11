@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="In this post I will share some tips on the final aspect of datamatching that was glossed over in parts 1 and 2 - scoring matches. This is maybe the &hellip;">
+  <meta name="description" content="I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -84,7 +84,687 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/07/29/datamatching-part-3-match-scoring/">Datamatching Part 3: Match Scoring</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/09/17/text-generation-with-keras-char-rnns/">Text Generation With Keras char-RNNs</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-09-17T22:17:50+01:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>10:17 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I recently bought a deep learning rig to start doing all the cool stuff people do with neural networks these days. First on the list - because it seemed easiest to implement - text generation with character-based recurrent neural networks.</p>
+
+<p><img src="/images/deep_learning_pc.png" alt="" />
+<em>watercooling, pretty lights and 2 x GTX 1080 (on the right)</em></p>
+
+<p>This topic has been widely written about by better people so if you don’t already know about char-RNNs go read them instead. <a href="http://karpathy.github.io/2015/05/21/rnn-effectiveness/">Here</a> is Andrej Karpathy’s blog post that started it all. It has an introduction to RNNs plus some <em>extremely</em> fun examples of texts generated with them. For an in depth explanation of LSTM (the specific type of RNN that everyone uses) I highly recommend <a href="http://r2rt.com/written-memories-understanding-deriving-and-extending-the-lstm.html">this</a>.</p>
+
+<p>I started playing with LSTMs by copying the <a href="https://github.com/fchollet/keras/blob/master/examples/lstm_text_generation.py">example from Keras</a>, and then I kept adding to it. First - more layers, then - training with generators instead of batch - to handle datasets that don’t fit in memory. Then a bunch of scripts for getting interesting datasets, then utilities for persisting the models and so on. I ended up with a small set of command line tools for getting the data and running the experiments that I thought may be worth sharing. <a href="https://github.com/nadbordrozd/neural_playground">Here</a> it is.</p>
+
+<h3 id="and-here-are-the-results">And here are the results</h3>
+<p>A network with 3 LSTM layers 512 units each + a dense layer trained on the trained for a week on the concatenation of all java files from the <a href="https://github.com/apache/hadoop">hadoop repository</a> produces stuff like <a href="https://github.com/nadbordrozd/neural_playground/blob/master/output/hadoop.java">this</a>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+<span class="line-number">74</span>
+<span class="line-number">75</span>
+<span class="line-number">76</span>
+<span class="line-number">77</span>
+<span class="line-number">78</span>
+<span class="line-number">79</span>
+<span class="line-number">80</span>
+<span class="line-number">81</span>
+<span class="line-number">82</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line">  <span class="nd">@Override</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setPerDispatcher</span><span class="o">(</span>
+</span><span class="line">      <span class="n">MockAM</span> <span class="n">nn1</span><span class="o">,</span> <span class="n">String</span> <span class="n">queue</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">app1</span><span class="o">.</span><span class="na">getAppAttemptId</span><span class="o">()).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">defaultSize</span><span class="o">);</span>
+</span><span class="line">    <span class="n">menlined</span><span class="o">.</span><span class="na">incr</span><span class="o">();</span>
+</span><span class="line">      <span class="n">assertLaunchRMNodes</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="s">&quot;AM.2.0 scheduler event&quot;</span><span class="o">);</span>
+</span><span class="line">      <span class="n">store</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Test</span><span class="o">(</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">5000</span><span class="o">)</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testAllocateBoths</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">RMAppAttemptContainer</span> <span class="n">event</span> <span class="o">=</span>
+</span><span class="line">        <span class="k">new</span> <span class="nf">RMAppStatusesStatus</span><span class="o">(</span><span class="n">csConf</span><span class="o">);</span>
+</span><span class="line">    <span class="kd">final</span> <span class="n">ApplicationAttemptId</span> <span class="n">applicationRetry</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">StatusInfo</span><span class="o">(</span><span class="n">appAttempt</span><span class="o">.</span><span class="na">getAppAttemptId</span><span class="o">(),</span> <span class="kc">null</span><span class="o">,</span>
+</span><span class="line">        <span class="n">RMAppEventType</span><span class="o">.</span><span class="na">APP_ENTITY</span><span class="o">,</span>
+</span><span class="line">        <span class="n">RMAppEventType</span><span class="o">.</span><span class="na">NODE</span>
+</span><span class="line">                  <span class="n">currentFinalBuffer</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">rm</span><span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class="line">    <span class="n">assertEquals</span><span class="o">(</span><span class="n">memory</span> <span class="o">&gt;</span> <span class="n">queue</span><span class="o">.</span><span class="na">getAbsolutePreemptionCount</span><span class="o">(),</span> <span class="kc">true</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">sched</span> <span class="o">=</span> <span class="n">putQueueScheduler</span><span class="o">();</span>
+</span><span class="line">    <span class="n">webServiceEvent</span><span class="o">.</span><span class="na">awaitTrackedState</span><span class="o">(</span><span class="k">new</span> <span class="nf">YarnApplicationAttemptEvent</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">      <span class="nd">@Override</span>
+</span><span class="line">      <span class="kd">public</span> <span class="n">RMAppEvent</span> <span class="nf">applicationAttemptId</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="o">(</span><span class="n">ApplicationNumMBean</span><span class="o">)</span> <span class="n">response</span><span class="o">.</span><span class="na">getNode</span><span class="o">(</span><span class="n">appAttemptId</span><span class="o">);</span>
+</span><span class="line">      <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">        <span class="k">return</span> <span class="k">try</span><span class="o">;</span>
+</span><span class="line">      <span class="o">}</span>
+</span><span class="line">    <span class="o">});</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Test</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testApplicationOverConfigurationHreserved</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">throw</span> <span class="k">new</span> <span class="nf">StrongResponseException</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Override</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setMediaType</span><span class="o">(</span><span class="n">Angate</span><span class="o">.</span><span class="na">ASQUEUTTED</span><span class="o">,</span> <span class="kt">int</span> <span class="n">cellReplication</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">ApplicationAttemptStatus</span><span class="o">[]</span> <span class="n">url</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">YarnApplicationStatus</span><span class="o">(</span><span class="n">ContainerEventHandler</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">scheduler</span><span class="o">).</span><span class="na">getFailSet</span><span class="o">(</span><span class="n">nnApplicationRef</span><span class="o">,</span> <span class="mi">1</span><span class="o">)</span>
+</span><span class="line">        <span class="o">.</span><span class="na">handle</span><span class="o">(</span><span class="kc">false</span><span class="o">);</span>
+</span><span class="line">    <span class="n">RMAppAttemptAttemptRMState</span> <span class="n">status</span> <span class="o">=</span> <span class="n">spy</span><span class="o">(</span><span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">ApplicationAttemptId</span><span class="o">,</span> <span class="n">RMAppEvent</span><span class="o">&gt;());</span>
+</span><span class="line">    <span class="n">testAppManagerManager</span><span class="o">(</span><span class="n">RMAppAttempt</span><span class="o">.</span><span class="na">getApplicationQueueEnabledAndTavanatationFrom</span><span class="o">(),</span> <span class="mi">2</span><span class="o">);</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/**</span>
+</span><span class="line"><span class="cm">   * Whether of spy a stite and heat by Mappings</span>
+</span><span class="line"><span class="cm">   */</span>
+</span><span class="line">  <span class="nd">@Test</span> <span class="o">(</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">60000</span><span class="o">)</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testFences</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">scheduler</span><span class="o">.</span><span class="na">getRMApp</span><span class="o">(</span>
+</span><span class="line">          <span class="kc">false</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">.</span><span class="na">getApplicationAttempt</span><span class="o">());</span>
+</span><span class="line">    <span class="n">ApplicationAttemptEvent</span> <span class="n">attempt</span> <span class="o">=</span> <span class="k">new</span> <span class="nf">MomaRMApplicationAttemptAttemptEvent</span><span class="o">(</span><span class="n">applicationAttempt</span><span class="o">.</span><span class="na">getApplicationAttemptId</span><span class="o">(),</span> <span class="kc">null</span><span class="o">);</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">conf</span><span class="o">.</span><span class="na">setBoolean</span><span class="o">(</span><span class="n">rmContainer</span><span class="o">.</span><span class="na">getAttemptState</span><span class="o">());</span>
+</span><span class="line">    <span class="n">conf</span><span class="o">.</span><span class="na">setNodeAttemptId</span><span class="o">(</span><span class="n">conf</span><span class="o">);</span>
+</span><span class="line">    <span class="n">RMAppStateChange</span> <span class="n">context</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</span><span class="line">    <span class="n">containersPublishEventPBHandler</span><span class="o">.</span><span class="na">registerNode</span><span class="o">((</span><span class="n">FinalApplicationHistoryArgument</span><span class="o">)</span> <span class="n">relatedVirtualCores</span><span class="o">);</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">static</span> <span class="kd">static</span> <span class="kd">class</span> <span class="nc">DuvalivedAppResourceUsage</span> <span class="o">{</span>
+</span><span class="line">    <span class="c1">// Test</span>
+</span><span class="line">    <span class="n">rm1</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="nf">UserGroupInformation</span><span class="o">());</span>
+</span><span class="line">    <span class="n">vrainedApplicationTokenUrl</span><span class="o">.</span><span class="na">await</span><span class="o">(</span><span class="kc">null</span><span class="o">);</span>
+</span><span class="line">    <span class="n">currentHttpState</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="na">getTokenService</span><span class="o">();</span>
+</span><span class="line">    <span class="n">nitel</span><span class="o">.</span><span class="na">authentication</span><span class="o">();</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="nd">@Override</span>
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setEntityForRowEventUudingInVersion</span><span class="o">(</span><span class="kt">int</span> <span class="n">applicationAttemptId</span><span class="o">)</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">throw</span> <span class="k">new</span> <span class="nf">UnsupportedOperationException</span><span class="o">(</span><span class="s">&quot;So mock capability&quot;</span><span class="o">,</span> <span class="n">testCaseAccept</span><span class="o">).</span><span class="na">getName</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;/list.out&quot;</span><span class="o">;</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setSchedulerAppTestsBufferWithClusterMasterReconfiguration</span><span class="o">()</span> <span class="o">{</span>
+</span><span class="line">    <span class="c1">// event zips and allocate gremb attempt date this</span>
+</span><span class="line">    <span class="n">when</span><span class="o">(</span><span class="n">scheduler</span><span class="o">.</span><span class="na">getFinishTime</span><span class="o">())</span>
+</span><span class="line">      <span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">getQueue</span><span class="o">(</span><span class="s">&quot;metrics&quot;</span><span class="o">).</span><span class="na">newSchedulingProto</span><span class="o">(</span>
+</span><span class="line">        <span class="s">&quot;&lt;x-MASTERATOR new this attempt &quot;</span><span class="o">+</span><span class="s">&quot;ClientToRemovedResourceRasheder&quot;</span><span class="o">,</span> <span class="n">taskDispatcher</span><span class="o">),</span>
+</span><span class="line">        <span class="n">server</span><span class="o">.</span><span class="na">getBarerSet</span><span class="o">());</span>
+</span><span class="line">  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That’s pretty believable java if you don’t look too closely! It’s important to remember that this is a character-level model. It doesn’t just assemble previously encountered tokens together in some new order. It hallucinates everything from ground up. For example <code>setSchedulerAppTestsBufferWithClusterMasterReconfiguration()</code> is sadly not a real function in hadoop codebase. Although it very well could be and it wouldn’t stand out among all the other monstrous names like <code>RefreshAuthorazationPolicyProtocolServerSideTranslatorPB</code>. Which was exactly the point of this exercise.</p>
+
+<p>Sometimes the network decides that it’s time for a new file and then it produces the Apache software licence varbatim followed by a million lines of imports:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+</pre></td><td class="code"><pre><code class="java"><span class="line"><span class="cm">/**</span>
+</span><span class="line"><span class="cm"> * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);</span>
+</span><span class="line"><span class="cm"> * you may not use this file except in compliance with the License.</span>
+</span><span class="line"><span class="cm"> * You may obtain a copy of the License at</span>
+</span><span class="line"><span class="cm"> *</span>
+</span><span class="line"><span class="cm"> *   http://www.apache.org/licenses/LICENSE-2.0</span>
+</span><span class="line"><span class="cm"> *</span>
+</span><span class="line"><span class="cm"> * Unless required by applicable law or agreed to in writing, software</span>
+</span><span class="line"><span class="cm"> * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,</span>
+</span><span class="line"><span class="cm"> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+</span><span class="line"><span class="cm"> * See the License for the specific language governing permissions and</span>
+</span><span class="line"><span class="cm"> * limitations under the License.</span>
+</span><span class="line"><span class="cm"> */</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">apache</span><span class="o">.</span><span class="na">hadoop</span><span class="o">.</span><span class="na">yarn</span><span class="o">.</span><span class="na">api</span><span class="o">.</span><span class="na">records</span><span class="o">.</span><span class="na">ApplicationResourcementRequest</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.service.Notify</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.api.protocolrecords.AllocationWrapperStatusYarnState</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.authentication.RMContainerAttempt</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.metrics.YarnScheduler</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.cookie.test.MemoryWUTIMPUndatedMetrics</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.records.Resources</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.fimat.GetStore</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.state.TokenAddrWebKey</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.rmapp.attempt.attempt.SchedulerUtils</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.handle.Operator</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.rmapp.RMAppAttemptAppList</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.security.AMRequest</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.metrics.RMApplicationCluster</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.protocolrecords.NMContainerEvent</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.nodelabels.RMContainer</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.server.security.WebAppEvent</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.records.ContainerException</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.store.FailAMState</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.creater.SchedulerEvent</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.ndated.common.Priority</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.api.records.AppAttemptStateUtils</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.da.RM3</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.rmapp.rtbase.ExapplicatesTrackerService</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.timelineservice.security.Capability</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.AM</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.scheduler.container.KillLocalData</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">org.apache.hadoop.yarn.server.resourcemanager.state.ContainerHIP</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.xml.am.resource.state.UndecomponentScheduler</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.servlet.NMElement</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.servlet.ArgumentSubmissionContext</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.security.servlet.KILLeaseWriter</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">javax.lang.authenticatenators.DALER</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Arrays</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.concurrent.StringUtils</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Collection</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Iterator</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.HashSet</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Random</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.concurrent.TimelineInitializer</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.concurrent.atomic.AtomicLong</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+</span><span class="line">
+</span><span class="line"><span class="kn">import</span> <span class="nn">com.google.common.annotations.VisibleUtils</span><span class="o">;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>At first I thought this was a glitch, a result of the network is getting stuck in one state. But then I checked and - no, actually this is exactly what those hadoop .java files look like, 50 lines is a completely unexceptional amount of imports. And again, most of those imports are made up.</p>
+
+<p>And <a href="https://github.com/nadbordrozd/neural_playground/blob/master/output/sklearn.py">here’s</a> a bunch of python code dreamt up by a network trained on scikit-learn <a href="https://github.com/scikit-learn/scikit-learn">repository</a>.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">nose.tools</span> <span class="kn">import</span> <span class="n">assert_almost_equal</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.datasets</span> <span class="kn">import</span> <span class="n">regularization</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">DataStringIO</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics.compatibility</span> <span class="kn">import</span> <span class="n">Parameters</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">test_range</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.linear_model.Dictionary</span> <span class="kn">import</span> <span class="n">Dictionary</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.distance</span> <span class="kn">import</span> <span class="n">cOST_RORG</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">LabelBineration</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">os</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">TKError</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">datasets</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.externals.six</span> <span class="kn">import</span> <span class="n">LinearSVC</span>
+</span><span class="line"><span class="c"># Test the hash to a file was that bug the many number be as constructor.</span>
+</span><span class="line"><span class="c"># Make a classification case for set are indicator.</span>
+</span><span class="line">
+</span><span class="line"><span class="n">Examples</span>
+</span><span class="line">    <span class="o">--------</span>
+</span><span class="line">
+</span><span class="line"><span class="p">(</span>
+</span><span class="line">        <span class="n">Parameters</span>
+</span><span class="line">        <span class="o">----------</span>
+</span><span class="line">        <span class="kn">import</span> <span class="nn">sys</span>
+</span><span class="line">        <span class="n">y</span> <span class="o">=</span> <span class="n">filename</span>
+</span><span class="line">        <span class="c"># Closed&#39;</span>
+</span><span class="line">        <span class="n">total_best</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_proba</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mf">0.10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="s">&#39;all&#39;</span><span class="p">,</span> <span class="n">max_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">clf</span> <span class="o">=</span> <span class="n">Pickler</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float34</span><span class="p">)</span>
+</span><span class="line">    <span class="n">correct_set_using_MACHITER_LIVER_SPY</span> <span class="o">=</span> <span class="n">WORD_INL_OXITIMATION_DER</span>
+</span><span class="line">    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Ardument SVD: Pimsha, Moved and More an array&quot;</span><span class="p">)</span>
+</span><span class="line">    <span class="n">assert_true</span><span class="p">((</span><span class="s">&#39;g&#39;</span> <span class="o">*</span> <span class="n">GramCAXSORS</span><span class="p">))</span>
+</span><span class="line">    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Transformer areair not sparse &quot;</span>
+</span><span class="line">                              <span class="s">&quot;memory&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s">&#39;urllib_split&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
+</span><span class="line">                     <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">n_features</span><span class="p">),</span>
+</span><span class="line">                                    <span class="k">if</span> <span class="n">that</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">param_range</span><span class="o">=</span><span class="s">&quot;name&quot;</span>
+</span><span class="line">
+</span><span class="line">                        <span class="n">assert_equal</span><span class="p">(</span><span class="n">decision_function</span><span class="p">,</span> <span class="s">&quot;&#39;)</span>
+</span><span class="line">
+</span><span class="line">                <span class="k">return</span> <span class="n">BaseCompiler</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">return_path</span><span class="o">=</span><span class="s">&#39;alpha&#39;</span><span class="p">,</span>
+</span><span class="line">                                                                                                         <span class="n">sample_weight</span><span class="o">=</span><span class="n">n_nodes</span><span class="p">,</span>
+</span><span class="line">                                                                                                                                                     <span class="n">axis</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;arpack&#39;</span><span class="p">,</span>
+</span><span class="line">                                                                              <span class="nb">isinstance</span><span class="p">(</span><span class="o">%</span><span class="n">s</span> <span class="n">Early</span> <span class="n">produced</span><span class="o">.</span><span class="s">&quot;)</span>
+</span><span class="line">
+</span><span class="line">            <span class="n">starts</span><span class="o">.</span><span class="n">attrgetter</span><span class="p">(</span><span class="n">output_method_regression</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;test&#39;</span><span class="p">)</span>
+</span><span class="line">            <span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+</span><span class="line">            <span class="n">new_params</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">beck</span>
+</span><span class="line">            <span class="c"># The implementation of the module distribution cases and classifiers are specified to chenk the file</span>
+</span><span class="line">            <span class="bp">self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">embedding</span>
+</span><span class="line">            <span class="k">return</span> <span class="n">_argment</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">_item</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">_predict_proba</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+</span><span class="line">        <span class="k">print</span><span class="p">(</span><span class="s">&#39;Calibration in wrapper file may be</span>
+</span><span class="line">                                       <span class="s">&#39;grid_search&#39;</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">_build_adjust_size</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">target_conot</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="n">toem</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+</span><span class="line">        <span class="n">support_</span><span class="o">-</span><span class="n">_given_build_rese_unlib</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This is much lower quality because the network was smaller and sklearn’s codebase is much smaller than that of hadoop. I’m sure there is a witty comment about the quality of code in those two repositories somewhere in there.</p>
+
+<p>And <a href="https://github.com/scalaz/scalaz">here’s</a> the result of training on the <a href="https://github.com/scalaz/scalaz">scalaz repository</a>:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+<span class="line-number">50</span>
+<span class="line-number">51</span>
+<span class="line-number">52</span>
+<span class="line-number">53</span>
+<span class="line-number">54</span>
+<span class="line-number">55</span>
+<span class="line-number">56</span>
+<span class="line-number">57</span>
+<span class="line-number">58</span>
+<span class="line-number">59</span>
+<span class="line-number">60</span>
+<span class="line-number">61</span>
+<span class="line-number">62</span>
+<span class="line-number">63</span>
+<span class="line-number">64</span>
+<span class="line-number">65</span>
+<span class="line-number">66</span>
+<span class="line-number">67</span>
+<span class="line-number">68</span>
+<span class="line-number">69</span>
+<span class="line-number">70</span>
+<span class="line-number">71</span>
+<span class="line-number">72</span>
+<span class="line-number">73</span>
+</pre></td><td class="code"><pre><code class="scala"><span class="line"><span class="k">private</span> <span class="k">trait</span> <span class="nc">BijectionTContravariant</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">G</span><span class="o">[</span><span class="k">_</span><span class="o">]]</span> <span class="nc">extends</span> <span class="nc">Comonad</span><span class="o">[</span><span class="kt">Coproduct</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">G</span>, <span class="kt">?</span><span class="o">]]</span> <span class="k">with</span> <span class="nc">CoproductFoldable1</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">G</span><span class="o">]</span> <span class="o">{</span>
+</span><span class="line">  <span class="k">implicit</span> <span class="k">def</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Traverse1</span><span class="o">[</span><span class="kt">F</span><span class="o">]</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">traverse1Impl</span><span class="o">[</span><span class="kt">G</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">OneOr</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">G</span><span class="o">[</span><span class="kt">B</span><span class="o">])(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Traverse</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span>
+</span><span class="line">    <span class="n">G</span><span class="o">.</span><span class="n">apply2</span><span class="o">(</span><span class="n">fa</span><span class="o">.</span><span class="n">foldMap</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">f</span><span class="o">))(</span><span class="n">F</span><span class="o">.</span><span class="n">append</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">),</span> <span class="n">f</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** Collect `Coproduct[F, G, A]` is the given context `F` */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">uncontra1_</span><span class="o">[</span><span class="kt">F</span><span class="o">[</span><span class="k">_</span><span class="o">]</span>, <span class="kt">G</span><span class="o">[</span><span class="k">_</span><span class="o">]](</span><span class="k">implicit</span> <span class="n">G0</span><span class="k">:</span> <span class="kt">Foldable1</span><span class="o">[</span><span class="kt">G</span><span class="o">])</span><span class="k">:</span> <span class="kt">Foldable1</span><span class="o">[</span><span class="kt">l</span><span class="o">[</span><span class="kt">a</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="kt">F</span><span class="o">[</span><span class="kt">a</span><span class="o">]</span>, <span class="kt">G</span><span class="o">[</span><span class="kt">a</span><span class="o">])]]</span> <span class="k">=</span>
+</span><span class="line">    <span class="k">new</span> <span class="nc">ProductCozip</span><span class="o">[</span><span class="kt">F</span>, <span class="kt">G</span><span class="o">]</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">implicit</span> <span class="k">def</span> <span class="n">F</span> <span class="k">=</span> <span class="n">self</span>
+</span><span class="line">      <span class="k">implicit</span> <span class="k">def</span> <span class="n">G</span> <span class="k">=</span> <span class="n">G0</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/**Like `Foldable1[F]` is the zipper instance to a `Zip` */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">indexOf</span><span class="o">[</span><span class="kt">A</span> <span class="k">&gt;:</span> <span class="kt">A2</span> <span class="k">&lt;:</span> <span class="kt">A1:</span> <span class="kt">Boolean</span><span class="o">](</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Functor</span><span class="o">[</span><span class="kt">F</span><span class="o">])</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">Boolean</span><span class="o">]</span> <span class="k">=</span>
+</span><span class="line">    <span class="n">F</span><span class="o">.</span><span class="n">empty</span><span class="o">[</span><span class="kt">A</span><span class="o">].</span><span class="n">leftMap</span><span class="o">(</span><span class="n">implicitly</span><span class="o">[</span><span class="kt">A</span> <span class="kt">&lt;~&lt;</span> <span class="kt">A</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">extendsInstance</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="o">-/(</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=</span> <span class="n">l</span><span class="o">.</span><span class="n">toList</span>
+</span><span class="line">  <span class="cm">/** A version of `zip` that all of the underlying value if the new `Maybe` to the errors */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">index</span><span class="o">[</span><span class="kt">A</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">self</span><span class="o">.</span><span class="n">subForest</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="n">as</span><span class="o">,</span> <span class="n">empty</span><span class="o">[</span><span class="kt">A</span><span class="o">])((</span><span class="n">x</span><span class="o">,</span> <span class="n">y</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">x</span> <span class="o">+:</span> <span class="n">x</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** See `Maybe` is run and then the success of this disjunction. */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">orElse</span><span class="o">[</span><span class="kt">A</span> <span class="k">&gt;:</span> <span class="kt">A2</span> <span class="k">&lt;:</span> <span class="kt">A1:</span> <span class="kt">Falider</span> <span class="kt">=</span> <span class="kt">Traverse</span><span class="o">[</span><span class="kt">Applicative</span><span class="o">]](</span><span class="n">fa</span> <span class="k">=&gt;</span> <span class="n">apply</span><span class="o">(</span><span class="n">a</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">emptyDequeue</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span><span class="k">:</span> <span class="kt">A</span> <span class="o">==&gt;&gt;</span> <span class="n">B</span> <span class="k">=</span>
+</span><span class="line">    <span class="n">foldRight</span><span class="o">(</span><span class="n">as</span><span class="o">)(</span><span class="n">f</span><span class="o">)</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">override</span> <span class="k">def</span> <span class="n">foldLeft</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">z</span><span class="k">:</span> <span class="kt">B</span><span class="o">)(</span><span class="n">f</span><span class="k">:</span> <span class="o">(</span><span class="kt">B</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span>
+</span><span class="line">    <span class="n">fa</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="n">map</span><span class="o">(</span><span class="n">fa</span><span class="o">)(</span><span class="n">self</span><span class="o">)(</span><span class="n">f</span><span class="o">))</span>
+</span><span class="line">  <span class="k">override</span> <span class="k">def</span> <span class="n">foldMap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">F</span><span class="o">.</span><span class="n">traverseTree</span><span class="o">(</span><span class="n">foldMap1</span><span class="o">(</span><span class="k">_</span><span class="o">)(</span><span class="n">f</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">traverse</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">B</span><span class="o">]</span> <span class="k">=</span>
+</span><span class="line">    <span class="n">F</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))(</span><span class="n">M</span><span class="o">.</span><span class="n">point</span><span class="o">(</span><span class="n">z</span><span class="o">))</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** A view for a `Coproduct[F, G, A]` that the folded. */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">foldMapRight1</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">F</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">f</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="k">implicit</span> <span class="n">F</span><span class="k">:</span> <span class="kt">Monoid</span><span class="o">[</span><span class="kt">B</span><span class="o">])</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class="line">    <span class="k">def</span> <span class="n">option</span><span class="k">:</span> <span class="kt">Tree</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Some</span><span class="o">(</span><span class="n">none</span>
+</span><span class="line">    <span class="k">def</span> <span class="n">streamThese</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">a</span><span class="k">:</span> <span class="kt">A</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="k">=</span> <span class="n">r</span><span class="o">.</span><span class="n">toVector</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">oneOr</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">IndSeq</span><span class="o">[</span><span class="kt">A</span><span class="o">]]</span> <span class="k">=</span>
+</span><span class="line">    <span class="k">if</span> <span class="o">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">)</span> <span class="nc">Some</span><span class="o">((</span><span class="nc">Some</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))))</span> <span class="nc">List</span><span class="o">(</span><span class="n">s</span><span class="o">.</span><span class="n">take</span><span class="o">(</span><span class="n">n</span><span class="o">))</span>
+</span><span class="line">        <span class="o">)</span>
+</span><span class="line">        <span class="k">else</span> <span class="o">{</span>
+</span><span class="line">          <span class="n">loop</span><span class="o">(</span><span class="n">l</span><span class="o">.</span><span class="n">size</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class="line">            <span class="k">case</span> <span class="o">\/-(</span><span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
+</span><span class="line">            <span class="k">case</span> <span class="nc">One</span><span class="o">(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">Tranc</span><span class="o">(</span><span class="n">fa</span><span class="o">))</span>        <span class="k">=&gt;</span> <span class="nc">Coproduct</span><span class="o">((</span><span class="n">a</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">empty</span><span class="o">[</span><span class="kt">A</span><span class="o">],</span> <span class="n">none</span><span class="o">,</span> <span class="n">b</span><span class="o">)))</span>
+</span><span class="line">  <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="cm">/** Set that infers the first self. */</span>
+</span><span class="line">  <span class="k">def</span> <span class="n">invariantFunctor</span><span class="o">[</span><span class="kt">A:</span> <span class="kt">Arbitrary</span><span class="o">]</span><span class="k">:</span> <span class="kt">Arbitrary</span><span class="o">[</span><span class="kt">Tree</span><span class="o">[</span><span class="kt">A</span><span class="o">]]</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">OrdSeq</span><span class="o">[</span><span class="kt">A</span><span class="o">]</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">def</span> <span class="n">foldMap</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">fa</span><span class="k">:</span> <span class="kt">List</span><span class="o">[</span><span class="kt">A</span><span class="o">])(</span><span class="n">z</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=&gt;</span> <span class="n">B</span><span class="o">)(</span><span class="n">f</span><span class="k">:</span> <span class="o">(</span><span class="kt">B</span><span class="o">,</span> <span class="kt">A</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">B</span><span class="o">)</span><span class="k">:</span> <span class="kt">B</span> <span class="o">=</span>
+</span><span class="line">        <span class="n">fa</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class="line">          <span class="k">case</span> <span class="nc">Tip</span><span class="o">()</span> <span class="k">=&gt;</span>
+</span><span class="line">            <span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">)</span> <span class="o">&gt;&gt;</span> <span class="n">optionM</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))</span>
+</span><span class="line">            <span class="k">case</span> <span class="o">-\/(</span><span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Some</span><span class="o">((</span><span class="n">a</span><span class="o">,</span> <span class="n">b</span><span class="o">))</span>
+</span><span class="line">            <span class="k">case</span> <span class="o">\/-(</span><span class="n">b</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="nc">Success</span><span class="o">(</span><span class="n">b</span><span class="o">)</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">    <span class="o">}</span>
+</span><span class="line">
+</span><span class="line">  <span class="k">def</span> <span class="n">elementPLens</span><span class="o">[</span><span class="kt">A</span>, <span class="kt">B</span><span class="o">](</span><span class="n">lens</span><span class="k">:</span> <span class="kt">ListT</span><span class="o">[</span><span class="kt">Id</span>, <span class="kt">A</span><span class="o">])</span><span class="k">:</span> <span class="kt">A</span> <span class="o">=</span>
+</span><span class="line">    <span class="n">s</span> <span class="n">until</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class="line">      <span class="k">case</span> <span class="nc">None</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">s</span><span class="o">,</span> <span class="n">b</span><span class="o">)</span>
+</span><span class="line">      <span class="k">case</span> <span class="o">-\/(</span><span class="n">a</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span><span class="line">        <span class="n">F</span><span class="o">.</span><span class="n">toFingerTree</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">bind</span><span class="o">(</span><span class="n">f</span><span class="o">(</span><span class="n">a</span><span class="o">))(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">Stream</span><span class="o">.</span><span class="n">cons</span><span class="o">(</span><span class="n">fa</span><span class="o">.</span><span class="n">tail</span><span class="o">,</span> <span class="n">as</span><span class="o">(</span><span class="n">i</span><span class="o">))))</span>
+</span><span class="line">
+</span><span class="line">                <span class="n">fingerTreeOptionFingerTree</span><span class="o">[</span><span class="kt">V</span>, <span class="kt">A</span><span class="o">](</span><span class="n">k</span><span class="o">)</span>
+</span><span class="line">          <span class="n">tree</span><span class="o">.</span><span class="n">foldMap</span><span class="o">(</span><span class="n">self</span><span class="o">)(</span><span class="n">f</span><span class="o">)</span>
+</span><span class="line">        <span class="o">}</span>
+</span><span class="line">      <span class="o">)</span>
+</span><span class="line">    <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>In equal measure elegant and incomprehensible. Just like real scalaz.</p>
+
+<p>Enough with the github. How about we try some literature? Here’s LSTM-generated Jane Austen:</p>
+
+<blockquote>
+  <p>“I wish I had not been satisfied with the other thing.”</p>
+
+  <p>“Do you think you have not the party in the world who has been a great deal of more agreeable young ladies to be got on to Miss Tilney’s happiness to Miss Tilney. They were only to all all the rest of the same day. She was gone away in her
+mother’s drive, but she had not passed the rest. They were to be already ready to be a good deal of service the appearance of the house, was discouraged to be a great deal to say, “I do not think I have been able to do them in Bath?”</p>
+
+  <p>“Yes, very often to have a most complaint, and what shall I be to her a great deal of more advantage in the garden, and I am sure you have come at all the proper and the entire of his side for the conversation of Mr. Tilney, and he was satisfied with the door, was sure her situation was soon getting to be a decided partner to her and her father’s circumstances. They were offended to her, and they were all
+the expenses of the books, and was now
+perfectly much at Louisa the sense of the family of the compliments in the room. The arrival was to be more good.</p>
+</blockquote>
+
+<p>That was ok but let’s try something more modern. And what better represents modernity than people believing that the earth is flat. I have scraped all the top level comments from top 500 youtube videos matching the query “flat earth”. <a href="https://github.com/nadbordrozd/neural_playground/blob/master/getting_data/youtube_comments.py">Here</a> is the comments scraper I made for this. And here is the neural network spat out after ingesting 10MB worth of those comments</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">[James Channel]:    I am a fucking Antarctica in the Bible in the Bible and the REAL Angel
+</span><span class="line">of God, the Fact the Moon and Sun is NOT flat and the moon is not flat.
+</span><span class="line">The ice wall below the earth is flat and it is the round earth is the
+</span><span class="line">earth is flat.
+</span><span class="line">[Mark Filler]:    The Earth is flat with your stupid Qur&#39;an and Christ And I can watch the
+</span><span class="line">truth of crazy and the earth is a curve flat then why do we have to
+</span><span class="line">discover the earth flat?
+</span><span class="line">[James Channel]:    I don&#39;t know what we do not get the communication and the earth and the
+</span><span class="line">center of the earth is just a globe because the earth is not flat. The
+</span><span class="line">earth is round and why is the sun and the sun would be a flat disc and the
+</span><span class="line">earth is flat?
+</span><span class="line">[Mark Lanz]:    I am a Flat Earther and I can see the truth that was not the reason the
+</span><span class="line">ship is the sun and the South Pole in the last of the world and the size of
+</span><span class="line">the earth and the moon is the same formation that we can fly around the
+</span><span class="line">earth and do the moon the earth is flat is the disk??
+</span><span class="line">[Bone City]:    I can see the sun end of the sun and sun with the edge of the earth.
+</span><span class="line">[Star Call]:    The Earth is flat, it is a flat earth theory that are the problems to go
+</span><span class="line">there and the Earth is flat. So all the way to the Earth and the
+</span><span class="line">Earth. FLAT EARTH IS FLAT THE EARTH IS FLAT.... I HAVE BECAUSE THE SULLARS WITH A SPACE THE EARTH IS FLAT!!!
+</span><span class="line">[MrJohnny]:    I am the truth that is bullshit lol
+</span><span class="line">[Jesse Cack]:    Great job God bless you for this video
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>That doesn’t make any sense at all. It’s so much like real youtube comments it’s uncanny.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/07/29/datamatching-part-3-match-scoring/">Data Matching Part 3: Match Scoring</a></h1>
     
     
       <p class="meta">
@@ -100,7 +780,7 @@
   </header>
 
 
-  <div class="entry-content"><p>In this post I will share some tips on the final aspect of datamatching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
+  <div class="entry-content"><p>In this post I will share some tips on the final aspect of data matching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
 
 <h3 id="recap">Recap</h3>
 <p>In the previous posts we started with two datasets “left” and “right”. Using tokenization and the magic of spark we generated for every left record a small bunch of right records that maybe correspond to it. For example this record:</p>
@@ -237,7 +917,7 @@
 
 <p>One more improvement that can take accuracy to the next level is iterative learning. You train your model, apply it and see in what situations is the classifier least confident (probability ~50%). Then you pick some of those ambiguous examples, hand-label them and add to the training set, rinse and repeat. If everything goes right, now the classifier has learned to crack previously uncrackable cases.</p>
 
-<p>This concludes my tutorial on datamatching but there is one more tip that I want to share.</p>
+<p>This concludes my tutorial on data matching but there is one more tip that I want to share.</p>
 
 <h3 id="name-similarity-trick">Name similarity trick</h3>
 <p>Levenshtein distance, Yaro-Winkler distnce etc. are great measures of edit distance but not much else. If the variation in the string you’re comparing is due to typos (<code>"Bruce Wayne"</code> -&gt; <code>"Burce Wanye"</code>) then Levenshtein is the way to go. Frequently though the variation in names has nothing to do with typos at all, there are just multiple ways people refer to the same entity. If we’re talking about companies <code>"Tesco"</code> is clearly <code>"Tesco PLC"</code> and <code>"Manchester United F.C."</code> is the same as <code>"Manchester United"</code>. Even <code>"Nadbor Consulting Company"</code> is very likely at least related to <code>"Nadbor Limited"</code> given how unique the word <code>"Nadbor"</code> is and how <code>"Limited"</code>, <code>"Company"</code> and <code>"Consulting"</code> are super common to the point of meaninglessness. No edit distance would ever figure that out because it doesn’t know anything about the nature of the strings it receives or about their frequency in the dataset.</p>
@@ -283,7 +963,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/">Datamatching Part 2: Spark Pipeline</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/">Data Matching Part 2: Spark Pipeline</a></h1>
     
     
       <p class="meta">
@@ -299,7 +979,7 @@
   </header>
 
 
-  <div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of datamatching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
+  <div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of data matching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for data matching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
 
 <p>To match two datasets:</p>
 
@@ -310,7 +990,7 @@
 </ol>
 
 <h3 id="why-spark">Why spark</h3>
-<p>This datamatching algorithm could easily be implemented in the traditional single-machine, single-threaded way using a collection of hashmaps. In fact this is what I have done on more than one occasion and it worked. The advantage of spark here is built-in scalability. If your datasets get ten times bigger, just invoke spark requesting ten times as many cores. If matching is taking too long - throw some more resources at it again. In the single-threaded model all you can do is up the RAM as your data grows but the computation is taking longer and longer and there is nothing you can do about it.</p>
+<p>This data matching algorithm could easily be implemented in the traditional single-machine, single-threaded way using a collection of hashmaps. In fact this is what I have done on more than one occasion and it worked. The advantage of spark here is built-in scalability. If your datasets get ten times bigger, just invoke spark requesting ten times as many cores. If matching is taking too long - throw some more resources at it again. In the single-threaded model all you can do is up the RAM as your data grows but the computation is taking longer and longer and there is nothing you can do about it.</p>
 
 <p>As an added bonus, I discovered that the abstractions Spark forces on you - maps, joins, reduces - are actually appropriate for this problem and encourage a better design than the naive implementation.</p>
 
@@ -719,7 +1399,7 @@
 <p>Glorious.</p>
 
 <h3 id="putting-it-all-together">Putting it all together</h3>
-<p>Now is the time to put “generic” back in the “generic datamatching pipeline in spark”.</p>
+<p>Now is the time to put “generic” back in the “generic data matching pipeline in spark”.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -898,7 +1578,7 @@
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2016/07/20/datamatching-part-1/">Datamatching Part 1: Algorithm</a></h1>
+      <h1 class="entry-title"><a href="/blog/2016/07/20/datamatching-part-1/">Data Matching Part 1: Algorithm</a></h1>
     
     
       <p class="meta">
@@ -914,7 +1594,7 @@
   </header>
 
 
-  <div class="entry-content"><p>In this and the next post I will explain the basics of datamatching and give an implementation of a bare-bones datamatching pipeline in pyspark.</p>
+  <div class="entry-content"><p>In this and the next post I will explain the basics of data matching and give an implementation of a bare-bones data matching pipeline in pyspark.</p>
 
 <h3 id="datamatching">Datamatching</h3>
 <p>You have a dataset of - let’s say - names and addresses of some group of people. You want to enrich it with information scraped from e.g. linkedin or wikipedia. How do you figure out which scraped profiles match wich records in your database?</p>
@@ -926,12 +1606,12 @@
 <p>All of the above are specific cases of a problem that can be described as:
  <em>Finding all the pairs (groups) of records in a dataset(s) that correspond to the same real-world entity.</em></p>
 
-<p>This is what I will mean by datamatching in this post.</p>
+<p>This is what I will mean by data matching in this post.</p>
 
-<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is datamatching. Nevertheless for many usecases a DIY datamatching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
+<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is data matching. Nevertheless for many usecases a DIY data matching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
 
 <h3 id="an-example">An example</h3>
-<p>The general problem of datamatching will be easier to discuss with a specific example in mind. Here goes:</p>
+<p>The general problem of data matching will be easier to discuss with a specific example in mind. Here goes:</p>
 
 <p>You work at a company selling insurance to comic book characters. You have a database of 50.000 potential clients (these are the first 3):</p>
 
@@ -1812,7 +2492,7 @@ You: If I don’t tell them you will accept, they will keep interviewing and the
   </header>
 
 
-  <div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found here: <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">python2 version</a> and <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking_python3.ipynb">python3 version</a> by Marcelo Beckmann (thank you!).</p>
+  <div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found here: <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">python 2 version</a> and <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking_python3.ipynb">python 3 version</a> by Marcelo Beckmann (thank you!).</p>
 
 <h4 id="motivation">Motivation</h4>
 <p>The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones.</p>
@@ -2261,43 +2941,9 @@ Unknown are:</p>
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/07/26/test-post/">Test Post</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-07-26T22:20:42+01:00'><span class='date'><span class='date-month'>Jul</span> <span class='date-day'>26</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:20 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is my first post. pls work pls
-This is code span (hopefully)
-<code>def fibo(n):
-	if n &lt; 2:
-		return 1
-	else:
-		return fibo(n - 1) + fibo(n - 2)
-</code></p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
+    
+      <a class="prev" href="/posts/3">&larr; Older</a>
     
     <a href="/blog/archives">Blog Archives</a>
     
@@ -2310,6 +2956,10 @@ This is code span (hopefully)
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2019/08/11/5-types-of-nonsense-data-science/">5 Types of Nonsense Data Science</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/">What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison</a>
@@ -2325,10 +2975,6 @@ This is code span (hopefully)
     
       <li class="post">
         <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
       </li>
     
   </ul>
@@ -2382,7 +3028,7 @@ This is code span (hopefully)
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - nadbor -
+  Copyright &copy; 2019 - nadbor -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

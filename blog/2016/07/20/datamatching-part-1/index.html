@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Datamatching Part 1: Algorithm - DS lore</title>
+  <title>Data Matching Part 1: Algorithm - DS lore</title>
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="Datamatching Part 1: Algorithm Jul 20th, 2016 9:59 pm In this and the next post I will explain the basics of datamatching and give an implementation &hellip;">
+  <meta name="description" content="Data Matching Part 1: Algorithm Jul 20th, 2016 9:59 pm In this and the next post I will explain the basics of data matching and give an &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">Datamatching Part 1: Algorithm</h1>
+      <h1 class="entry-title">Data Matching Part 1: Algorithm</h1>
     
     
       <p class="meta">
@@ -97,7 +97,7 @@
   </header>
 
 
-<div class="entry-content"><p>In this and the next post I will explain the basics of datamatching and give an implementation of a bare-bones datamatching pipeline in pyspark.</p>
+<div class="entry-content"><p>In this and the next post I will explain the basics of data matching and give an implementation of a bare-bones data matching pipeline in pyspark.</p>
 
 <h3 id="datamatching">Datamatching</h3>
 <p>You have a dataset of - let’s say - names and addresses of some group of people. You want to enrich it with information scraped from e.g. linkedin or wikipedia. How do you figure out which scraped profiles match wich records in your database?</p>
@@ -109,12 +109,12 @@
 <p>All of the above are specific cases of a problem that can be described as:
  <em>Finding all the pairs (groups) of records in a dataset(s) that correspond to the same real-world entity.</em></p>
 
-<p>This is what I will mean by datamatching in this post.</p>
+<p>This is what I will mean by data matching in this post.</p>
 
-<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is datamatching. Nevertheless for many usecases a DIY datamatching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
+<p>This type of task is very common in data science, and I have done it (badly) many times before finally coming up with a generic, clean and scalable solution. There are already many commercial solutions to specific instances of this problem out there and I know of at least two startups whose main product is data matching. Nevertheless for many usecases a DIY data matching pipeline should be just as good and may be easier to build than integration with an external service or application.</p>
 
 <h3 id="an-example">An example</h3>
-<p>The general problem of datamatching will be easier to discuss with a specific example in mind. Here goes:</p>
+<p>The general problem of data matching will be easier to discuss with a specific example in mind. Here goes:</p>
 
 <p>You work at a company selling insurance to comic book characters. You have a database of 50.000 potential clients (these are the first 3):</p>
 
@@ -333,7 +333,7 @@ There will never be a normalisation function that does the right thing for every
         <a class="basic-alignment left" href="/blog/2016/06/15/dear-recruiter/" title="Previous Post: Dear Recruiter">&laquo; Dear Recruiter</a>
       
       
-        <a class="basic-alignment right" href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/" title="Next Post: datamatching part 2: spark pipeline">datamatching part 2: spark pipeline &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2016/07/22/datamatching-part-2-spark-pipeline/" title="Next Post: data matching part 2: spark pipeline">data matching part 2: spark pipeline &raquo;</a>
       
     </p>
   </footer>
@@ -354,6 +354,10 @@ There will never be a normalisation function that does the right thing for every
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/08/11/5-types-of-nonsense-data-science/">5 Types of Nonsense Data Science</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/">What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison</a>
       </li>
     
@@ -367,10 +371,6 @@ There will never be a normalisation function that does the right thing for every
     
       <li class="post">
         <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
       </li>
     
   </ul>
@@ -425,7 +425,7 @@ There will never be a normalisation function that does the right thing for every
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - nadbor -
+  Copyright &copy; 2019 - nadbor -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

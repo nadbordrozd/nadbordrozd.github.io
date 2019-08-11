@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Datamatching Part 2: Spark Pipeline - DS lore</title>
+  <title>Data Matching Part 2: Spark Pipeline - DS lore</title>
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="Datamatching Part 2: Spark Pipeline Jul 22nd, 2016 10:57 pm In the last post I talked about the principles of datamatching, now it’s time to put &hellip;">
+  <meta name="description" content="Data Matching Part 2: Spark Pipeline Jul 22nd, 2016 10:57 pm In the last post I talked about the principles of data matching, now it’s time to put &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">Datamatching Part 2: Spark Pipeline</h1>
+      <h1 class="entry-title">Data Matching Part 2: Spark Pipeline</h1>
     
     
       <p class="meta">
@@ -97,7 +97,7 @@
   </header>
 
 
-<div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of datamatching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for datamatching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
+<div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2016/07/12/datamatching-part-1/">last post</a> I talked about the principles of data matching, now it’s time to put them into practice. I will present a generic, customisable Spark pipeline for data matching as well as a specific instance of it that for matching the toy datasets from the last post. TL;DR of the last post:</p>
 
 <p>To match two datasets:</p>
 
@@ -108,7 +108,7 @@
 </ol>
 
 <h3 id="why-spark">Why spark</h3>
-<p>This datamatching algorithm could easily be implemented in the traditional single-machine, single-threaded way using a collection of hashmaps. In fact this is what I have done on more than one occasion and it worked. The advantage of spark here is built-in scalability. If your datasets get ten times bigger, just invoke spark requesting ten times as many cores. If matching is taking too long - throw some more resources at it again. In the single-threaded model all you can do is up the RAM as your data grows but the computation is taking longer and longer and there is nothing you can do about it.</p>
+<p>This data matching algorithm could easily be implemented in the traditional single-machine, single-threaded way using a collection of hashmaps. In fact this is what I have done on more than one occasion and it worked. The advantage of spark here is built-in scalability. If your datasets get ten times bigger, just invoke spark requesting ten times as many cores. If matching is taking too long - throw some more resources at it again. In the single-threaded model all you can do is up the RAM as your data grows but the computation is taking longer and longer and there is nothing you can do about it.</p>
 
 <p>As an added bonus, I discovered that the abstractions Spark forces on you - maps, joins, reduces - are actually appropriate for this problem and encourage a better design than the naive implementation.</p>
 
@@ -517,7 +517,7 @@
 <p>Glorious.</p>
 
 <h3 id="putting-it-all-together">Putting it all together</h3>
-<p>Now is the time to put “generic” back in the “generic datamatching pipeline in spark”.</p>
+<p>Now is the time to put “generic” back in the “generic data matching pipeline in spark”.</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -723,10 +723,10 @@
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2016/07/20/datamatching-part-1/" title="Previous Post: datamatching part 1: algorithm">&laquo; datamatching part 1: algorithm</a>
+        <a class="basic-alignment left" href="/blog/2016/07/20/datamatching-part-1/" title="Previous Post: data matching part 1: algorithm">&laquo; data matching part 1: algorithm</a>
       
       
-        <a class="basic-alignment right" href="/blog/2016/07/29/datamatching-part-3-match-scoring/" title="Next Post: datamatching part 3: match scoring">datamatching part 3: match scoring &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2016/07/29/datamatching-part-3-match-scoring/" title="Next Post: data matching part 3: match scoring">data matching part 3: match scoring &raquo;</a>
       
     </p>
   </footer>
@@ -747,6 +747,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/08/11/5-types-of-nonsense-data-science/">5 Types of Nonsense Data Science</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/">What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison</a>
       </li>
     
@@ -760,10 +764,6 @@
     
       <li class="post">
         <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
       </li>
     
   </ul>
@@ -818,7 +818,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - nadbor -
+  Copyright &copy; 2019 - nadbor -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

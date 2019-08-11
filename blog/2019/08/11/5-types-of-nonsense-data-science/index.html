@@ -1,0 +1,384 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>5 Types of Nonsense Data Science - DS lore</title>
+  <meta name="author" content="nadbor">
+
+  
+  <meta name="description" content="5 Types of Nonsense Data Science Aug 11th, 2019 12:22 pm I recently came across several articles about failing data science projects (according to &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-65624880-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">DS lore</a></h1>
+  
+    <h2>words about stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="nadbordrozd.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/interviews">Interviews</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">5 Types of Nonsense Data Science</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2019-08-11T12:22:57+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>12:22 pm</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I recently came across several articles about failing data science projects (according to Gartner 85% big data projects are never fully productionised). The articles blame misaligned objectives, management resistance, unrealistic expectations, poor communication with stakeholders, poor data infrastructure. I think this is basically correct but it stops short of stating the ugly truth:</p>
+
+<blockquote>
+  <p>The typical data science project doesn’t make any sense whatsoever and should never have been attempted.</p>
+</blockquote>
+
+<hr />
+<p>Data science has a huge solution-looking-for-a-problem situation going on. Enterprise managers trying to appear data-driven, startup founders wanting to impress investors with cool buzzwords and proprietary IP, young data scientists themselves itching to try the newest technique from a paper - there are a lot of people looking for an excuse to do ML/AI/DL. When they finally find it, they (or rather - <em>we</em>) don’t try too hard to see if it makes business sense. As a result, majority of data science projects never move beyond the stage of slides and jupyter notebooks.</p>
+
+<p>Here is a non-exhaustive list ways how it happens:</p>
+
+<h3 id="vanity-data-science">1. Vanity data science</h3>
+<p>By far the most common failure mode for a data science project is to never be productionised because of lack of infrastructure or lack of interest on the business side. These projects were only attempted because thought they sounded cool, in the complete absence of a realistic business case. This could have been avoided by asking a simple question before starting the project:</p>
+
+<p><em>‘And then what?’</em></p>
+
+<p>So you apply your DBSCAN on top of your vectors from Word2Vec to assign your customers to clusters - <em>and then what?</em><br />
+Or you run sentiment analysis on all the comments on your website - <em>and then what?</em><br />
+Or you train a GAN on all the images in your database - <em>and then what?</em></p>
+
+<p><em>‘How do we productionise the result? Do we have the infrastructure for it? What will the benefit be if we manage to do it?’</em></p>
+
+<p>If the only answer is <em>‘and then we prepare slides to show to stakeholders’</em> - I suggest that we skip the ‘train the neural network’ bit and prepare the slides already. In the unlikely event that the stakeholders have a real use case for the classifier, we can start working on the use case immediately. Otherwise we move on to the next task having saved ourselves weeks, maybe months of unnecessary work.</p>
+
+<h3 id="busywork">2. Busywork</h3>
+<p>Another, less blatant way for a data science project to not make sense is for it to be sort of useful but completely not worth the effort. Like training a bespoke deep learning model to analyse 20 pages of text. Or an image quality assessment tool that saves a real estate agent 5 seconds per 1h house visit.</p>
+
+<p>The question I ask stakeholders (sometimes that means asking myself) to address this problem is:</p>
+
+<p><em>‘How much is the solution to this problem worth to you? If it’s so valuable, why haven’t you paid people to do it manually before?’</em></p>
+
+<p>The set of good answers to this question includes:</p>
+
+<p><span style="font-family:Papyrus;"><em><strong>we have</strong> been doing it manually, automating it would save us £X/year</em></span></p>
+
+<p>and</p>
+
+<p><span style="font-family:Papyrus;"> <em>we could do it manually but being able to do it in real time would be a game-changer, worth £X.</em></span></p>
+
+<h3 id="reinventing-the-wheel">3. Reinventing the wheel</h3>
+<p>A special subcategory of ‘obviously not worth it’ projects contains ones where a solution already exists in a commoditised form on AWS, GCP, Azure etc. Examples include OCR, speech to text, generic text and image classification, object detection, named entity recognition and more.</p>
+
+<p>Trying to build (for instance) a better or cheaper OCR than the one Google is selling is first of all hopeless but more importantly a distraction from your actual business (unless you’re business is selling OCR, in which case good luck!).</p>
+
+<p>I sometimes hear data scientists complaining that it’s no fun calling APIs for everything and they would rather build ML models themselves. I disagree. For one, I find solving an already solved problem depressing. Secondly, outsourcing the most generic ML tasks frees up your time to do higher-level tasks and tasks specific to your business. If you really have nothing to do in your company except for reinventing the wheel then you’re in the wrong company.</p>
+
+<h3 id="wishful-thinking">4. Wishful thinking</h3>
+<p>The flipside of Busywork Data Science is Wishful Thinking Data Science. Attacking problems that it would be fantastic to have solved but which are obviously not solvable with the given data.</p>
+
+<p>I most often see this kind of thing with predicting the future (which is the hardest period to predict).</p>
+
+<p><span style="font-family:Papyrus;">Wouldn’t it be great to know the house price index/traffic on the website/demand for a product a year in advance? Can you fit your neural network/hidden markov model to the chart with historical data to make a forecast?</span></p>
+
+<p>I can fit anything to anything but that won’t tell you much a hand-drawn trend line wouldn’t reveal. Next year’s house prices depend on a million different external political, economic and demographic factors that are either unpredictable or not predictable from price data alone. How the Prime Minister is going to handle Brexit is simply not something that can be divined from squiggly line of past house prices.</p>
+
+<p>Sometimes projects like these are pitched by naive managers and CEOs who think AI is a magic dust you can sprinkle over a problem and make the impossible possible. More often it involves people who either know the prediction won’t work or don’t care enough to find out, their only concern being whether the technology will impress the customer.</p>
+
+<h3 id="if-you-dont-know-where-youre-going-any-road-will-take-you-there">5. If you don’t know where you’re going, any road will take you there</h3>
+<p>This is when the client has a vaguely data-sciencey task but adamantly refuses to specify the objective or acceptance criteria.</p>
+
+<p>- <span style="font-family:Papyrus;">We need you to calculate a score for every company.</span><br />
+- Ok. What do you what this score to measure or predict?<br />
+- <span style="font-family:Papyrus;">Dunno. Like, how good they are?</span><br />
+- Good in what way? Good to work at? Good to invest in? A credit rating maybe?<br />
+- <span style="font-family:Papyrus;"> No, nothing mundane like that.</span><br />
+- Then what?<br />
+- <span style="font-family:Papyrus;"> You’re the data scientist, we were hoping you would tell us.</span><br />
+- …<br />
+- <span style="font-family:Papyrus;"> Be sure to include Twitter data!</span></p>
+
+<p>It’s a normal part of a data scientist’s job to act as a psychoanalyst helping the client discover and articulate what they actually want. But sometimes there is just nothing there to discover because the whole project is just an empty marketing gimmick or an exercise in bureaucratic box-checking.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>In 1985 sci-fi comedy movie Weird Science a pair of teenagers make a simulation of a perfect woman on their <a href="https://en.wikipedia.org/wiki/Memotech_MTX">home computer</a>. After they hook the computer to a plastic doll and hack into a government system, a power surge which causes the magical dream woman to <a href="https://www.youtube.com/watch?v=-UJ9K8lMxPA">come to life</a>.</p>
+
+<p>Today even small children and the elderly are familiar enough with computers to know they don’t work like that. But replace the government system with the cloud, throw in some deep learning references and you’ve got yourself a plausible 2019 movie premise.</p>
+
+<p>Bullshit data science happens because decision makers have the level of understanding of and attitude towards data science the 1980s audiences had for computers. They have unrealistic expectations, are easily bamboozled by it, don’t know how to use it and don’t trust it enough to use where it would make a real difference.</p>
+
+<p>This will eventually change the same way it did with computers in general. The current generation of data scientists will start graduating into management roles, founding their own startups, eventually retiring - same as happened with the programmers from the 1980s.</p>
+
+<p>Until then, we are going to have to fight the bullshit however we can. For data scientists themselves that entails paying more attention to the ‘why’ of what they’re doing, not just the ‘how’. And for the of clients the first step would be to involve an experienced and business savvy data scientist from the get go, to help shape what needs to be done instead of just carrying out (potentially nonsensical) orders.</p>
+</div>
+
+
+
+  <head>
+    
+  </head>
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">nadbor</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2019-08-11T12:22:57+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>11</span><span class='date-suffix'>th</span>, <span class='date-year'>2019</span></span> <span class='time'>12:22 pm</span></time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/" data-via="" data-counturl="http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/" title="Previous Post: What they don't tell you about data science 2: data analyst roles are poison">&laquo; What they don't tell you about data science 2: data analyst roles are poison</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2019/08/11/5-types-of-nonsense-data-science/">5 Types of Nonsense Data Science</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/">What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/12/05/what-they-dont-tell-you-about-data-science-1/">What They Don't Tell You About Data Science 1: You Are a Software Engineer First</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/12/looking-for-the-text-top-model/">Looking for the Text Top Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/nadbordrozd">@nadbordrozd</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'nadbordrozd',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/nadbordrozd?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2019 - nadbor -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ds-lore';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/';
+        var disqus_url = 'http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+
+<!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+</html>

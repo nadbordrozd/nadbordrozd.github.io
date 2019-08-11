@@ -97,7 +97,7 @@
   </header>
 
 
-<div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found here: <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">python2 version</a> and <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking_python3.ipynb">python3 version</a> by Marcelo Beckmann (thank you!).</p>
+<div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2015/11/29/ds-toolbox-topic-models/">previous post</a> I talked about usefulness of topic models for non-NLP tasks, it’s back to NLP-land this time. I decided to investigate if word embeddings can help in a classic NLP problem - text categorization. Full code used to generate numbers and plots in this post can be found here: <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking.ipynb">python 2 version</a> and <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/classification_w2v/benchmarking_python3.ipynb">python 3 version</a> by Marcelo Beckmann (thank you!).</p>
 
 <h4 id="motivation">Motivation</h4>
 <p>The basic idea is that semantic vectors (such as the ones provided by Word2Vec) should preserve most of the relevant information about a text while having relatively low dimensionality which allows better machine learning treatment than straight one-hot encoding of words. Another advantage of topic models is that they are unsupervised so they can help when labaled data is scarce. Say you only have one thousand manually classified blog posts but a million unlabeled ones. A high quality topic model can be trained on the full set of one million. If you can use topic modeling-derived features in your classification, you will be benefitting from your entire collection of texts, not just the labeled ones.</p>
@@ -422,6 +422,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2019/08/11/5-types-of-nonsense-data-science/">5 Types of Nonsense Data Science</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/">What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison</a>
       </li>
     
@@ -435,10 +439,6 @@
     
       <li class="post">
         <a href="/blog/2017/07/18/so-you-think-you-can-stats/">So You Think You Can Stats</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/07/07/loafing-around-with-xgboots/">Loafing Around With XGBoots</a>
       </li>
     
   </ul>
@@ -493,7 +493,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2017 - nadbor -
+  Copyright &copy; 2019 - nadbor -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
