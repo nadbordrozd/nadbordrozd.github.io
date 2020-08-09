@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and finally show how to use PBG on two very &hellip;">
+  <meta name="description" content="In this post I explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and show how to use PBG on two very simple examples &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -100,7 +100,7 @@
   </header>
 
 
-  <div class="entry-content"><p>In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and finally show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
+  <div class="entry-content"><p>In this post I explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
 
 <p>All the code can be found <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/PBG">here</a>. With this you can quickly get started embedding your own graphs.</p>
 
@@ -127,6 +127,8 @@
 
 <p>I encourage you to mouse over the graphs to reveal clusters of movies related by either overlapping cast and crew (first plot) or by overlapping fanbase (second plot). It’s quite fun.</p>
 
+<p>Note that one could use either of these embeddings (or a combination of the two) as a basis for a movie recommender system.</p>
+
 <h3 id="why-graph-embeddings">Why graph embeddings?</h3>
 <p>Graph embeddings are a set of algorithms that given a graph (set of nodes connected by edges) produce a mapping node -&gt; n-dimensional vector (for some specified n). The goal of embedding is for the metric relationships between vectors to reflect connections of the graph. If two nodes are connected, their embeddings should be close in vector space (under some metric), if they are not - the embeddings should be distant.</p>
 
@@ -151,7 +153,7 @@
   <li>has (some) <a href="https://torchbiggraph.readthedocs.io/en/latest/">documentation</a>.</li>
   <li>includes utils for transforming edge-list data to it’s preferred format.</li>
   <li>includes multiple metrics for monitoring performance during as well as after training</li>
-  <li>supports multi-relation graphs</li>
+  <li>supports multi-relation and multi-entity graphs</li>
   <li>is customizable enough that it supersedes multiple other older models</li>
   <li>
     <p>is CPU-based - which is unusual and seems like a wasted opportunity but it does make using it easier and cheaper
@@ -324,16 +326,16 @@ And most importantly:</p>
 <span class="line-number">10</span>
 <span class="line-number">11</span>
 </pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">nodes_path</span> <span class="o">=</span> <span class="n">DATA_DIR</span> <span class="o">+</span> <span class="s">&#39;/entity_names_WHATEVER_0.json&#39;</span>
-</span><span class="line">    <span class="n">embeddings_path</span> <span class="o">=</span> <span class="n">MODEL_DIR</span> <span class="o">+</span> <span class="s">&quot;/embeddings_WHATEVER_0.v{NUMBER_OF_EPOCHS}.h5&quot;</span> \
-</span><span class="line">        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">NUMBER_OF_EPOCHS</span><span class="o">=</span><span class="n">raw_config</span><span class="p">[</span><span class="s">&#39;num_epochs&#39;</span><span class="p">])</span>
+</span><span class="line"><span class="n">embeddings_path</span> <span class="o">=</span> <span class="n">MODEL_DIR</span> <span class="o">+</span> <span class="s">&quot;/embeddings_WHATEVER_0.v{NUMBER_OF_EPOCHS}.h5&quot;</span> \
+</span><span class="line">    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">NUMBER_OF_EPOCHS</span><span class="o">=</span><span class="n">raw_config</span><span class="p">[</span><span class="s">&#39;num_epochs&#39;</span><span class="p">])</span>
 </span><span class="line">
-</span><span class="line">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nodes_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span class="line">        <span class="n">node_names</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span class="line"><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nodes_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span class="line">    <span class="n">node_names</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 </span><span class="line">
-</span><span class="line">    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">embeddings_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">g</span><span class="p">:</span>
-</span><span class="line">        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s">&#39;embeddings&#39;</span><span class="p">][:]</span>
+</span><span class="line"><span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">embeddings_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">g</span><span class="p">:</span>
+</span><span class="line">    <span class="n">embeddings</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s">&#39;embeddings&#39;</span><span class="p">][:]</span>
 </span><span class="line">
-</span><span class="line">    <span class="n">node2embedding</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">node_names</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">))</span>
+</span><span class="line"><span class="n">node2embedding</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">node_names</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">))</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
 
 <p>The final result will look something like this:</p>
@@ -355,7 +357,7 @@ And most importantly:</p>
 
 <h3 id="multi-relation-graphs">Multi-relation graphs</h3>
 <p>The second example will feature PBG’s big selling point - the support for multi-relation graphs. 
-That means graphs with multiple kinds of edges.</p>
+That means graphs with multiple kinds of edges. We will also throw in multiple entity types for good measure.</p>
 
 <p>Imagine if Twitter and eBay had a baby. Data genereated on this unholy abomination of a website might look something like this:</p>
 
@@ -395,7 +397,7 @@ That means graphs with multiple kinds of edges.</p>
 
 <p>Internally, PBG deals with different relation types by applying a different (learned) transaformation to a node’s embedding in the context of a different relation type. For example it could learn that that if A ‘follows’ B, they should be close in vector space but when A ‘hates’ B, they should by close after flipping the sign of all coordinates of A - i.e. they should be represented by opposite vectors.</p>
 
-<p>From the point of view of a PBG the only difference when embedding a multi-relation graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
+<p>From the point of view of a PBG user the only difference when embedding a multi-relation, multi-entity graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
@@ -496,6 +498,8 @@ That means graphs with multiple kinds of edges.</p>
 </span><span class="line">    <span class="n">eval_fraction</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
 </span><span class="line"><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Once embedding is trained, the embeddings can be loaded the same way as with a generic graph, the only difference being that each entity type has a separate embedding file.</p>
 
 <p>Full code is <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_multi_relation.py">here</a>.</p>
 

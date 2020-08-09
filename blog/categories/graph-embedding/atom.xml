@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Graph Embedding | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/graph-embedding/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2020-08-09T13:45:00+01:00</updated>
+  <updated>2020-08-09T19:46:08+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -18,7 +18,7 @@
     <link href="http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/"/>
     <updated>2020-08-04T09:58:04+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph</id>
-    <content type="html"><![CDATA[<p>In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and finally show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
+    <content type="html"><![CDATA[<p>In this post I explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
 
 <p>All the code can be found <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/PBG">here</a>. With this you can quickly get started embedding your own graphs.</p>
 
@@ -45,6 +45,8 @@
 
 <p>I encourage you to mouse over the graphs to reveal clusters of movies related by either overlapping cast and crew (first plot) or by overlapping fanbase (second plot). It’s quite fun.</p>
 
+<p>Note that one could use either of these embeddings (or a combination of the two) as a basis for a movie recommender system.</p>
+
 <h3 id="why-graph-embeddings">Why graph embeddings?</h3>
 <p>Graph embeddings are a set of algorithms that given a graph (set of nodes connected by edges) produce a mapping node -&gt; n-dimensional vector (for some specified n). The goal of embedding is for the metric relationships between vectors to reflect connections of the graph. If two nodes are connected, their embeddings should be close in vector space (under some metric), if they are not - the embeddings should be distant.</p>
 
@@ -69,7 +71,7 @@
   <li>has (some) <a href="https://torchbiggraph.readthedocs.io/en/latest/">documentation</a>.</li>
   <li>includes utils for transforming edge-list data to it’s preferred format.</li>
   <li>includes multiple metrics for monitoring performance during as well as after training</li>
-  <li>supports multi-relation graphs</li>
+  <li>supports multi-relation and multi-entity graphs</li>
   <li>is customizable enough that it supersedes multiple other older models</li>
   <li>
     <p>is CPU-based - which is unusual and seems like a wasted opportunity but it does make using it easier and cheaper
@@ -181,17 +183,17 @@ train(config, subprocess_init=subprocess_init)
 
 <p>```python
 nodes_path = DATA_DIR + ‘/entity_names_WHATEVER_0.json’
-    embeddings_path = MODEL_DIR + “/embeddings_WHATEVER_0.v{NUMBER_OF_EPOCHS}.h5” \
-        .format(NUMBER_OF_EPOCHS=raw_config[‘num_epochs’])</p>
+embeddings_path = MODEL_DIR + “/embeddings_WHATEVER_0.v{NUMBER_OF_EPOCHS}.h5” \
+    .format(NUMBER_OF_EPOCHS=raw_config[‘num_epochs’])</p>
 
-<pre><code>with open(nodes_path, 'r') as f:
-    node_names = json.load(f)
+<p>with open(nodes_path, ‘r’) as f:
+    node_names = json.load(f)</p>
 
-with h5py.File(embeddings_path, 'r') as g:
-    embeddings = g['embeddings'][:]
+<p>with h5py.File(embeddings_path, ‘r’) as g:
+    embeddings = g[‘embeddings’][:]</p>
 
-node2embedding = dict(zip(node_names, embeddings)) ```
-</code></pre>
+<p>node2embedding = dict(zip(node_names, embeddings))
+```</p>
 
 <p>The final result will look something like this:
 <code>
@@ -207,7 +209,7 @@ node2embedding = dict(zip(node_names, embeddings)) ```
 
 <h3 id="multi-relation-graphs">Multi-relation graphs</h3>
 <p>The second example will feature PBG’s big selling point - the support for multi-relation graphs. 
-That means graphs with multiple kinds of edges.</p>
+That means graphs with multiple kinds of edges. We will also throw in multiple entity types for good measure.</p>
 
 <p>Imagine if Twitter and eBay had a baby. Data genereated on this unholy abomination of a website might look something like this:</p>
 
@@ -237,7 +239,7 @@ That means graphs with multiple kinds of edges.</p>
 
 <p>Internally, PBG deals with different relation types by applying a different (learned) transaformation to a node’s embedding in the context of a different relation type. For example it could learn that that if A ‘follows’ B, they should be close in vector space but when A ‘hates’ B, they should by close after flipping the sign of all coordinates of A - i.e. they should be represented by opposite vectors.</p>
 
-<p>From the point of view of a PBG the only difference when embedding a multi-relation graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
+<p>From the point of view of a PBG user the only difference when embedding a multi-relation, multi-entity graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
 
 <p><code>python
 raw_config = dict(
@@ -290,6 +292,8 @@ raw_config = dict(
     eval_fraction=0.,
 )
 </code></p>
+
+<p>Once embedding is trained, the embeddings can be loaded the same way as with a generic graph, the only difference being that each entity type has a separate embedding file.</p>
 
 <p>Full code is <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_multi_relation.py">here</a>.</p>
 
