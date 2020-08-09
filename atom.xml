@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2020-08-04T09:50:32+01:00</updated>
+  <updated>2020-08-09T11:37:55+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -12,6 +12,393 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA["Hello World!" in PyTorch BigGraph]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/"/>
+    <updated>2020-08-04T09:58:04+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph</id>
+    <content type="html"><![CDATA[<p>In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and finally show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
+
+<p>All the code can be found <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/PBG">here</a>. With this you can quickly get started embedding your own graphs.</p>
+
+<h3 id="why-graph-embeddings">Why graph embeddings?</h3>
+<p>Graph embeddings are a set of algorithms that given a graph (set of nodes connected by edges) produce a mapping node -&gt; n-dimensional vector (for some specified n). The goal of embedding is for the metric relationships between vectors to reflect connections of the graph. If two nodes are connected, their embeddings should be close in vector space (under some metric), if they are not - the embeddings should be distant.</p>
+
+<p>If successful, the embedding encodes much of the structure of the original graph but in a fixed-width, dense numeric format that can be directly used by most machine learning models.</p>
+
+<p>Unlike their better known cousins - word embeddings - graph embeddings are  still somewhat obscure and underutilised in the data science community. That must be in part because people don’t realise that graphs are everywhere.</p>
+
+<p>Most obviously, when the entities you’re studying directly interact with each other - they form a graph. Think - people following each other on social media or bank customers sending each other money.</p>
+
+<p>More common in real life applications are bipartite graphs. That’s when there are two kinds of entities - A and B - and As link with Bs but As don’t link with other As directly and neither do Bs with other Bs. Think - shoppers and items, movies and reviewers, companies and directors. Embedding these kinds of graphs is a popular technique in recommender systems - see for example <a href="https://eng.uber.com/uber-eats-graph-learning/">Uber Eats</a>.</p>
+
+<p>Text corpora are graphs too! You can represent each document in a corpus and each word in a document by a node. Then you connect a document-node to a word-node if the document contains the word. That’s your graph. Embedding this graph yields a word embedding + document embedding for free. (you can also use a sliding window of a few words instead of full document for better results). This way you can get a good quality word embedding using graph embedding techniques (see e.g. <a href="https://www.aclweb.org/anthology/D19-5305.pdf">this</a>).</p>
+
+<p>In short - graph embeddings are a powerful and universal feature engineering technique that turns many kinds of sparse, unstructured data into dense, structured data for use in downstream machine learning applications.</p>
+
+<h3 id="why-pytorch-biggraph">Why PyTorch BigGraph</h3>
+<p>There are <em>heaps</em> of graph embedding algorithms to pick from. <a href="https://github.com/chihming/awesome-network-embedding">Here’s a list</a> of models with (mostly Python) implementations. Unfortunately most of them are little better than some researcher’s one-off scripts. I think of them less as tools that you can pick up and use and more as a starting point to building your own graph embedder.</p>
+
+<p><a href="https://github.com/facebookresearch/PyTorch-BigGraph">PyTorch BigGraph</a> is by far the most mature of the libraries I have seen. It:</p>
+
+<ul>
+  <li>has (some) <a href="https://torchbiggraph.readthedocs.io/en/latest/">documentation</a>.</li>
+  <li>includes utils for transforming edge-list data to it’s preferred format.</li>
+  <li>includes multiple metrics for monitoring performance during as well as after training</li>
+  <li>supports multi-relation graphs</li>
+  <li>is customizable enough that it supersedes multiple other older models</li>
+  <li>
+    <p>is CPU-based - which is unusual and seems like a wasted opportunity but it does make using it easier and cheaper
+And most importantly:</p>
+  </li>
+  <li>it is fast and works reliably on even very big graphs (being disk-based, it won’t run out of RAM)</li>
+</ul>
+
+<p>It even includes a distributed mode for parallelizing training on the cluster. Unless the nodes of your graph number in the billions though, IMHO it is easier to just spin up a bigger machine at your favourite cloud platform. In my experiments a 16 CPU instance is enough to embed a graph of 25m nodes, 30m edges in 100d in a few hours.</p>
+
+<p>If you’re curious about 
+### Why this tutorial?
+If PBG is so great why does it need a tutorial?</p>
+
+<p>It seems to me that the authors were so focused on customizability that they let user experience take a back seat. Simply put - it takes way too many lines of code to do the simplest thing in PBG. The simplest usage example included in the repository consists of two files - one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/fb15k.py">108</a> and one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/configs/fb15k_config_cpu.py">46</a> lines long. This is what it takes to do the equivalent of <code>model.fit(data).predict(data)</code>.</p>
+
+<p>I’m guessing this is the reason why the library hasn’t achieved wider adoption. And without a wide user base, who is there to demand a friendlier API?</p>
+
+<p>I have wasted a lot of time before I managed to refactor the example to work on my graph. What follows is my stripped down to basics version of graph embedding that should work out of the box - the “Hello World!” - and one that you can use as a template for more complicated tasks.</p>
+
+<p>I found another similar tutorial on <a href="https://towardsdatascience.com/introduction-to-pytorch-biggraph-with-examples-b50ddad922b8">Towards Data Science</a> but the code didn’t work for me (newer version of PBG perhaps?).</p>
+
+<h3 id="hello-world">Hello World!</h3>
+<p>The full code of the example, with comments, is <a href="https://github.com/nadbordrozd/okapi/blob/master/blog/hello_graph_1.py">here</a>.</p>
+
+<p>First thing to do is installing PBG. As of this writing, the version available on PyPi is broken (crashes on running the first example) and you have to install it directly from github:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">pip install git+https://github.com/facebookresearch/PyTorch-BigGraph.git
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>Full requirements are <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_graph.py">here</a>.</p>
+
+<p>The graph we will be embedding consists of 4 nodes - <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code> and 5 edges between them. It needs to be saved as a tab-separated file like so:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">A</span>   <span class="n">B</span>
+</span><span class="line"><span class="n">B</span>   <span class="n">C</span>
+</span><span class="line"><span class="n">C</span>   <span class="n">D</span>
+</span><span class="line"><span class="n">D</span>   <span class="n">B</span>
+</span><span class="line"><span class="n">B</span>   <span class="n">D</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Before we can apply PBG to the graph, we will have to transform it to a PBG-friendly format (fortunately P  BG provides a function for that). Before we do that, we have to define the training config. The config is a data structure holding all the settings and hyperparameters - like how many partitions to use (1 unless you want to do distributed training), what types of nodes there are (only 1 type), what types of edges between them etc.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">raw_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+</span><span class="line">    <span class="c"># graph metadata will go here</span>
+</span><span class="line">    <span class="n">entity_path</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="n">edge_paths</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="c"># graph data in HDF5 format will be saved here</span>
+</span><span class="line">        <span class="n">DATA_DIR</span> <span class="o">+</span> <span class="s">&#39;/edges_partitioned&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="c"># trained embeddings as well as temporary files go here</span>
+</span><span class="line">    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">MODEL_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="c"># Graph structure</span>
+</span><span class="line">    <span class="n">entities</span><span class="o">=</span><span class="p">{</span>
+</span><span class="line">        <span class="s">&quot;WHATEVER&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;num_partitions&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</span><span class="line">    <span class="p">},</span>
+</span><span class="line">    <span class="n">relations</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;doesnt_matter&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;WHATEVER&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;WHATEVER&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="n">dynamic_relations</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dimension</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="c"># silly graph, silly dimensionality</span>
+</span><span class="line">    <span class="n">global_emb</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">comparator</span><span class="o">=</span><span class="s">&quot;dot&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_epochs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_uniform_negs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+</span><span class="line">    <span class="n">loss_fn</span><span class="o">=</span><span class="s">&quot;softmax&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+</span><span class="line">    <span class="n">regularization_coef</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+</span><span class="line">    <span class="n">eval_fraction</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+</span><span class="line"><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, we use the config to transform the data into the preferred format using a helper function from <code>torchbiggraph.converters.importers.convert_input_data</code> function. Note that the config needs to be parsed first using another helper function because nothing is simple with PyTorch BigGraph.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">setup_logging</span><span class="p">()</span>
+</span><span class="line"><span class="n">config</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">raw_config</span><span class="p">)</span>
+</span><span class="line"><span class="n">subprocess_init</span> <span class="o">=</span> <span class="n">SubprocessInitializer</span><span class="p">()</span>
+</span><span class="line"><span class="c"># path to the tsv file with the graph edges</span>
+</span><span class="line"><span class="n">input_edge_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">GRAPH_PATH</span><span class="p">)]</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="n">convert_input_data</span><span class="p">(</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">entities</span><span class="p">,</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">relations</span><span class="p">,</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">entity_path</span><span class="p">,</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">edge_paths</span><span class="p">,</span>
+</span><span class="line">    <span class="n">input_edge_paths</span><span class="p">,</span>
+</span><span class="line">    <span class="n">TSVEdgelistReader</span><span class="p">(</span><span class="n">lhs_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rel_col</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rhs_col</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+</span><span class="line">    <span class="n">dynamic_relations</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">dynamic_relations</span><span class="p">,</span>
+</span><span class="line"><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Having prepared the data, training is straightforward:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">train</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">subprocess_init</span><span class="o">=</span><span class="n">subprocess_init</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><em>Important</em> note: the above code (both data preparation and training) can’t be at the top level of a module - it needs to be placed inside a <code>if __name__ == '__main__':</code> block or some equivalent. This is because PTBG spawns multiple processes that import this very module at the same time. If this code is at the top level of a module, multiple processes will be trying to create the same file simultaneously and you will have a bad time!</p>
+
+<p>After training is done, we can load the embeddings from a h5 file. This file doesn’t include names of the nodes so we will have to look those up in one of the files created by the preprocessing function.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">nodes_path</span> <span class="o">=</span> <span class="n">DATA_DIR</span> <span class="o">+</span> <span class="s">&#39;/entity_names_WHATEVER_0.json&#39;</span>
+</span><span class="line">    <span class="n">embeddings_path</span> <span class="o">=</span> <span class="n">MODEL_DIR</span> <span class="o">+</span> <span class="s">&quot;/embeddings_WHATEVER_0.v{NUMBER_OF_EPOCHS}.h5&quot;</span> \
+</span><span class="line">        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">NUMBER_OF_EPOCHS</span><span class="o">=</span><span class="n">raw_config</span><span class="p">[</span><span class="s">&#39;num_epochs&#39;</span><span class="p">])</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nodes_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span class="line">        <span class="n">node_names</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">embeddings_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">g</span><span class="p">:</span>
+</span><span class="line">        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s">&#39;embeddings&#39;</span><span class="p">][:]</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">node2embedding</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">node_names</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The final result will look something like this:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;D&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.0803747</span> <span class="p">,</span>  <span class="mf">0.2267056</span> <span class="p">,</span>  <span class="mf">0.09371386</span><span class="p">,</span>  <span class="mf">0.12704636</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">),</span>
+</span><span class="line">    <span class="s">&#39;A&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">0.1961012</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.5856796</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.28119525</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4106653</span> <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">),</span>
+</span><span class="line">    <span class="s">&#39;B&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">0.10987103</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.40970576</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.18397042</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.11587717</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">),</span>
+</span><span class="line">    <span class="s">&#39;C&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.16625881</span><span class="p">,</span>  <span class="mf">0.51607686</span><span class="p">,</span>  <span class="mf">0.2659427</span> <span class="p">,</span>  <span class="mf">0.32392678</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This is it!</p>
+
+<h3 id="multi-relation-graphs">Multi-relation graphs</h3>
+<p>The second example will feature PBG’s big selling point - the support for multi-relation graphs. 
+That means graphs with multiple kinds of edges.</p>
+
+<p>Imagine if Twitter and eBay had a baby. Data genereated on this unholy abomination of a website might look something like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">alice</span>   <span class="n">bought</span>  <span class="n">fridge</span>
+</span><span class="line"><span class="n">alice</span>   <span class="n">bought</span>    <span class="n">bike</span>
+</span><span class="line"><span class="n">bob</span> <span class="n">bought</span>  <span class="n">laptop</span>
+</span><span class="line"><span class="n">carol</span>   <span class="n">bought</span>  <span class="n">fridge</span>
+</span><span class="line"><span class="n">carol</span>   <span class="n">sold</span>  <span class="n">laptop</span>
+</span><span class="line"><span class="n">carol</span>   <span class="n">sold</span>    <span class="n">bike</span>
+</span><span class="line"><span class="n">dave</span>    <span class="n">sold</span>    <span class="n">fridge</span>
+</span><span class="line"><span class="n">alice</span>   <span class="n">follows</span> <span class="n">bob</span>
+</span><span class="line"><span class="n">bob</span> <span class="n">follows</span> <span class="n">carol</span>
+</span><span class="line"><span class="n">bob</span> <span class="n">hates</span> <span class="n">dave</span>
+</span><span class="line"><span class="n">dave</span> <span class="n">hates</span> <span class="n">carol</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Here users follow other users as well as buy and sell items to each other. As a result we have two types of entities - users and items - and four types of edges - ‘bought’, ‘sold’, ‘follows’ and ‘hates’.</p>
+
+<p>We want to jointly embed users and items in a way that implicitly encodes who is buying and selling what and following or hating whom.</p>
+
+<p>We could do it by ignoring relation types and embedding it as a generic graph. That would be wrong because ‘follows’ and ‘hates’ mean something quite different and we don’t want to represent Bob and Dave as similar just because one of them follow Carol and the other hates her.</p>
+
+<p>Or we could do it by separately embedding 4 graphs - one for each type of relation. But that’s not ideal either because we’re losing valuable information. In our silly example Alice would only appear in the graphs of “bought” and of “follows”. Dave only appears in graphs of “sold” and “hates”. Therefore the two users wouldn’t have a common embedding and it wouldn’t be possible to calculate distance between them. A classfier wouldn’t trained on Alice couldn’t be applied to Dave.</p>
+
+<p>We can solve this problem by embedding the full multi-relation graph in one go in PBG.</p>
+
+<p>Internally, PBG deals with different relation types by applying a different (learned) transaformation to a node’s embedding in the context of a different relation type. For example it could learn that that if A ‘follows’ B, they should be close in vector space but when A ‘hates’ B, they should by close after flipping the sign of all coordinates of A - i.e. they should be represented by opposite vectors.</p>
+
+<p>From the point of view of a PBG the only difference when embedding a multi-relation graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">raw_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+</span><span class="line">    <span class="c"># I/O data</span>
+</span><span class="line">    <span class="n">entity_path</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="n">edge_paths</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="n">DATA_DIR</span> <span class="o">+</span> <span class="s">&#39;/edges_partitioned&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">MODEL_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="c"># Graph structure</span>
+</span><span class="line">    <span class="n">entities</span><span class="o">=</span><span class="p">{</span>
+</span><span class="line">        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;num_partitions&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+</span><span class="line">        <span class="s">&quot;item&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;num_partitions&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+</span><span class="line">    <span class="p">},</span>
+</span><span class="line">    <span class="n">relations</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;bought&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;item&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">},</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;sold&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;item&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">},</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;follows&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">},</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;hates&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="n">dynamic_relations</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dimension</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+</span><span class="line">    <span class="n">global_emb</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">comparator</span><span class="o">=</span><span class="s">&quot;dot&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_epochs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_uniform_negs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+</span><span class="line">    <span class="n">loss_fn</span><span class="o">=</span><span class="s">&quot;softmax&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+</span><span class="line">    <span class="n">regularization_coef</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+</span><span class="line">    <span class="n">eval_fraction</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+</span><span class="line"><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Full code is <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_multi_relation.py">here</a>.</p>
+
+<p>Happy embdding!</p>
+
+<p>c5454cgfd
+adfas;fksad fs;adfilsdf</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[5 Types of Nonsense Data Science]]></title>
@@ -2967,7 +3354,7 @@ perfectly much at Louisa the sense of the family of the compliments in the room.
     <link href="http://nadbordrozd.github.io/blog/2016/07/29/datamatching-part-3-match-scoring/"/>
     <updated>2016-07-29T20:39:30+01:00</updated>
     <id>http://nadbordrozd.github.io/blog/2016/07/29/datamatching-part-3-match-scoring</id>
-    <content type="html"><![CDATA[<p>In this post I will share some tips on the final aspect of data matching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
+    <content type="html"><![CDATA[<p>In this post I will share some tips on the final aspect of data matching that was glossed over in parts <a href="http://nadbordrozd.github.io/blog/2016/07/20/datamatching-part-1/">1</a> and <a href="http://nadbordrozd.github.io/blog/2016/07/22/datamatching-part-2-spark-pipeline/">2</a> - scoring matches. This is maybe the hardest part of the process, but it also requires the most domain knowledge so it’s hard to give general advice.</p>
 
 <h3 id="recap">Recap</h3>
 <p>In the previous posts we started with two datasets “left” and “right”. Using tokenization and the magic of spark we generated for every left record a small bunch of right records that maybe correspond to it. For example this record:</p>
@@ -4870,97 +5257,6 @@ Called it. People are totally doing that now <a href="http://arxiv.org/abs/1603.
 <p>If you know of any other cool applications of topic modeling to non-NLP problems let me know.</p>
 
 <p>If you want to play with topic models yourself I wholehartedly recommend <a href="https://radimrehurek.com/gensim/">gensim</a>. I tried also MLLib but its word2vec implementation required 3 times as much RAM (for each of 10 cores I used) and still was about ten times slower than gensim.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Lead Scoring Without Negative Examples]]></title>
-    <link href="http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples/"/>
-    <updated>2015-08-01T20:49:26+01:00</updated>
-    <id>http://nadbordrozd.github.io/blog/2015/08/01/forgetting-salesman-problem-or-classification-without-negative-examples</id>
-    <content type="html"><![CDATA[<p>How do you train a binary classifier when you have only positive-labeled training examples? 
-Impossible? Maybe. But sometimes you can do something just as good. Let’s start from the beginning…</p>
-
-<h3 id="lead-generation">Lead generation</h3>
-<p>Everyone and their mum in the b2b sector is trying to use machine learning 
-for lead generation. For our purposes lead-gen means selecting from the millions of active companies in your country the ones that are most likely to buy your product once contacted by your sales team. Needless to say lead generation is extremely <em>serious business</em> and constitutes a market sector in its own right - a type of b2b2b if you will.</p>
-
-<p>One popular lead-gen strategy is to look for leads among companies similar the ones that have worked out for you in the past. A machine learning implementation of this strategy is straightforward:</p>
-
-<ol>
-  <li>collect data on all relevant companies</li>
-  <li>take all the companies your sales have contacted in the past and label every one as either successful (you made money) or failed (you wasted your time) lead. This is your training set.</li>
-  <li>extract good features for every company*</li>
-  <li>train a binary classifier (predicting successful/failed label) on your training set. Ideally this should be a classifier that outputs probabilities.</li>
-  <li>apply the classifier to all the companies outside the training set and hand the results over to sales.
-The number assigned by the classifier to a given company is (in theory at least) the probability that the lead will be successful. Highest scorers should be prioritized, low scorers should be left alone. So far, so good.</li>
-</ol>
-
-<h3 id="forgetting-salesman-problem">Forgetting salesman problem</h3>
-<p>An interesting difficulty frequently arises when you try to apply this approach in real life. Sales teams usually have good records on their clients but often fail to keep track of all the prospects that didn’t work out. As a result, you end up with only positive examples to train your classifier on. It’s not possible in general to train a classifier on a training set with one class amputated this way. But…</p>
-
-<h3 id="the-solution">The solution</h3>
-<p>TL;DR = divide density of “good points” by density of all - this is the lead score</p>
-
-<p>Keep in mind that:</p>
-
-<ul>
-  <li>in addition to the positive examples, you have also the full set of all data points (all companies whether previously contacted or not)</li>
-  <li>you are not interested in the absolute probability of success of a given lead per se. You only really need the relative ranking of different leads. All the classifier scores may be off by a factor of 10 but as long as the order is preserved - you’ll still be able to prioritize good leads over rubbish ones.</li>
-</ul>
-
-<p>A solution will present itself once the problem is stated in mathematical terms. Consider the space of all possible company features $X$. Given are:</p>
-
-<ul>
-  <li>a set $C$ of points in $X$ - all companies</li>
-  <li>
-    <p>a subset $T_+$ of the above set - companies that were tested and gave positive result
-Unknown are:</p>
-  </li>
-  <li>the probability $f(x)$ that a company $x$ will test positive</li>
-  <li>the subset $T$ of all tested companies</li>
-</ul>
-
-<p>This is how it looks in an artificial 1-D dataset.
-<img src="http://nadbordrozd.github.io/images/leadgen1.png" /></p>
-
-<p>Notice that the distribution of companies $C$ and the conversion probability $f$ peak at different points and the distribution of positive exmaples $T_+$ peaks somewhere between those two.</p>
-
-<p>It’s useful to think of $C$ as a sample from some probabilty distribution $P(x)$ defined on $X$. Or to express the same in the language of point densities in space:</p>
-
-<script type="math/tex; mode=display">density\_of\_C(x) = const_1 P(x)</script>
-
-<p>If the companies tested $T$ were chosen at random from all companies $C$ then they constitute a sample from the same probability distribution $P(x)$</p>
-
-<script type="math/tex; mode=display">density\_of\_T(x) = const_2 P(x)</script>
-
-<p>Since a company’s chance of testing positive is $f$, the density of companies that tested positive is simply:</p>
-
-<script type="math/tex; mode=display">density\_of\_T_+(x) = density\_of\_T(x) f(x) = const_2 P(x) f(x)</script>
-
-<p>The set $T$ is hidden from us but $C$ and $T_+$ are available so we can use them to find $f(x)$. Combining the first and third equation we get:</p>
-
-<script type="math/tex; mode=display">\frac{const_2}{const_1} f(x) = \frac{density\_of\_T_+(x)}{density\_of\_C(x)}</script>
-
-<p>This is it. If we can just estimate the densities of $C$ and $T_+$ - we’re golden. Their ratio gives the $f$ function up to a constant, which is all we need to do lead scoring. There are many ways to do density estimation in practice:</p>
-
-<ul>
-  <li>histogram based estimation - lowest on the sophistication scale - divide the space $X$ into sectors and count the number of points in every sector, divide it by volume. Do it for both $C$ and $T_+$ and divide one result by the other</li>
-  <li>nearest neighbour estimation - for any interesting point find $k$ (let’s say $k=20$) nearest points in $C$. Count how many of them are also in $T_+$, divide the figures</li>
-  <li>kernel based estimation - in a way this is similar to the knn version - except instead of taking k nearest points you take all of them but discount the farthest by a dicreasing function of distance</li>
-</ul>
-
-<p>This is how it looks on our toy dataset:
-<img src="http://nadbordrozd.github.io/images/leadgen2.png" /></p>
-
-<p>Unsuprisingly, on a toy model everything works rather well. In reality conversion rates are low, data is sparse, dimensionality is high and even the basic assumption “good lead means similar to what has worked in the past” is questionable. But you have to start somewhere.</p>
-
-<p>For more information about the ML aspect of classification without negatives google the term “PU learning”.</p>
-
-<p>* this is arguably the hardest and most important step, but I’m glossing over it as it’s not relevant to this 
-  post</p>
-
-<p>** if there is prior knowledge regarding how the contacted companies were chosen, it can be easily incorporated</p>
 ]]></content>
   </entry>
   

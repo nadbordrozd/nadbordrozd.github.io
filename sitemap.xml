@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/</loc>
+<lastmod>2020-08-04T09:58:04+01:00</lastmod>
+</url>
+<url>
 <loc>http://nadbordrozd.github.io/blog/2019/08/11/5-types-of-nonsense-data-science/</loc>
 <lastmod>2019-08-11T12:22:57+01:00</lastmod>
 </url>
@@ -172,6 +176,9 @@
 <loc>http://nadbordrozd.github.io/blog/categories/char-rnn/</loc>
 </url>
 <url>
+<loc>http://nadbordrozd.github.io/blog/categories/graph-embedding/</loc>
+</url>
+<url>
 <loc>http://nadbordrozd.github.io/posts/2/</loc>
 </url>
 <url>
@@ -188,5 +195,9 @@
 <url>
 <loc>http://nadbordrozd.github.io/images/phone%20screen%20-%20Google%20Docs_files/xdbcm.html</loc>
 <lastmod>2016-05-16T22:08:46+01:00</lastmod>
+</url>
+<url>
+<loc>http://nadbordrozd.github.io/javascripts/custom/bokeh_pbg/ratings_plot.html</loc>
+<lastmod>2020-08-09T11:37:54+01:00</lastmod>
 </url>
 </urlset>

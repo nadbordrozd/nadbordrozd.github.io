@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Graph Embedding | DS lore]]></title>
+  <link href="http://nadbordrozd.github.io/blog/categories/graph-embedding/atom.xml" rel="self"/>
+  <link href="http://nadbordrozd.github.io/"/>
+  <updated>2020-08-09T11:53:02+01:00</updated>
+  <id>http://nadbordrozd.github.io/</id>
+  <author>
+    <name><![CDATA[nadbor]]></name>
+    <email><![CDATA[nadbordrozd@gmail.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA["Hello World!" in PyTorch BigGraph]]></title>
+    <link href="http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/"/>
+    <updated>2020-08-04T09:58:04+01:00</updated>
+    <id>http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph</id>
+    <content type="html"><![CDATA[<p>In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and finally show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
+
+<p>All the code can be found <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/PBG">here</a>. With this you can quickly get started embedding your own graphs.</p>
+
+<h3 id="why-graph-embeddings">Why graph embeddings?</h3>
+<p>Graph embeddings are a set of algorithms that given a graph (set of nodes connected by edges) produce a mapping node -&gt; n-dimensional vector (for some specified n). The goal of embedding is for the metric relationships between vectors to reflect connections of the graph. If two nodes are connected, their embeddings should be close in vector space (under some metric), if they are not - the embeddings should be distant.</p>
+
+<p>If successful, the embedding encodes much of the structure of the original graph but in a fixed-width, dense numeric format that can be directly used by most machine learning models.</p>
+
+<p>Unlike their better known cousins - word embeddings - graph embeddings are  still somewhat obscure and underutilised in the data science community. That must be in part because people don’t realise that graphs are everywhere.</p>
+
+<p>Most obviously, when the entities you’re studying directly interact with each other - they form a graph. Think - people following each other on social media or bank customers sending each other money.</p>
+
+<p>More common in real life applications are bipartite graphs. That’s when there are two kinds of entities - A and B - and As link with Bs but As don’t link with other As directly and neither do Bs with other Bs. Think - shoppers and items, movies and reviewers, companies and directors. Embedding these kinds of graphs is a popular technique in recommender systems - see for example <a href="https://eng.uber.com/uber-eats-graph-learning/">Uber Eats</a>.</p>
+
+<p>Text corpora are graphs too! You can represent each document in a corpus and each word in a document by a node. Then you connect a document-node to a word-node if the document contains the word. That’s your graph. Embedding this graph yields a word embedding + document embedding for free. (you can also use a sliding window of a few words instead of full document for better results). This way you can get a good quality word embedding using graph embedding techniques (see e.g. <a href="https://www.aclweb.org/anthology/D19-5305.pdf">this</a>).</p>
+
+<p>In short - graph embeddings are a powerful and universal feature engineering technique that turns many kinds of sparse, unstructured data into dense, structured data for use in downstream machine learning applications.</p>
+
+<h3 id="why-pytorch-biggraph">Why PyTorch BigGraph</h3>
+<p>There are <em>heaps</em> of graph embedding algorithms to pick from. <a href="https://github.com/chihming/awesome-network-embedding">Here’s a list</a> of models with (mostly Python) implementations. Unfortunately most of them are little better than some researcher’s one-off scripts. I think of them less as tools that you can pick up and use and more as a starting point to building your own graph embedder.</p>
+
+<p><a href="https://github.com/facebookresearch/PyTorch-BigGraph">PyTorch BigGraph</a> is by far the most mature of the libraries I have seen. It:</p>
+
+<ul>
+  <li>has (some) <a href="https://torchbiggraph.readthedocs.io/en/latest/">documentation</a>.</li>
+  <li>includes utils for transforming edge-list data to it’s preferred format.</li>
+  <li>includes multiple metrics for monitoring performance during as well as after training</li>
+  <li>supports multi-relation graphs</li>
+  <li>is customizable enough that it supersedes multiple other older models</li>
+  <li>
+    <p>is CPU-based - which is unusual and seems like a wasted opportunity but it does make using it easier and cheaper
+And most importantly:</p>
+  </li>
+  <li>it is fast and works reliably on even very big graphs (being disk-based, it won’t run out of RAM)</li>
+</ul>
+
+<p>It even includes a distributed mode for parallelizing training on the cluster. Unless the nodes of your graph number in the billions though, IMHO it is easier to just spin up a bigger machine at your favourite cloud platform. In my experiments a 16 CPU instance is enough to embed a graph of 25m nodes, 30m edges in 100d in a few hours.</p>
+
+<p>If you’re curious about 
+### Why this tutorial?
+If PBG is so great why does it need a tutorial?</p>
+
+<p>It seems to me that the authors were so focused on customizability that they let user experience take a back seat. Simply put - it takes way too many lines of code to do the simplest thing in PBG. The simplest usage example included in the repository consists of two files - one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/fb15k.py">108</a> and one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/configs/fb15k_config_cpu.py">46</a> lines long. This is what it takes to do the equivalent of <code>model.fit(data).predict(data)</code>.</p>
+
+<p>I’m guessing this is the reason why the library hasn’t achieved wider adoption. And without a wide user base, who is there to demand a friendlier API?</p>
+
+<p>I have wasted a lot of time before I managed to refactor the example to work on my graph. What follows is my stripped down to basics version of graph embedding that should work out of the box - the “Hello World!” - and one that you can use as a template for more complicated tasks.</p>
+
+<p>I found another similar tutorial on <a href="https://towardsdatascience.com/introduction-to-pytorch-biggraph-with-examples-b50ddad922b8">Towards Data Science</a> but the code didn’t work for me (newer version of PBG perhaps?).</p>
+
+<h3 id="hello-world">Hello World!</h3>
+<p>The full code of the example, with comments, is <a href="https://github.com/nadbordrozd/okapi/blob/master/blog/hello_graph_1.py">here</a>.</p>
+
+<p>First thing to do is installing PBG. As of this writing, the version available on PyPi is broken (crashes on running the first example) and you have to install it directly from github:</p>
+
+<p><code>bash
+pip install git+https://github.com/facebookresearch/PyTorch-BigGraph.git
+</code>
+Full requirements are <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_graph.py">here</a>.</p>
+
+<p>The graph we will be embedding consists of 4 nodes - <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code> and 5 edges between them. It needs to be saved as a tab-separated file like so:
+<code>python
+A   B
+B   C
+C   D
+D   B
+B   D
+</code></p>
+
+<p>Before we can apply PBG to the graph, we will have to transform it to a PBG-friendly format (fortunately P  BG provides a function for that). Before we do that, we have to define the training config. The config is a data structure holding all the settings and hyperparameters - like how many partitions to use (1 unless you want to do distributed training), what types of nodes there are (only 1 type), what types of edges between them etc.</p>
+
+<p><code>python
+raw_config = dict(
+    # graph metadata will go here
+    entity_path=DATA_DIR,
+    edge_paths=[
+        # graph data in HDF5 format will be saved here
+        DATA_DIR + '/edges_partitioned',
+    ],
+    # trained embeddings as well as temporary files go here
+    checkpoint_path=MODEL_DIR,
+    # Graph structure
+    entities={
+        "WHATEVER": {"num_partitions": 1}
+    },
+    relations=[
+        {
+            "name": "doesnt_matter",
+            "lhs": "WHATEVER",
+            "rhs": "WHATEVER",
+            "operator": "complex_diagonal",
+        }
+    ],
+    dynamic_relations=False,
+    dimension=4, # silly graph, silly dimensionality
+    global_emb=False,
+    comparator="dot",
+    num_epochs=7,
+    num_uniform_negs=50,
+    loss_fn="softmax",
+    lr=0.1,
+    regularization_coef=1e-3,
+    eval_fraction=0.,
+)
+</code></p>
+
+<p>Next, we use the config to transform the data into the preferred format using a helper function from <code>torchbiggraph.converters.importers.convert_input_data</code> function. Note that the config needs to be parsed first using another helper function because nothing is simple with PyTorch BigGraph.</p>
+
+<p>```python
+    setup_logging()
+    config = parse_config(raw_config)
+    subprocess_init = SubprocessInitializer()
+    # path to the tsv file with the graph edges
+    input_edge_paths = [Path(GRAPH_PATH)]</p>
+
+<pre><code>convert_input_data(
+    config.entities,
+    config.relations,
+    config.entity_path,
+    config.edge_paths,
+    input_edge_paths,
+    TSVEdgelistReader(lhs_col=0, rel_col=None, rhs_col=1),
+    dynamic_relations=config.dynamic_relations,
+) ```
+</code></pre>
+
+<p>Having prepared the data, training is straightforward:</p>
+
+<p><code>python
+train(config, subprocess_init=subprocess_init)
+</code></p>
+
+<p><em>Important</em> note: the above code (both data preparation and training) can’t be at the top level of a module - it needs to be placed inside a <code>if __name__ == '__main__':</code> block or some equivalent. This is because PTBG spawns multiple processes that import this very module at the same time. If this code is at the top level of a module, multiple processes will be trying to create the same file simultaneously and you will have a bad time!</p>
+
+<p>After training is done, we can load the embeddings from a h5 file. This file doesn’t include names of the nodes so we will have to look those up in one of the files created by the preprocessing function.</p>
+
+<p>```python
+nodes_path = DATA_DIR + ‘/entity_names_WHATEVER_0.json’
+    embeddings_path = MODEL_DIR + “/embeddings_WHATEVER_0.v{NUMBER_OF_EPOCHS}.h5” \
+        .format(NUMBER_OF_EPOCHS=raw_config[‘num_epochs’])</p>
+
+<pre><code>with open(nodes_path, 'r') as f:
+    node_names = json.load(f)
+
+with h5py.File(embeddings_path, 'r') as g:
+    embeddings = g['embeddings'][:]
+
+node2embedding = dict(zip(node_names, embeddings)) ```
+</code></pre>
+
+<p>The final result will look something like this:
+<code>
+{
+    'D': array([-0.0803747 ,  0.2267056 ,  0.09371386,  0.12704636], dtype=float32), 
+    'A': array([ 0.1961012 , -0.5856796 , -0.28119525, -0.4106653 ], dtype=float32), 
+    'B': array([ 0.10987103, -0.40970576, -0.18397042, -0.11587717], dtype=float32), 
+    'C': array([-0.16625881,  0.51607686,  0.2659427 ,  0.32392678], dtype=float32)
+}
+</code></p>
+
+<p>This is it!</p>
+
+<h3 id="multi-relation-graphs">Multi-relation graphs</h3>
+<p>The second example will feature PBG’s big selling point - the support for multi-relation graphs. 
+That means graphs with multiple kinds of edges.</p>
+
+<p>Imagine if Twitter and eBay had a baby. Data genereated on this unholy abomination of a website might look something like this:</p>
+
+<p><code>
+    alice   bought  fridge
+    alice   bought    bike
+    bob bought  laptop
+    carol   bought  fridge
+    carol   sold  laptop
+    carol   sold    bike
+    dave    sold    fridge
+    alice   follows bob
+    bob follows carol
+    bob hates dave
+    dave hates carol
+</code></p>
+
+<p>Here users follow other users as well as buy and sell items to each other. As a result we have two types of entities - users and items - and four types of edges - ‘bought’, ‘sold’, ‘follows’ and ‘hates’.</p>
+
+<p>We want to jointly embed users and items in a way that implicitly encodes who is buying and selling what and following or hating whom.</p>
+
+<p>We could do it by ignoring relation types and embedding it as a generic graph. That would be wrong because ‘follows’ and ‘hates’ mean something quite different and we don’t want to represent Bob and Dave as similar just because one of them follow Carol and the other hates her.</p>
+
+<p>Or we could do it by separately embedding 4 graphs - one for each type of relation. But that’s not ideal either because we’re losing valuable information. In our silly example Alice would only appear in the graphs of “bought” and of “follows”. Dave only appears in graphs of “sold” and “hates”. Therefore the two users wouldn’t have a common embedding and it wouldn’t be possible to calculate distance between them. A classfier wouldn’t trained on Alice couldn’t be applied to Dave.</p>
+
+<p>We can solve this problem by embedding the full multi-relation graph in one go in PBG.</p>
+
+<p>Internally, PBG deals with different relation types by applying a different (learned) transaformation to a node’s embedding in the context of a different relation type. For example it could learn that that if A ‘follows’ B, they should be close in vector space but when A ‘hates’ B, they should by close after flipping the sign of all coordinates of A - i.e. they should be represented by opposite vectors.</p>
+
+<p>From the point of view of a PBG the only difference when embedding a multi-relation graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
+
+<p><code>python
+raw_config = dict(
+    # I/O data
+    entity_path=DATA_DIR,
+    edge_paths=[
+        DATA_DIR + '/edges_partitioned',
+    ],
+    checkpoint_path=MODEL_DIR,
+    # Graph structure
+    entities={
+        "user": {"num_partitions": 1}, 
+        "item": {"num_partitions": 1},
+    },
+    relations=[
+        {
+            "name": "bought",
+            "lhs": "user",
+            "rhs": "item",
+            "operator": "complex_diagonal",
+        },
+        {
+            "name": "sold",
+            "lhs": "user",
+            "rhs": "item",
+            "operator": "complex_diagonal",
+        },
+        {
+            "name": "follows",
+            "lhs": "user",
+            "rhs": "user",
+            "operator": "complex_diagonal",
+        },
+        {
+            "name": "hates",
+            "lhs": "user",
+            "rhs": "user",
+            "operator": "complex_diagonal",
+        }
+    ],
+    dynamic_relations=False,
+    dimension=4,
+    global_emb=False,
+    comparator="dot",
+    num_epochs=7,
+    num_uniform_negs=50,
+    loss_fn="softmax",
+    lr=0.1,
+    regularization_coef=1e-3,
+    eval_fraction=0.,
+)
+</code></p>
+
+<p>Full code is <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_multi_relation.py">here</a>.</p>
+
+<p>Happy embdding!</p>
+]]></content>
+  </entry>
+  
+</feed>

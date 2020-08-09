@@ -1,0 +1,687 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>"Hello World!" in PyTorch BigGraph - DS lore</title>
+  <meta name="author" content="nadbor">
+
+  
+  <meta name="description" content=""Hello World!" in PyTorch BigGraph Aug 4th, 2020 9:58 am In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="DS lore" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="/javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-65624880-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">DS lore</a></h1>
+  
+    <h2>words about stuff</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sitesearch" value="nadbordrozd.github.io">
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/interviews">Interviews</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">"Hello World!" in PyTorch BigGraph</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-08-04T09:58:04+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>9:58 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and finally show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
+
+<p>All the code can be found <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/PBG">here</a>. With this you can quickly get started embedding your own graphs.</p>
+
+<h3 id="why-graph-embeddings">Why graph embeddings?</h3>
+<p>Graph embeddings are a set of algorithms that given a graph (set of nodes connected by edges) produce a mapping node -&gt; n-dimensional vector (for some specified n). The goal of embedding is for the metric relationships between vectors to reflect connections of the graph. If two nodes are connected, their embeddings should be close in vector space (under some metric), if they are not - the embeddings should be distant.</p>
+
+<p>If successful, the embedding encodes much of the structure of the original graph but in a fixed-width, dense numeric format that can be directly used by most machine learning models.</p>
+
+<p>Unlike their better known cousins - word embeddings - graph embeddings are  still somewhat obscure and underutilised in the data science community. That must be in part because people don’t realise that graphs are everywhere.</p>
+
+<p>Most obviously, when the entities you’re studying directly interact with each other - they form a graph. Think - people following each other on social media or bank customers sending each other money.</p>
+
+<p>More common in real life applications are bipartite graphs. That’s when there are two kinds of entities - A and B - and As link with Bs but As don’t link with other As directly and neither do Bs with other Bs. Think - shoppers and items, movies and reviewers, companies and directors. Embedding these kinds of graphs is a popular technique in recommender systems - see for example <a href="https://eng.uber.com/uber-eats-graph-learning/">Uber Eats</a>.</p>
+
+<p>Text corpora are graphs too! You can represent each document in a corpus and each word in a document by a node. Then you connect a document-node to a word-node if the document contains the word. That’s your graph. Embedding this graph yields a word embedding + document embedding for free. (you can also use a sliding window of a few words instead of full document for better results). This way you can get a good quality word embedding using graph embedding techniques (see e.g. <a href="https://www.aclweb.org/anthology/D19-5305.pdf">this</a>).</p>
+
+<p>In short - graph embeddings are a powerful and universal feature engineering technique that turns many kinds of sparse, unstructured data into dense, structured data for use in downstream machine learning applications.</p>
+
+<h3 id="why-pytorch-biggraph">Why PyTorch BigGraph</h3>
+<p>There are <em>heaps</em> of graph embedding algorithms to pick from. <a href="https://github.com/chihming/awesome-network-embedding">Here’s a list</a> of models with (mostly Python) implementations. Unfortunately most of them are little better than some researcher’s one-off scripts. I think of them less as tools that you can pick up and use and more as a starting point to building your own graph embedder.</p>
+
+<p><a href="https://github.com/facebookresearch/PyTorch-BigGraph">PyTorch BigGraph</a> is by far the most mature of the libraries I have seen. It:</p>
+
+<ul>
+  <li>has (some) <a href="https://torchbiggraph.readthedocs.io/en/latest/">documentation</a>.</li>
+  <li>includes utils for transforming edge-list data to it’s preferred format.</li>
+  <li>includes multiple metrics for monitoring performance during as well as after training</li>
+  <li>supports multi-relation graphs</li>
+  <li>is customizable enough that it supersedes multiple other older models</li>
+  <li>
+    <p>is CPU-based - which is unusual and seems like a wasted opportunity but it does make using it easier and cheaper
+And most importantly:</p>
+  </li>
+  <li>it is fast and works reliably on even very big graphs (being disk-based, it won’t run out of RAM)</li>
+</ul>
+
+<p>It even includes a distributed mode for parallelizing training on the cluster. Unless the nodes of your graph number in the billions though, IMHO it is easier to just spin up a bigger machine at your favourite cloud platform. In my experiments a 16 CPU instance is enough to embed a graph of 25m nodes, 30m edges in 100d in a few hours.</p>
+
+<p>If you’re curious about 
+### Why this tutorial?
+If PBG is so great why does it need a tutorial?</p>
+
+<p>It seems to me that the authors were so focused on customizability that they let user experience take a back seat. Simply put - it takes way too many lines of code to do the simplest thing in PBG. The simplest usage example included in the repository consists of two files - one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/fb15k.py">108</a> and one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/configs/fb15k_config_cpu.py">46</a> lines long. This is what it takes to do the equivalent of <code>model.fit(data).predict(data)</code>.</p>
+
+<p>I’m guessing this is the reason why the library hasn’t achieved wider adoption. And without a wide user base, who is there to demand a friendlier API?</p>
+
+<p>I have wasted a lot of time before I managed to refactor the example to work on my graph. What follows is my stripped down to basics version of graph embedding that should work out of the box - the “Hello World!” - and one that you can use as a template for more complicated tasks.</p>
+
+<p>I found another similar tutorial on <a href="https://towardsdatascience.com/introduction-to-pytorch-biggraph-with-examples-b50ddad922b8">Towards Data Science</a> but the code didn’t work for me (newer version of PBG perhaps?).</p>
+
+<h3 id="hello-world">Hello World!</h3>
+<p>The full code of the example, with comments, is <a href="https://github.com/nadbordrozd/okapi/blob/master/blog/hello_graph_1.py">here</a>.</p>
+
+<p>First thing to do is installing PBG. As of this writing, the version available on PyPi is broken (crashes on running the first example) and you have to install it directly from github:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="bash"><span class="line">pip install git+https://github.com/facebookresearch/PyTorch-BigGraph.git
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+<p>Full requirements are <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_graph.py">here</a>.</p>
+
+<p>The graph we will be embedding consists of 4 nodes - <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code> and 5 edges between them. It needs to be saved as a tab-separated file like so:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">A</span>   <span class="n">B</span>
+</span><span class="line"><span class="n">B</span>   <span class="n">C</span>
+</span><span class="line"><span class="n">C</span>   <span class="n">D</span>
+</span><span class="line"><span class="n">D</span>   <span class="n">B</span>
+</span><span class="line"><span class="n">B</span>   <span class="n">D</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Before we can apply PBG to the graph, we will have to transform it to a PBG-friendly format (fortunately P  BG provides a function for that). Before we do that, we have to define the training config. The config is a data structure holding all the settings and hyperparameters - like how many partitions to use (1 unless you want to do distributed training), what types of nodes there are (only 1 type), what types of edges between them etc.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">raw_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+</span><span class="line">    <span class="c"># graph metadata will go here</span>
+</span><span class="line">    <span class="n">entity_path</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="n">edge_paths</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="c"># graph data in HDF5 format will be saved here</span>
+</span><span class="line">        <span class="n">DATA_DIR</span> <span class="o">+</span> <span class="s">&#39;/edges_partitioned&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="c"># trained embeddings as well as temporary files go here</span>
+</span><span class="line">    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">MODEL_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="c"># Graph structure</span>
+</span><span class="line">    <span class="n">entities</span><span class="o">=</span><span class="p">{</span>
+</span><span class="line">        <span class="s">&quot;WHATEVER&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;num_partitions&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+</span><span class="line">    <span class="p">},</span>
+</span><span class="line">    <span class="n">relations</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;doesnt_matter&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;WHATEVER&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;WHATEVER&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="n">dynamic_relations</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dimension</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="c"># silly graph, silly dimensionality</span>
+</span><span class="line">    <span class="n">global_emb</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">comparator</span><span class="o">=</span><span class="s">&quot;dot&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_epochs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_uniform_negs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+</span><span class="line">    <span class="n">loss_fn</span><span class="o">=</span><span class="s">&quot;softmax&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+</span><span class="line">    <span class="n">regularization_coef</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+</span><span class="line">    <span class="n">eval_fraction</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+</span><span class="line"><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Next, we use the config to transform the data into the preferred format using a helper function from <code>torchbiggraph.converters.importers.convert_input_data</code> function. Note that the config needs to be parsed first using another helper function because nothing is simple with PyTorch BigGraph.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">setup_logging</span><span class="p">()</span>
+</span><span class="line"><span class="n">config</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">raw_config</span><span class="p">)</span>
+</span><span class="line"><span class="n">subprocess_init</span> <span class="o">=</span> <span class="n">SubprocessInitializer</span><span class="p">()</span>
+</span><span class="line"><span class="c"># path to the tsv file with the graph edges</span>
+</span><span class="line"><span class="n">input_edge_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">GRAPH_PATH</span><span class="p">)]</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="n">convert_input_data</span><span class="p">(</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">entities</span><span class="p">,</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">relations</span><span class="p">,</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">entity_path</span><span class="p">,</span>
+</span><span class="line">    <span class="n">config</span><span class="o">.</span><span class="n">edge_paths</span><span class="p">,</span>
+</span><span class="line">    <span class="n">input_edge_paths</span><span class="p">,</span>
+</span><span class="line">    <span class="n">TSVEdgelistReader</span><span class="p">(</span><span class="n">lhs_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">rel_col</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">rhs_col</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+</span><span class="line">    <span class="n">dynamic_relations</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">dynamic_relations</span><span class="p">,</span>
+</span><span class="line"><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Having prepared the data, training is straightforward:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">train</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">subprocess_init</span><span class="o">=</span><span class="n">subprocess_init</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p><em>Important</em> note: the above code (both data preparation and training) can’t be at the top level of a module - it needs to be placed inside a <code>if __name__ == '__main__':</code> block or some equivalent. This is because PTBG spawns multiple processes that import this very module at the same time. If this code is at the top level of a module, multiple processes will be trying to create the same file simultaneously and you will have a bad time!</p>
+
+<p>After training is done, we can load the embeddings from a h5 file. This file doesn’t include names of the nodes so we will have to look those up in one of the files created by the preprocessing function.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">nodes_path</span> <span class="o">=</span> <span class="n">DATA_DIR</span> <span class="o">+</span> <span class="s">&#39;/entity_names_WHATEVER_0.json&#39;</span>
+</span><span class="line">    <span class="n">embeddings_path</span> <span class="o">=</span> <span class="n">MODEL_DIR</span> <span class="o">+</span> <span class="s">&quot;/embeddings_WHATEVER_0.v{NUMBER_OF_EPOCHS}.h5&quot;</span> \
+</span><span class="line">        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">NUMBER_OF_EPOCHS</span><span class="o">=</span><span class="n">raw_config</span><span class="p">[</span><span class="s">&#39;num_epochs&#39;</span><span class="p">])</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">nodes_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span class="line">        <span class="n">node_names</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">embeddings_path</span><span class="p">,</span> <span class="s">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">g</span><span class="p">:</span>
+</span><span class="line">        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">g</span><span class="p">[</span><span class="s">&#39;embeddings&#39;</span><span class="p">][:]</span>
+</span><span class="line">
+</span><span class="line">    <span class="n">node2embedding</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">node_names</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The final result will look something like this:</p>
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;D&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.0803747</span> <span class="p">,</span>  <span class="mf">0.2267056</span> <span class="p">,</span>  <span class="mf">0.09371386</span><span class="p">,</span>  <span class="mf">0.12704636</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">),</span>
+</span><span class="line">    <span class="s">&#39;A&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">0.1961012</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.5856796</span> <span class="p">,</span> <span class="o">-</span><span class="mf">0.28119525</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4106653</span> <span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">),</span>
+</span><span class="line">    <span class="s">&#39;B&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mf">0.10987103</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.40970576</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.18397042</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.11587717</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">),</span>
+</span><span class="line">    <span class="s">&#39;C&#39;</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.16625881</span><span class="p">,</span>  <span class="mf">0.51607686</span><span class="p">,</span>  <span class="mf">0.2659427</span> <span class="p">,</span>  <span class="mf">0.32392678</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+</span><span class="line"><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>This is it!</p>
+
+<h3 id="multi-relation-graphs">Multi-relation graphs</h3>
+<p>The second example will feature PBG’s big selling point - the support for multi-relation graphs. 
+That means graphs with multiple kinds of edges.</p>
+
+<p>Imagine if Twitter and eBay had a baby. Data genereated on this unholy abomination of a website might look something like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">alice</span>   <span class="n">bought</span>  <span class="n">fridge</span>
+</span><span class="line"><span class="n">alice</span>   <span class="n">bought</span>    <span class="n">bike</span>
+</span><span class="line"><span class="n">bob</span> <span class="n">bought</span>  <span class="n">laptop</span>
+</span><span class="line"><span class="n">carol</span>   <span class="n">bought</span>  <span class="n">fridge</span>
+</span><span class="line"><span class="n">carol</span>   <span class="n">sold</span>  <span class="n">laptop</span>
+</span><span class="line"><span class="n">carol</span>   <span class="n">sold</span>    <span class="n">bike</span>
+</span><span class="line"><span class="n">dave</span>    <span class="n">sold</span>    <span class="n">fridge</span>
+</span><span class="line"><span class="n">alice</span>   <span class="n">follows</span> <span class="n">bob</span>
+</span><span class="line"><span class="n">bob</span> <span class="n">follows</span> <span class="n">carol</span>
+</span><span class="line"><span class="n">bob</span> <span class="n">hates</span> <span class="n">dave</span>
+</span><span class="line"><span class="n">dave</span> <span class="n">hates</span> <span class="n">carol</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Here users follow other users as well as buy and sell items to each other. As a result we have two types of entities - users and items - and four types of edges - ‘bought’, ‘sold’, ‘follows’ and ‘hates’.</p>
+
+<p>We want to jointly embed users and items in a way that implicitly encodes who is buying and selling what and following or hating whom.</p>
+
+<p>We could do it by ignoring relation types and embedding it as a generic graph. That would be wrong because ‘follows’ and ‘hates’ mean something quite different and we don’t want to represent Bob and Dave as similar just because one of them follow Carol and the other hates her.</p>
+
+<p>Or we could do it by separately embedding 4 graphs - one for each type of relation. But that’s not ideal either because we’re losing valuable information. In our silly example Alice would only appear in the graphs of “bought” and of “follows”. Dave only appears in graphs of “sold” and “hates”. Therefore the two users wouldn’t have a common embedding and it wouldn’t be possible to calculate distance between them. A classfier wouldn’t trained on Alice couldn’t be applied to Dave.</p>
+
+<p>We can solve this problem by embedding the full multi-relation graph in one go in PBG.</p>
+
+<p>Internally, PBG deals with different relation types by applying a different (learned) transaformation to a node’s embedding in the context of a different relation type. For example it could learn that that if A ‘follows’ B, they should be close in vector space but when A ‘hates’ B, they should by close after flipping the sign of all coordinates of A - i.e. they should be represented by opposite vectors.</p>
+
+<p>From the point of view of a PBG the only difference when embedding a multi-relation graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+<span class="line-number">40</span>
+<span class="line-number">41</span>
+<span class="line-number">42</span>
+<span class="line-number">43</span>
+<span class="line-number">44</span>
+<span class="line-number">45</span>
+<span class="line-number">46</span>
+<span class="line-number">47</span>
+<span class="line-number">48</span>
+<span class="line-number">49</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">raw_config</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+</span><span class="line">    <span class="c"># I/O data</span>
+</span><span class="line">    <span class="n">entity_path</span><span class="o">=</span><span class="n">DATA_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="n">edge_paths</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="n">DATA_DIR</span> <span class="o">+</span> <span class="s">&#39;/edges_partitioned&#39;</span><span class="p">,</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="n">checkpoint_path</span><span class="o">=</span><span class="n">MODEL_DIR</span><span class="p">,</span>
+</span><span class="line">    <span class="c"># Graph structure</span>
+</span><span class="line">    <span class="n">entities</span><span class="o">=</span><span class="p">{</span>
+</span><span class="line">        <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;num_partitions&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+</span><span class="line">        <span class="s">&quot;item&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s">&quot;num_partitions&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">},</span>
+</span><span class="line">    <span class="p">},</span>
+</span><span class="line">    <span class="n">relations</span><span class="o">=</span><span class="p">[</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;bought&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;item&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">},</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;sold&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;item&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">},</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;follows&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">},</span>
+</span><span class="line">        <span class="p">{</span>
+</span><span class="line">            <span class="s">&quot;name&quot;</span><span class="p">:</span> <span class="s">&quot;hates&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;lhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;rhs&quot;</span><span class="p">:</span> <span class="s">&quot;user&quot;</span><span class="p">,</span>
+</span><span class="line">            <span class="s">&quot;operator&quot;</span><span class="p">:</span> <span class="s">&quot;complex_diagonal&quot;</span><span class="p">,</span>
+</span><span class="line">        <span class="p">}</span>
+</span><span class="line">    <span class="p">],</span>
+</span><span class="line">    <span class="n">dynamic_relations</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">dimension</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+</span><span class="line">    <span class="n">global_emb</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+</span><span class="line">    <span class="n">comparator</span><span class="o">=</span><span class="s">&quot;dot&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_epochs</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span>
+</span><span class="line">    <span class="n">num_uniform_negs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+</span><span class="line">    <span class="n">loss_fn</span><span class="o">=</span><span class="s">&quot;softmax&quot;</span><span class="p">,</span>
+</span><span class="line">    <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+</span><span class="line">    <span class="n">regularization_coef</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
+</span><span class="line">    <span class="n">eval_fraction</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span>
+</span><span class="line"><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Full code is <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_multi_relation.py">here</a>.</p>
+
+<p>Happy embdding!</p>
+
+<p>c5454cgfd
+adfas;fksad fs;adfilsdf</p>
+</div>
+
+
+
+  <head>
+    
+  </head>
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">nadbor</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2020-08-04T09:58:04+01:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>4</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>9:58 am</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/graph-embedding/'>graph embedding</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/" data-via="" data-counturl="http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/" >Tweet</a>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2019/08/11/5-types-of-nonsense-data-science/" title="Previous Post: 5 types of nonsense data science">&laquo; 5 types of nonsense data science</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2020/08/04/hello-world-in-pytorch-biggraph/">"Hello World!" in PyTorch BigGraph</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2019/08/11/5-types-of-nonsense-data-science/">5 Types of Nonsense Data Science</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/12/10/what-they-dont-tell-you-about-data-science-2-data-analyst-roles-are-poison/">What They Don't Tell You About Data Science 2: Data Analyst Roles Are Poison</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/12/05/what-they-dont-tell-you-about-data-science-1/">What They Don't Tell You About Data Science 1: You Are a Software Engineer First</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2017/08/12/looking-for-the-text-top-model/">Looking for the Text Top Model</a>
+      </li>
+    
+  </ul>
+</section>
+
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li class="loading">Status updating...</li>
+  </ul>
+  
+  <a href="https://github.com/nadbordrozd">@nadbordrozd</a> on GitHub
+  
+  <script type="text/javascript">
+    $(document).ready(function(){
+        if (!window.jXHR){
+            var jxhr = document.createElement('script');
+            jxhr.type = 'text/javascript';
+            jxhr.src = '/javascripts/libs/jXHR.js';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(jxhr, s);
+        }
+
+        github.showRepos({
+            user: 'nadbordrozd',
+            count: 0,
+            skip_forks: true,
+            target: '#gh_repos'
+        });
+    });
+  </script>
+  <script src="/javascripts/github.js" type="text/javascript"> </script>
+</section>
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/nadbordrozd?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2020 - nadbor -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'ds-lore';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/';
+        var disqus_url = 'http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+
+<!-- mathjax config similar to math.stackexchange -->
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+  jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+    inlineMath: [ ['$', '$'] ],
+    displayMath: [ ['$$', '$$']],
+    processEscapes: true,
+    skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+  },
+  messageStyle: "none",
+  "HTML-CSS": { preferredFont: "TeX", availableFonts: ["STIX","TeX"] }
+});
+</script>
+<script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML" type="text/javascript"></script>
+
+</html>
