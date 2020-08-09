@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Machine Learning Lead Generation | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/machine-learning-lead-generation/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2020-08-09T13:35:11+01:00</updated>
+  <updated>2020-08-09T13:37:38+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -62,7 +62,7 @@ Unknown are:</p>
 </ul>
 
 <p>This is how it looks in an artificial 1-D dataset.
-{% img /images/leadgen1.png %}</p>
+<img src="/images/leadgen1.png"></p>
 
 <p>Notice that the distribution of companies $C$ and the conversion probability $f$ peak at different points and the distribution of positive exmaples $T_+$ peaks somewhere between those two.</p>
 
@@ -91,7 +91,7 @@ Unknown are:</p>
 </ul>
 
 <p>This is how it looks on our toy dataset:
-{% img /images/leadgen2.png %}</p>
+<img src="/images/leadgen2.png"></p>
 
 <p>Unsuprisingly, on a toy model everything works rather well. In reality conversion rates are low, data is sparse, dimensionality is high and even the basic assumption “good lead means similar to what has worked in the past” is questionable. But you have to start somewhere.</p>
 
