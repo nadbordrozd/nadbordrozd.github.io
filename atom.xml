@@ -4,7 +4,7 @@
   <title><![CDATA[DS lore]]></title>
   <link href="http://nadbordrozd.github.io/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2020-08-09T11:37:55+01:00</updated>
+  <updated>2020-08-09T13:21:58+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -21,6 +21,29 @@
     <content type="html"><![CDATA[<p>In this post I will explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and finally show how to use PBG on two very simple examples - the “Hello World!” of graph embedding.</p>
 
 <p>All the code can be found <a href="https://github.com/nadbordrozd/blog_stuff/tree/master/PBG">here</a>. With this you can quickly get started embedding your own graphs.</p>
+
+<h4 id="example-graph-of-movies">Example: Graph of movies</h4>
+<p>Before we get started, here’s a motivating example: visualisation of the embedding of the graph of cast and crew of movies from the <a href="https://www.kaggle.com/rounakbanik/the-movies-dataset">Movies Dataset</a> from Kaggle.</p>
+
+<html lang="en">
+    <body>
+        <iframe src="http://nadbordrozd.github.io/javascripts/custom/bokeh_pbg/cast_and_crew.html" width="720" height="720"></iframe>
+    </body>
+</html>
+
+<p>The embedding was based on a multi-relation graph of people working on movies (actors, directors, screenwriters, lightning, cameras etc.). The visualisation is the result of running <a href="https://umap-learn.readthedocs.io/en/latest/">UMAP</a> on the embeddings of the most popular movies (ignoring embeddings of people which were a by-product).</p>
+
+<p>And here’s the same set of movies but with a different embedding:</p>
+
+<html lang="en">
+    <body>
+        <iframe src="http://nadbordrozd.github.io/javascripts/custom/bokeh_pbg/cast_and_crew.html" width="720" height="720"></iframe>
+    </body>
+</html>
+
+<p>This embedding was based on a graph of movie ratings. The nodes correspond to movies and raters. There are 3 types of edges - ‘this user hated this movie’, ‘this user found this movie acceptable’, ‘this user loved this movie’ - corresponding to ratings (1, 1.5, 2, 2.5); (3, 3.5); (4, 4.5, 5) out of 5.</p>
+
+<p>I encourage you to mouse over the graphs to reveal clusters of moveies that are related by overlapping cast and crew (first plot) or by overlapping fanbase (second plot).</p>
 
 <h3 id="why-graph-embeddings">Why graph embeddings?</h3>
 <p>Graph embeddings are a set of algorithms that given a graph (set of nodes connected by edges) produce a mapping node -&gt; n-dimensional vector (for some specified n). The goal of embedding is for the metric relationships between vectors to reflect connections of the graph. If two nodes are connected, their embeddings should be close in vector space (under some metric), if they are not - the embeddings should be distant.</p>
@@ -394,9 +417,6 @@ That means graphs with multiple kinds of edges.</p>
 <p>Full code is <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/PBG/hello_multi_relation.py">here</a>.</p>
 
 <p>Happy embdding!</p>
-
-<p>c5454cgfd
-adfas;fksad fs;adfilsdf</p>
 ]]></content>
   </entry>
   

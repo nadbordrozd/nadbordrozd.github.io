@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Text Classification | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/text-classification/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2020-08-09T11:53:02+01:00</updated>
+  <updated>2020-08-09T13:21:58+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -31,13 +31,17 @@ unzip glove.6B.zip
 </code></p>
 
 <p>and use load them up in python:
-```python
-import numpy as np</p>
-
-<p>with open(“glove.6B.50d.txt”, “rb”) as lines:
-    w2v = {line.split()[0]: np.array(map(float, line.split()[1:]))
-           for line in lines}
-```</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="err">“</span><span class="n">glove</span><span class="o">.</span><span class="mi">6</span><span class="n">B</span><span class="o">.</span><span class="mi">50</span><span class="n">d</span><span class="o">.</span><span class="n">txt</span><span class="err">”</span><span class="p">,</span> <span class="err">“</span><span class="n">rb</span><span class="err">”</span><span class="p">)</span> <span class="k">as</span> <span class="n">lines</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">w2v</span> <span class="o">=</span> <span class="p">{</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]))</span>
+</span><span class='line'>           <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>or we can train a Word2Vec model from scratch with gensim:
 <code>python
@@ -49,27 +53,45 @@ w2v = dict(zip(model.wv.index2word, model.wv.syn0))
 
 <h4 id="the-python-meat">The (python) meat</h4>
 <p>We got ourselves a dictionary mapping word -&gt; 100-dimensional vector. Now we can use it to build features. The simplest way to do that is by averaging word vectors for all words in a text. We will build a sklearn-compatible transformer that is initialised with a word -&gt; vector dictionary.
-```python
-class MeanEmbeddingVectorizer(object):
-    def <strong>init</strong>(self, word2vec):
-        self.word2vec = word2vec
-        # if a text is empty we should return a vector of zeros
-        # with the same dimensionality as all the other vectors
-        self.dim = len(word2vec.itervalues().next())</p>
-
-<pre><code>def fit(self, X, y):
-    return self 
-
-def transform(self, X):
-    return np.array([
-        np.mean([self.word2vec[w] for w in words if w in self.word2vec] 
-                or [np.zeros(self.dim)], axis=0)
-        for words in X
-    ]) ```
-</code></pre>
-
-<p>Let’s throw in a version that uses tf-idf weighting scheme for good measure
-```python
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="k">class</span> <span class="nc">MeanEmbeddingVectorizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">def</span> <span class="err">&lt;</span><span class="nf">strong</span><span class="o">&gt;</span><span class="n">init</span><span class="o">&lt;/</span><span class="n">strong</span><span class="o">&gt;</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">word2vec</span><span class="p">):</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">word2vec</span> <span class="o">=</span> <span class="n">word2vec</span>
+</span><span class='line'>        <span class="c"># if a text is empty we should return a vector of zeros</span>
+</span><span class='line'>        <span class="c"># with the same dimensionality as all the other vectors</span>
+</span><span class='line'>        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">word2vec</span><span class="o">.</span><span class="n">itervalues</span><span class="p">()</span><span class="o">.</span><span class="n">next</span><span class="p">())</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">pre</span><span class="o">&gt;&lt;</span><span class="n">code</span><span class="o">&gt;</span><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="bp">self</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+</span><span class='line'>        <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">word2vec</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">w</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">word2vec</span><span class="p">]</span>
+</span><span class='line'>                <span class="ow">or</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">for</span> <span class="n">words</span> <span class="ow">in</span> <span class="n">X</span>
+</span><span class='line'>    <span class="p">])</span> <span class="sb">``</span><span class="err">`</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;&lt;/</span><span class="n">pre</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">Let</span><span class="err">’</span><span class="n">s</span> <span class="n">throw</span> <span class="ow">in</span> <span class="n">a</span> <span class="n">version</span> <span class="n">that</span> <span class="n">uses</span> <span class="n">tf</span><span class="o">-</span><span class="n">idf</span> <span class="n">weighting</span> <span class="n">scheme</span> <span class="k">for</span> <span class="n">good</span> <span class="n">measure</span>
+</span></code></pre></td></tr></table></div></figure>python
 class TfidfEmbeddingVectorizer(object):
     def <strong>init</strong>(self, word2vec):
         self.word2vec = word2vec
@@ -101,17 +123,25 @@ def transform(self, X):
 <p>These vectorizers can now be used <em>almost</em> the same way as <code>CountVectorizer</code> or <code>TfidfVectorizer</code> from <code>sklearn.feature_extraction.text</code>. Almost - because sklearn vectorizers can also do their own tokenization - a feature which we won’t be using anyway because the benchmarks we will be using come already tokenized. In a real application I wouldn’t trust sklearn with tokenization anyway - rather let spaCy do it.</p>
 
 <p>Now we are ready to define the actual models that will take tokenised text, vectorize and learn to classify the vectors with something fancy like Extra Trees. sklearn’s Pipeline is perfect for this:
-```python
-from sklearn.pipeline import Pipeline
-from sklearn.ensemble import ExtraTreesClassifier</p>
-
-<p>etree_w2v = Pipeline([
-    (“word2vec vectorizer”, MeanEmbeddingVectorizer(w2v)), 
-    (“extra trees”, ExtraTreesClassifier(n_estimators=200))])
-etree_w2v_tfidf = Pipeline([
-    (“word2vec vectorizer”, TfidfEmbeddingVectorizer(w2v)), 
-    (“extra trees”, ExtraTreesClassifier(n_estimators=200))])
-```</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+</span><span class='line'><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">ExtraTreesClassifier</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">etree_w2v</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+</span><span class='line'>    <span class="p">(</span><span class="err">“</span><span class="n">word2vec</span> <span class="n">vectorizer</span><span class="err">”</span><span class="p">,</span> <span class="n">MeanEmbeddingVectorizer</span><span class="p">(</span><span class="n">w2v</span><span class="p">)),</span>
+</span><span class='line'>    <span class="p">(</span><span class="err">“</span><span class="n">extra</span> <span class="n">trees</span><span class="err">”</span><span class="p">,</span> <span class="n">ExtraTreesClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">))])</span>
+</span><span class='line'><span class="n">etree_w2v_tfidf</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+</span><span class='line'>    <span class="p">(</span><span class="err">“</span><span class="n">word2vec</span> <span class="n">vectorizer</span><span class="err">”</span><span class="p">,</span> <span class="n">TfidfEmbeddingVectorizer</span><span class="p">(</span><span class="n">w2v</span><span class="p">)),</span>
+</span><span class='line'>    <span class="p">(</span><span class="err">“</span><span class="n">extra</span> <span class="n">trees</span><span class="err">”</span><span class="p">,</span> <span class="n">ExtraTreesClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">))])</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <h4 id="benchmarks">Benchmarks</h4>
 <p>I benchmarked the models on everyone’s favorite <a href="http://www.cs.umb.edu/~smimarog/textmining/datasets/">Reuters-21578</a> datasets. Extra Trees-based word-embedding-utilising models competed against text classification classics - Naive Bayes and SVM. Full list of contestants:</p>
@@ -147,17 +177,17 @@ bern_nb_tfidf       0.7954
 
 <p>SVM wins, word2vec-based Extra Trees is a close second, Naive Bayes not far behind. Interestingly, embedding trained on this relatively tiny dataset does significantly better than pretrained GloVe - which is otherwise fantastic. Can we do better? Let’s check how do the models compare depending on the number of labeled training examples. Due to its semi-supervised nature w2v should shine when there is little labeled data.</p>
 
-<p>{% img /images/text_class_with_w2v/r8.png %}</p>
+<p><img src="/images/text_class_with_w2v/r8.png"></p>
 
 <p>That indeed seems to be the case. <code>w2v_tfidf</code>’s performance degrades most gracefully of the bunch. <code>SVM</code> takes the biggest hit when examples are few. Lets try the other two benchmarks from Reuters-21578. 52-way classification:</p>
 
-<p>{% img /images/text_class_with_w2v/r52.png %}</p>
+<p><img src="/images/text_class_with_w2v/r52.png"></p>
 
 <p>Qualitatively similar results.</p>
 
 <p>And 20-way classification:</p>
 
-<p>{% img /images/text_class_with_w2v/20ng.png %}</p>
+<p><img src="/images/text_class_with_w2v/20ng.png"></p>
 
 <p>This time pretrained embeddings do better than Word2Vec and Naive Bayes does really well, otherwise same as before.</p>
 
@@ -179,22 +209,35 @@ bern_nb_tfidf       0.7954
 <p>Overall, we won’t be throwing away our SVMs any time soon in favor of word2vec but it has it’s place in text classification. Like when you have a tiny training set or to ensemble it with other models to gain edge in Kaggle.</p>
 
 <p>Plus, can SVM do this:
-```python
-X = [[‘Berlin’, ‘London’],
-     [‘cow’, ‘cat’],
-     [‘pink’, ‘yellow’]]
-y = [‘capitals’, ‘animals’, ‘colors’]
-etree_glove_big.fit(X, y)</p>
-
-<h1 id="never-before-seen-words">never before seen words!!!</h1>
-<p>test_X = [[‘dog’], [‘red’], [‘Madrid’]]</p>
-
-<p>print etree_glove_big.predict(test_X)
-<code>
-prints
-</code>text
-[‘animals’ ‘colors’ ‘capitals’]
-```</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">X</span> <span class="o">=</span> <span class="p">[[</span><span class="err">‘</span><span class="n">Berlin</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">London</span><span class="err">’</span><span class="p">],</span>
+</span><span class='line'>     <span class="p">[</span><span class="err">‘</span><span class="n">cow</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">cat</span><span class="err">’</span><span class="p">],</span>
+</span><span class='line'>     <span class="p">[</span><span class="err">‘</span><span class="n">pink</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">yellow</span><span class="err">’</span><span class="p">]]</span>
+</span><span class='line'><span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="err">‘</span><span class="n">capitals</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">animals</span><span class="err">’</span><span class="p">,</span> <span class="err">‘</span><span class="n">colors</span><span class="err">’</span><span class="p">]</span>
+</span><span class='line'><span class="n">etree_glove_big</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">h1</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;never-before-seen-words&quot;</span><span class="o">&gt;</span><span class="n">never</span> <span class="n">before</span> <span class="n">seen</span> <span class="n">words</span><span class="err">!!!</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="n">test_X</span> <span class="o">=</span> <span class="p">[[</span><span class="err">‘</span><span class="n">dog</span><span class="err">’</span><span class="p">],</span> <span class="p">[</span><span class="err">‘</span><span class="n">red</span><span class="err">’</span><span class="p">],</span> <span class="p">[</span><span class="err">‘</span><span class="n">Madrid</span><span class="err">’</span><span class="p">]]</span><span class="o">&lt;/</span><span class="n">p</span><span class="o">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&lt;</span><span class="n">p</span><span class="o">&gt;</span><span class="k">print</span> <span class="n">etree_glove_big</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_X</span><span class="p">)</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">code</span><span class="o">&gt;</span>
+</span><span class='line'><span class="n">prints</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">code</span><span class="o">&gt;</span><span class="n">text</span>
+</span><span class='line'><span class="p">[</span><span class="err">‘</span><span class="n">animals</span><span class="err">’</span> <span class="err">‘</span><span class="n">colors</span><span class="err">’</span> <span class="err">‘</span><span class="n">capitals</span><span class="err">’</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 ]]></content>
   </entry>
