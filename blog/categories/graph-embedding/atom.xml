@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Graph Embedding | DS lore]]></title>
   <link href="http://nadbordrozd.github.io/blog/categories/graph-embedding/atom.xml" rel="self"/>
   <link href="http://nadbordrozd.github.io/"/>
-  <updated>2020-08-09T13:37:38+01:00</updated>
+  <updated>2020-08-09T13:45:00+01:00</updated>
   <id>http://nadbordrozd.github.io/</id>
   <author>
     <name><![CDATA[nadbor]]></name>
@@ -80,9 +80,10 @@ And most importantly:</p>
 
 <p>It even includes a distributed mode for parallelizing training on the cluster. Unless the nodes of your graph number in the billions though, IMHO it is easier to just spin up a bigger machine at your favourite cloud platform. In my experiments a 16 CPU instance is enough to embed a graph of 25m nodes, 30m edges in 100d in a few hours.</p>
 
-<p>If you’re curious about 
-### Why this tutorial?
-If PBG is so great why does it need a tutorial?</p>
+<p>If you’re curious about</p>
+
+<h3 id="why-this-tutorial">Why this tutorial?</h3>
+<p>If PBG is so great why does it need a tutorial?</p>
 
 <p>It seems to me that the authors were so focused on customizability that they let user experience take a back seat. Simply put - it takes way too many lines of code to do the simplest thing in PBG. The simplest usage example included in the repository consists of two files - one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/fb15k.py">108</a> and one <a href="https://github.com/facebookresearch/PyTorch-BigGraph/blob/master/torchbiggraph/examples/configs/fb15k_config_cpu.py">46</a> lines long. This is what it takes to do the equivalent of <code>model.fit(data).predict(data)</code>.</p>
 
