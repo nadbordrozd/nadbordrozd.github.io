@@ -389,15 +389,15 @@ That means graphs with multiple kinds of edges. We will also throw in multiple e
 
 <p>We want to jointly embed users and items in a way that implicitly encodes who is buying and selling what and following or hating whom.</p>
 
-<p>We could do it by ignoring relation types and embedding it as a generic graph. That would be wrong because ‘follows’ and ‘hates’ mean something quite different and we don’t want to represent Bob and Dave as similar just because one of them follow Carol and the other hates her.</p>
+<p>We could do it by ignoring relation types and embedding it as a generic graph. That would be wrong because ‘follows’ and ‘hates’ mean something quite different and we don’t want to represent Bob and Dave as similar just because one of them follows Carol and the other hates her.</p>
 
-<p>Or we could do it by separately embedding 4 graphs - one for each type of relation. But that’s not ideal either because we’re losing valuable information. In our silly example Alice would only appear in the graphs of “bought” and of “follows”. Dave only appears in graphs of “sold” and “hates”. Therefore the two users wouldn’t have a common embedding and it wouldn’t be possible to calculate distance between them. A classfier wouldn’t trained on Alice couldn’t be applied to Dave.</p>
+<p>Or we could do it by separately embedding 4 graphs - one for each type of relation. But that’s not ideal either because we’re losing valuable information. In our silly example Alice would only appear in the graphs of “bought” and of “follows”. Dave only appears in graphs of “sold” and “hates”. Therefore the two users wouldn’t have a common embedding and it wouldn’t be possible to calculate distance between them. A classfier trained on Alice couldn’t be applied to Dave.</p>
 
 <p>We can solve this problem by embedding the full multi-relation graph in one go in PBG.</p>
 
 <p>Internally, PBG deals with different relation types by applying a different (learned) transaformation to a node’s embedding in the context of a different relation type. For example it could learn that that if A ‘follows’ B, they should be close in vector space but when A ‘hates’ B, they should by close after flipping the sign of all coordinates of A - i.e. they should be represented by opposite vectors.</p>
 
-<p>From the point of view of a PBG user the only difference when embedding a multi-relation, multi-entity graph is that one has to declare all entity types and relation types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
+<p>From the point of view of a PBG user the only difference when embedding a multi-relation, multi-entity graph is that one has to declare all relation types and entity types in the config. We also get to chose a different transformation for each relation (though I can’t imagine why anyone would). The config dict for our Twitter/eBay graph would look like this:</p>
 
 <div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
 <span class="line-number">2</span>
