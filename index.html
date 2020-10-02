@@ -9,7 +9,7 @@
   <meta name="author" content="nadbor">
 
   
-  <meta name="description" content="In this post I explain why graph embedding is cool, why Pytorch BigGraph is a cool way to do it and show how to use PBG on two very simple examples &hellip;">
+  <meta name="description" content="This post will be about a cool new feature engineering technique for encoding sets of vectors as a single vector - as described in the recent paper &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,432 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2020/09/07/embedding-sets-of-vectors-with-emde/">Embedding Sets of Vectors With EMDE</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2020-09-07T10:20:58+01:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2020</span></span> <span class='time'>10:20 am</span></time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This post will be about a cool new feature engineering technique for encoding sets of vectors as a single vector - as described in the recent paper <a href="https://arxiv.org/abs/2006.01894">An efficient manifold density estimator for all recommendation systems.</a> The paper focuses on EMDE’s applications to recommender systems but I’m more interested in the technique itself.</p>
+
+<p>I will provide motivation for the technique, a <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/emde/emde.ipynb">python implementation</a> of it and finally some benchmarks.</p>
+
+<h2 id="aggregating-vectors-as-feature-engineering">Aggregating vectors as feature engineering</h2>
+<p>From a pragmatic perspective, EMDE is just an algorithm for compressing sets of vectors into a single fixed-width vector.</p>
+
+<p>Aggregating a set of vectors into a single vector may seem like a pretty esoteric requirement but it is actually quite common. It often arises when you have one kind of entities (users) interacting with another (items, merchants, websites).</p>
+
+<p>Let’s say you already have a vector representation (embedding) of every food item in the world. Like any good embedding, it captures the metric relations between the underlying objects - similar foods are represented by similar vectors and vice versa. You also have a list of people and the foods they like. You would like to leverage the food embeddings to create embeddings of the people - for the purpose of recommendation or classification or any other person-based ML task.</p>
+
+<p><img src="/images/emde/1_embedding_alice.png" width="500" height="500" /></p>
+
+<p>Somehow you want to turn the information that Alice likes salami, chorizo and Hawaiian pizza (mapped to vectors v1, v2, v3) into a single vector representing Alice. The procedure should work regardless of how many food items a person likes.</p>
+
+<h2 id="aggregating-vectors-as-density-estimation">Aggregating vectors as density estimation</h2>
+<p>Another way of looking at the same problem - and one taken by the authors of the EMDE paper - is as a problem of estimation of a density function in the embedding space.</p>
+
+<p>Instead of thinking of foods as distinct points in space, we can imagine a continuous shape - a manifold - in the embedding space whose every point corresponds to a food - real or potential. Some of the points on this manifold are familiar - an apple or a salami. But between the familiar ones there is a whole continuum of foods that could be. An apple-flavored salami? Apple and salami salad? If <a href="https://it.wikipedia.org/wiki/File:Prosciutto_di_Parma_e_melone.jpg">prosciutto e melone</a> is a thing, why not salami apple?</p>
+
+<p>In this model we can think of Alice’s preferences as a probability density function defined on the manifold. Maybe function’s value is highest in the cured meats region of the manifold, lower around pizzas and zero near the fruits. That means Alice likes salami, chorizo, pepperoni and every other similar sausage we can invent but she only likes some pizzas and none of the fruits.</p>
+
+<p><img src="/images/emde/2_latent_density.png" width="500" height="500" /></p>
+
+<p>This density function is <em>latent</em> - we can’t measure it directly. All we know is the handful of foods that Alice explicitly liked. We can interpret these items as points <em>drawn from the latent probability distribution</em>. What we’re trying to do is use the sample to get an estimate of the pdf. The reason this estimation is at all possible is that we believe the function is well-behaved in the embedding space - it doesn’t vary too wildly between neighbouring items. If Alice likes salami and chorizo, she will also probably like other similar kinds of sausage like pepperoni.</p>
+
+<p>Viewed from this perspective, the purpose of EMDE is to:</p>
+
+<ol>
+  <li><em>Parametrize</em> the space of all probability distributions over the manifold of food items.</li>
+  <li><em>Estimate</em> the paramaters of a specific distribution based on a sample.</li>
+</ol>
+
+<p>The estimated parameters can then serve as a feature vector describing the user.</p>
+
+<h4 id="how-not-to-do-it">How not to do it</h4>
+<p>The most straightforward way of summarising a list of vectors is by taking their arithmetic average. That’s exactly what I have tried in my <a href="http://nadbordrozd.github.io/blog/2016/05/20/text-classification-with-word2vec/">post from 2016</a>. It worked okay-ish as a feature engineering technique but clearly a lot of detail gets lost this way. For instance, by looking at just the average vector, you can’t tell the difference between someone who likes hot dogs and someone else who only likes buns and frankfurters separately.</p>
+
+<p>The average is just a summary statistic of a distribution - but what EMDE is trying to do is capture the full distribution itself (up to a finite but arbitrary precision).</p>
+
+<h2 id="emde---idea">EMDE - idea</h2>
+<p>The input to this algorithm consists of:</p>
+
+<ul>
+  <li>the set of embeddings of all items</li>
+  <li>list of items per user</li>
+</ul>
+
+<p>And the hyperparameters:</p>
+
+<ul>
+  <li>K - the number of hyperplanes in a single partitioning</li>
+  <li>and N - the number of independent partitionings</li>
+</ul>
+
+<p>The output is a sparse embedding of each user.</p>
+
+<p>The algorithm (the illustrations will use <strong>K=3</strong> and <strong>N=4</strong>):</p>
+
+<h4 id="section">1.</h4>
+<p>Start with the set of embeddings of all items.</p>
+
+<p><img src="/images/emde/3_raw_embedding.png" width="500" height="500" /></p>
+
+<h4 id="section-1">2.</h4>
+<p>Cut the space into regions (buckets) using random hyperplanes. The orientation of the hyperplanes is uniformly random and their position is drawn from the distribution of the item vectors. That means the planes always cut through the data and most often through regions where data is dense, never outside the range of data.</p>
+
+<p>Assign numbers to the regions.</p>
+
+<p><img src="/images/emde/4_buckets.png" width="500" height="500" /></p>
+
+<h4 id="section-2">3.</h4>
+
+<p>For each user count items in each bucket. 
+<img src="/images/emde/5_bucket_counts_old.png" width="500" height="600" /></p>
+
+<p><img src="/images/emde/5_bucket_counts_new.png" width="500" height="100" /></p>
+
+<p>The sequence of numbers generated this way</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">[0, 0, 2, 0, 0, 0, 1]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>is the desired summary of the user’s items (almost). It is easy to see that these numbers define a coarse-grained density function over the space of items - like so:</p>
+
+<p><img src="/images/emde/6_inferred_density.png" width="500" height="500" /></p>
+
+<h4 id="section-3">4.</h4>
+<p>To get a more fine-grained estimate of the latent density, we need to repeat steps 2. and 3. N times and concatenate the resulting count vectors per user.</p>
+
+<p><img src="/images/emde/7_N_iterations.png" width="800" height="500" /></p>
+
+<p>This sequence of numbers (the authors of the paper call it a “<strong>sketch</strong>” as it is a kind of a <a href="https://en.wikipedia.org/wiki/Count%E2%80%93min_sketch">Count Sketch</a>)</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">[0, 0, 2, 0, 0, 0, 1, 0, 0, 2, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 2, 1, 0, 0, 0, 0]
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>is the final output of EMDE (for one particular user).</p>
+
+<p>The corresponding density function would look something like this:</p>
+
+<p><img src="/images/emde/8_fine_density.png" width="500" height="500" /></p>
+
+<hr />
+
+<p>Two important properties of this algorithm:</p>
+
+<ol>
+  <li>The resulting sketches are <strong>additive</strong> - <code>sketch({apple, salami}) = sketch({apple}) + sketch({salami})</code>.</li>
+  <li>Similar items tend to fall into the same bucket so they end up with a similar sketch - <code>sketch({apple, salami}) ~ sketch({pear, chorizo})</code>.</li>
+</ol>
+
+<h3 id="k-and-n">K and N</h3>
+
+<p>The authors of the EMDE paper suggest that sketch width = 128 (roughly corresponding to K=7) is a good default setting and one should spend one’s dimensionality budget on increasing N rather than K beyond this point.</p>
+
+<p>But why bother with N sets of hyperplanes at all? Why not use all of them in one go (N=1, big K)?</p>
+
+<p>The answer (I think) is that we don’t want the buckets to get too small. The entire point of EMDE is to have multiple similar items land in the same bucket - otherwise it’s just one-hot encoding. OHE is not a bad thing in itself but it’s not leveraging the embeddings anymore.</p>
+
+<p>Having large buckets (small K), on the other hand leads to false positives - <em>dissimilar</em> items landing in the same bucket - but we mitigate this problem by having N overlapping sets of buckets. Even if bananas and chorizo end up in the same bucket one of the sets, they probably won’t in the others.</p>
+
+<p>That being said, I have tried lots of different combinations of K and N and can’t see any clear pattern regarding what works best.</p>
+
+<h2 id="emde---implementation">EMDE - implementation</h2>
+
+<p>Once trained on a set of vectors, EMDE can be used to transform any other sets of vectors - as long as they have the same dimension. However, in most applications, all the item vectors are static and known up front. The following implementation will assume that this is the case which will let us make the code cleaner and more efficient. I have included the more general, less efficient implementation <a href="https://github.com/nadbordrozd/blog_stuff/blob/master/emde/emde.ipynb">here</a>.</p>
+
+<p>Thanks to additivity of sketches, to find the sketch of any given set of items it is enough to find the sketches of all the individual items and add them. Since all the items are know at training time, we can just pre-calculate sketches for all of them and simply add them at prediction time.</p>
+
+<p>The following function pre-calculates sketches for all the items given their embeddings.</p>
+
+<p><em>Linear algebra 101 reminder: a hyperplane is the set of points $\vec{x}$ in a Euclidean space that satisfy:</em></p>
+
+<script type="math/tex; mode=display">\vec{v} \cdot \vec{x} = c</script>
+
+<p>*for some constant $\vec{v}$, $c$._</p>
+
+<p>_If $\vec{v} \cdot \vec{x} &gt; c$ - then $\vec{x}$ lies to one side of the hyperplane. If $\vec{v} \cdot \vec{x} &lt; c$ - it lies on the other side.*</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+<span class="line-number">21</span>
+<span class="line-number">22</span>
+<span class="line-number">23</span>
+<span class="line-number">24</span>
+<span class="line-number">25</span>
+<span class="line-number">26</span>
+<span class="line-number">27</span>
+<span class="line-number">28</span>
+<span class="line-number">29</span>
+<span class="line-number">30</span>
+<span class="line-number">31</span>
+<span class="line-number">32</span>
+<span class="line-number">33</span>
+<span class="line-number">34</span>
+<span class="line-number">35</span>
+<span class="line-number">36</span>
+<span class="line-number">37</span>
+<span class="line-number">38</span>
+<span class="line-number">39</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+</span><span class="line"><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+</span><span class="line"><span class="kn">import</span> <span class="nn">scipy.sparse</span> <span class="kn">as</span> <span class="nn">ssp</span>
+</span><span class="line">
+</span><span class="line">
+</span><span class="line"><span class="k">def</span> <span class="nf">EMDE_transform</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">item_vectors</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;takes a and array of embedding vectors and </span>
+</span><span class="line"><span class="sd">    returns a sparse array of their sketches</span>
+</span><span class="line"><span class="sd">    &quot;&quot;&quot;</span>
+</span><span class="line">    <span class="n">n_items</span><span class="p">,</span> <span class="n">d</span> <span class="o">=</span> <span class="n">item_vectors</span><span class="o">.</span><span class="n">shape</span>
+</span><span class="line">    <span class="n">shallow_sketches</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span class="line">    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+</span><span class="line">        <span class="c"># first chose K vectors at random - these are the normal vectors to the K hyperplanes</span>
+</span><span class="line">        <span class="n">random_vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span>
+</span><span class="line">
+</span><span class="line">        <span class="c"># for every hyperplane choose one of the items at random</span>
+</span><span class="line">        <span class="c"># we will choose the offset for the hyperplane so that it passes</span>
+</span><span class="line">        <span class="c"># through the selected item (or rather the item&#39;s vector)</span>
+</span><span class="line">        <span class="n">random_inds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="n">n_items</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">K</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">        <span class="c"># scalar product of every item with the random vectors</span>
+</span><span class="line">        <span class="n">scalar_products</span> <span class="o">=</span> <span class="n">random_vectors</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">item_vectors</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+</span><span class="line">        <span class="n">offsets</span> <span class="o">=</span> <span class="n">scalar_products</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="p">),</span> <span class="n">random_inds</span><span class="p">]</span>
+</span><span class="line">
+</span><span class="line">        <span class="c"># for every point for every plane determine </span>
+</span><span class="line">        <span class="c"># on which side of the plane does the point lie</span>
+</span><span class="line">        <span class="c"># the result is a boolean array of size (n_items, K)</span>
+</span><span class="line">        <span class="n">bits</span> <span class="o">=</span> <span class="p">(</span><span class="n">scalar_products</span> <span class="o">&gt;</span> <span class="n">offsets</span><span class="o">.</span><span class="n">reshape</span><span class="p">([</span><span class="n">K</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span><span class="o">.</span><span class="n">T</span>
+</span><span class="line">
+</span><span class="line">        <span class="c"># for every item encode the sequence of booleans as an integer using binary</span>
+</span><span class="line">        <span class="c"># the result is an integer array of length n_items</span>
+</span><span class="line">        <span class="n">bucket_nums</span> <span class="o">=</span> <span class="p">(</span><span class="n">bits</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">K</span><span class="p">)))</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">        <span class="c"># one-hot-encoding on bucket numbers</span>
+</span><span class="line">        <span class="n">sketch</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">analyzer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span>
+</span><span class="line">            <span class="n">bucket_nums</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">n_items</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+</span><span class="line">        <span class="n">shallow_sketches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sketch</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">return</span> <span class="n">ssp</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">shallow_sketches</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Note that <code>CountVectorizer</code> above makes sure that only the buckets with at least one vector in them are represented. As a result, the width of a single sketch which is <em>at most</em> $2^K$ ($2^K N$ for the full sketch), in practice is often much lower - especially for low dimensional embeddings.</p>
+
+<p>Now, for convenience, we can wrap this up in a sklearn-like interface while adding the option to use tfidf weighting for items.</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+<span class="line-number">16</span>
+<span class="line-number">17</span>
+<span class="line-number">18</span>
+<span class="line-number">19</span>
+<span class="line-number">20</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="k">class</span> <span class="nc">EMDEVectorizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+</span><span class="line">    <span class="sd">&quot;&quot;&quot;A drop-in replacement for CountVectorizer and TfidfVectorizer</span>
+</span><span class="line"><span class="sd">    - based on EMDE&quot;&quot;&quot;</span>
+</span><span class="line">    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">K</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">item2vec</span><span class="p">,</span> <span class="n">tfidf</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+</span><span class="line">        <span class="n">items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">item2vec</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+</span><span class="line">        <span class="n">item_vectors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">item2vec</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+</span><span class="line">
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">emde_embeddings</span> <span class="o">=</span> <span class="n">EMDE_transform</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">item_vectors</span><span class="p">)</span>
+</span><span class="line">        <span class="k">if</span> <span class="n">tfidf</span><span class="p">:</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">analyzer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">vocabulary</span><span class="o">=</span><span class="n">items</span><span class="p">)</span>
+</span><span class="line">        <span class="k">else</span><span class="p">:</span>
+</span><span class="line">            <span class="bp">self</span><span class="o">.</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">analyzer</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">vocabulary</span><span class="o">=</span><span class="n">items</span><span class="p">)</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+</span><span class="line">        <span class="c"># this is only necessary for tfidf=True, otherwise it does nothing</span>
+</span><span class="line">        <span class="bp">self</span><span class="o">.</span><span class="n">vectorizer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+</span><span class="line">        <span class="k">return</span> <span class="bp">self</span>
+</span><span class="line">
+</span><span class="line">    <span class="k">def</span> <span class="nf">transform</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">):</span>
+</span><span class="line">        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">vectorizer</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">emde_embeddings</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>It can be used like this:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+<span class="line-number">12</span>
+<span class="line-number">13</span>
+<span class="line-number">14</span>
+<span class="line-number">15</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="n">item2vec</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class="line">    <span class="s">&#39;chorizo&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">]),</span>
+</span><span class="line">    <span class="s">&#39;banana&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.7</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.2</span><span class="p">,</span> <span class="mf">2.56</span><span class="p">]),</span>
+</span><span class="line">    <span class="s">&#39;sourdough&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">])</span>
+</span><span class="line"><span class="p">}</span>
+</span><span class="line">
+</span><span class="line"><span class="n">user_baskets</span> <span class="o">=</span> <span class="p">[</span>
+</span><span class="line">    <span class="p">[</span><span class="s">&#39;chorizo&#39;</span><span class="p">,</span> <span class="s">&#39;banana&#39;</span><span class="p">],</span>
+</span><span class="line">    <span class="p">[</span><span class="s">&#39;sourdough&#39;</span><span class="p">],</span>
+</span><span class="line">    <span class="p">[</span><span class="s">&#39;banana&#39;</span><span class="p">,</span> <span class="s">&#39;banana&#39;</span><span class="p">,</span> <span class="s">&#39;banana&#39;</span><span class="p">],</span>
+</span><span class="line">    <span class="p">[</span><span class="s">&#39;banana&#39;</span><span class="p">,</span> <span class="s">&#39;chorizo&#39;</span><span class="p">,</span> <span class="s">&#39;sourdough&#39;</span><span class="p">,</span> <span class="s">&#39;sourdough&#39;</span><span class="p">]</span>
+</span><span class="line"><span class="p">]</span>
+</span><span class="line">
+</span><span class="line"><span class="n">emde</span> <span class="o">=</span> <span class="n">EMDEVectorizer</span><span class="p">(</span><span class="n">K</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">item2vec</span><span class="o">=</span><span class="n">item2vec</span><span class="p">)</span>
+</span><span class="line"><span class="n">users_embedded</span> <span class="o">=</span> <span class="n">emde</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">user_baskets</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>The result is:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="o">&gt;&gt;&gt;</span> <span class="n">users_embedded</span><span class="o">.</span><span class="n">todense</span><span class="p">()</span>
+</span><span class="line"><span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+</span><span class="line">        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span class="line">        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+</span><span class="line">        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">int64</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>Before passing this sketch to a ML model, you might want to normalize it row-wise. The paper suggests ‘L2’ normalization. I’ve had even better results with <em>max</em> norm:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+</pre></td><td class="code"><pre><code class="python"><span class="line"><span class="kn">from</span> <span class="nn">np.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
+</span><span class="line">
+</span><span class="line"><span class="n">users_embedded_normed</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">users_embedded</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<h2 id="benchmarks">Benchmarks</h2>
+
+<p>To test the efficacy of the EMDE approach I used the good old <a href="https://www.cs.umb.edu/~smimarog/textmining/datasets/">text classification benchmarks</a> - 20 Newsgroups and R8.</p>
+
+<p>In both cases I trained Word2Vec on all the texts to get a word embedding and then used EMDE to generate a sketch for every document by aggregating the word embeddings. Then I trained and tested a logistic regression (with 5-fold cross validation) on the sketches as well as on the raw word counts and on averaged embeddings.</p>
+
+<p>The results for R8:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">features            accuracy    dim
+</span><span class="line">----------------  ----------  -----
+</span><span class="line">EMDE K=1  N=2000    0.967943   4000
+</span><span class="line">EMDE K=10 N=30      0.967813   8104
+</span><span class="line">EMDE K=8 N=30       0.967553   4010
+</span><span class="line">EMDE K=8 N=10       0.964425   1303
+</span><span class="line">EMDE K=1  N=1000    0.964424   2000
+</span><span class="line">EMDE K=10 N=10      0.964164   2554
+</span><span class="line">EMDE K=30  N=1      0.95856    3704
+</span><span class="line">OHE                 0.952826  22931
+</span><span class="line">mean vec            0.948918    100
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>And for 20 Newsgroups:</p>
+
+<div class="bogus-wrapper"><notextile><figure class="code"><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class="line-number">1</span>
+<span class="line-number">2</span>
+<span class="line-number">3</span>
+<span class="line-number">4</span>
+<span class="line-number">5</span>
+<span class="line-number">6</span>
+<span class="line-number">7</span>
+<span class="line-number">8</span>
+<span class="line-number">9</span>
+<span class="line-number">10</span>
+<span class="line-number">11</span>
+</pre></td><td class="code"><pre><code class="text"><span class="line">features            accuracy    dim
+</span><span class="line">----------------  ----------  -----
+</span><span class="line">EMDE K=30  N=1      0.872642  20694
+</span><span class="line">EMDE K=10 N=30      0.837468  15855
+</span><span class="line">OHE                 0.825833  92811
+</span><span class="line">EMDE K=8 N=30       0.817809   5850
+</span><span class="line">EMDE K=10 N=10      0.809945   5191
+</span><span class="line">EMDE K=8 N=10       0.781998   2048
+</span><span class="line">EMDE K=1  N=2000    0.764093   4000
+</span><span class="line">EMDE K=1  N=1000    0.753733   2000
+</span><span class="line">mean vec            0.619521    100
+</span></code></pre></td></tr></table></div></figure></notextile></div>
+
+<p>First of all - you’ll notice that all the EMDE dimensionalities tend to be lower for the R8 dataset than for 20 Newsgroups. That is because R8 is a much smaller dataset with fewer distinct words in it (23k vs 93k). Consequently you more often end up with an empty bucket - and those get dropped by <code>CountVectorizer</code>.</p>
+
+<p>As for the actual results:</p>
+
+<ul>
+  <li>overall (some) EMDE sketches beat one-hot-encoding on both benchmarks and by a fairly wide margin</li>
+  <li>averaging embedding vectors doesn’t perform well at all</li>
+  <li>the higher dimensional sketches tend to do better on these datasets</li>
+  <li>there is no clear pattern regarding the importance of increasing K vs N. <code>K=30 N=1</code> is on top of one of the benchmarks. <code>K=30 N=2000</code> wins in the other</li>
+</ul>
+
+<hr />
+
+<p>In conclusion - EMDE is simple, fast, efficient. It will make a great addition to the feature engineering arsenal of any data scientist.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -2413,119 +2839,6 @@ Since I don’t have access to a labeled dataset with phone numbers and emails, 
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2017/03/23/missing-data-imputation-with-pymc-part-2/">Missing Data Imputation With Pymc: Part 2</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2017-03-23T21:52:41+00:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>23</span><span class='date-suffix'>rd</span>, <span class='date-year'>2017</span></span> <span class='time'>9:52 pm</span></time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In the <a href="http://nadbordrozd.github.io/blog/2017/03/05/missing-data-imputation-with-bayesian-networks/">last post</a> I presented a way to do Bayesian networks with pymc and use them to impute missing data. This time I benchmark the accuracy of this method on some artificial datasets.</p>
-
-<h3 id="datasets">Datasets</h3>
-<p>In the previous posts I showed the imputation of boolean missing data, but the same method works for categorical features of any cardinality as well as continuous ones (except in the continues case additional prior knowledge is required to specify the likelihood). Nevertheless, I decided to test the imputers on purely boolean datasets because it makes the scores easy to interpret and the models quick to train.</p>
-
-<p>To make it really easy on the Bayesian imputer, I created a few artificial datasets by the following process:</p>
-
-<ol>
-  <li>define a Bayesian network</li>
-  <li>sample variables corresponding to conditional probabilities describing the network from their priors (once)</li>
-  <li>fix the parameters from step 2. and sample the other variables (the observed ones) repeatedly</li>
-</ol>
-
-<p>With data generated by the same Bayesian network that we will fit to it, we’re making it as easy on pymc as possible to get a good score. Mathematically speaking, the bayesian model is <em>the</em> way to do it. Anything less than optimal performance can only be due to a bug or pymc underfitting (perhaps from too few iterations).</p>
-
-<p>The first dataset used is based on the famous <em>wet sidewalk - rain - sprinkler</em> network as seen in the <a href="https://en.wikipedia.org/wiki/Bayesian_network">wikipedia article</a> on Bayesian networks.</p>
-
-<p><img src="/images/bayesian_networks/wet_sprinkler_rain.png" /></p>
-
-<p>The second, bigger, is based on the <a href="http://www.causality.inf.ethz.ch/data/LUCAS.html">LUCAS</a> network</p>
-
-<p><img src="/images/bayesian_networks/cancer_network.png" /></p>
-
-<p>And the biggest one is based on an example <a href="http://www.igi.tugraz.at/lehre/MLB/WS10/MLB_Exercises_2010/node15.html">from some ML lecture notes</a></p>
-
-<p><img src="/images/bayesian_networks/car_insurance.png" /></p>
-
-<p>For each of these networks I would generate a dataframe with 10, 50, 250, 1250 or 6250 records and drop (replace with <code>-1</code>) a random subset of 20% or 50% of values in each column. Then I would try to fill them in with each model and score the model on accuracy. This was repeated 5 times for each network and data size and the accuracy reported is the mean of the 5 tries.</p>
-
-<h3 id="models">Models</h3>
-<p>The following models were used to impute the missing records:</p>
-
-<ul>
-  <li><code>most frequent</code> - a dummy model that predicts most frequent value per dataframe column. This is the absolute baseline of imputer performance, every model should be at least as good as this.</li>
-  <li><code>xgboost</code> - a more ambitious machine learning-based baseline. This imputer simply trains an XGBoost Classifier for every column of the dataframe. The classifier is trained only on the records where the value of that column is not missing and it uses all the remaining columns to predict that one. So, if there are n columns - n classifiers are trained, each using n - 1 remaining columns as features.</li>
-  <li><code>MAP fmin_powell</code> - a model constructed the same way as the <code>DuckImputer</code> model from the previous post. Actually, it’s a different model for each dataset, but the principle is the same. You take the very same Bayesian network that was used to create the dataset and fit it to the dataset. Then you predict the missing values using MAP with ‘method’ parameter set to ‘fmin_powell’.</li>
-  <li><code>MAP fmin</code> - same as above, only with ‘method’ set to ‘fmin’. This one actually performed so poorly, (no better than random and worse than <code>most frequent</code>) and was so slow that I quickly dropped it from the benchmark</li>
-  <li><code>MCMC 500</code>, <code>MCMC 2000</code>, <code>MCMC 10000</code> - same as the <code>MAP</code> models, except for the last step. Instead of finding <em>maximum a posteriori</em> for each variable directly using the MAP function, the variable is sampled n times from the posterior using MCMC, and the empirically most common value is used as the prediction. Three versions of this model were used - with 500, 2000 and 10000 iterations for burn-in repectively. After burn-in, 200 samples were used each time.</li>
-</ul>
-
-<h3 id="results">Results</h3>
-<p>Let’s start with the simplest network:</p>
-
-<p><img src="/images/bayesian_networks/rain_sprinkler_wet_accuracy20.png" alt="" />
-<em>Rain-Sprinkler-Wet Sidewalk benchmark (20% missing values). Mean imputation accuracy from 5 runs vs data size.</em></p>
-
-<p><img src="/images/bayesian_networks/rain_sprinkler_wet_time20.png" alt="" />
-<em>Average fitting time in seconds. Beware log scale!</em></p>
-
-<p>XGBoost comes out on top, bayesian models do poorly, apparently worse than even <code>most frequent</code> imputer. But variance in scores is quite big and there is not much structure in this dataset anyway, so let’s not lose hope. <code>MAP fmin_powell</code> is particularly bad and terribly slow on top of that, dropping it from further benchmarks.</p>
-
-<p>Let’s try a wider dataset - the cancer network. This one has more structure - that the bayesian network knows up front and xgboost doesn’t - which should give bayesian models an edge.</p>
-
-<p><img src="/images/bayesian_networks/cancer20_accuracy.png" alt="" />
-<em>Cancer network imputation accuracy. 20% missing values</em></p>
-
-<p><img src="/images/bayesian_networks/cancer20_time.png" alt="" />
-<em>Cancer network imputation time.</em></p>
-
-<p>That’s more like it! MCMC wins when records are few, but deteriorates when data gets bigger. MCMC models continue to be horribly slow.</p>
-
-<p>And finally, the biggest (27 features!), car insurance network.</p>
-
-<p><img src="/images/bayesian_networks/car_insurance_accuracy.png" alt="" />
-<em>Car insurance network imputation accuracy. 20% missing values</em></p>
-
-<p><img src="/images/bayesian_networks/car_insurance_time.png" alt="" />
-<em>Car insurance network imputation time.</em></p>
-
-<p>Qualitatively same as the cancer network case. It’s worth pointing out that in this case, the Bayesian models achieve at 50 records a level of accuracy that XGBoost doesn’t match until shown more than a thousand records! Still super slow though.</p>
-
-<h3 id="conclusions">Conclusions</h3>
-
-<p>What have we learned?</p>
-
-<ol>
-  <li>Bayesian models do relatively better when data is wide (more columns). This was expected. Wide data means bigger network, means there is more information implicit in the network structure. This is information that we hardcode into the Bayesian model, information that XGBoost doesn’t have.</li>
-  <li>Bayesian models do relatively better when data is short (less records). This was also expected, for the same reason. When data is short, the information contained in the network counts for a lot. With more records to train on, this advantage gets less important.</li>
-  <li>pymc’s MAP does poorly in terms of accuracy and is terribly slow, slower than MCMC. This one is a bit of a mystery.</li>
-  <li>For MCMC, longer burn-in gets better results, but takes more time. Duh.</li>
-  <li>MCMC model accuracy deteriorates as data gets bigger. I was surprised when I saw it, but it hindsight it’s clear that it would be the case. Bigger data means more missing values, means higher dimensionality of the space MCMC has to explore, means it would take more iterations for MCMC to  reach a high likelihood configuration. This could be alleviated if we first learned the most likely values of the parameters of the network and then used those to impute the missing values one record at a time.</li>
-  <li>XGBoost rocks.</li>
-</ol>
-
-<p>Overall, I count this experiment as a successful proof of concept, but of very limited usefulness in its current form. For any real world application one would have to redo it using some other technology. pymc is just not up to the task.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -2541,6 +2854,10 @@ Since I don’t have access to a labeled dataset with phone numbers and emails, 
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2020/09/07/embedding-sets-of-vectors-with-emde/">Embedding Sets of Vectors With EMDE</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2020/08/04/hello-world-in-pytorch-biggraph/">"Hello World!" in PyTorch BigGraph</a>
       </li>
     
@@ -2554,10 +2871,6 @@ Since I don’t have access to a labeled dataset with phone numbers and emails, 
     
       <li class="post">
         <a href="/blog/2017/12/05/what-they-dont-tell-you-about-data-science-1/">What They Don't Tell You About Data Science 1: You Are a Software Engineer First</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2017/08/12/looking-for-the-text-top-model/">Looking for the Text Top Model</a>
       </li>
     
   </ul>

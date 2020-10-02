@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://nadbordrozd.github.io/blog/2020/09/07/embedding-sets-of-vectors-with-emde/</loc>
+<lastmod>2020-09-07T10:20:58+01:00</lastmod>
+</url>
+<url>
 <loc>http://nadbordrozd.github.io/blog/2020/08/04/hello-world-in-pytorch-biggraph/</loc>
 <lastmod>2020-08-04T09:58:04+01:00</lastmod>
 </url>
@@ -177,12 +181,6 @@
 </url>
 <url>
 <loc>http://nadbordrozd.github.io/blog/categories/graph-embedding/</loc>
-</url>
-<url>
-<loc>http://nadbordrozd.github.io/posts/2/</loc>
-</url>
-<url>
-<loc>http://nadbordrozd.github.io/posts/3/</loc>
 </url>
 <url>
 <loc>http://nadbordrozd.github.io/images/phone%20screen%20-%20Google%20Docs_files/postmessageRelay.html</loc>
