@@ -1,0 +1,8 @@
+{{ define "main" }}
+<header class="article-header"><h1>Blog archive</h1></header>
+{{ range (where site.RegularPages "Section" "posts").GroupByDate "2006" }}
+  <section class="archive"><h2>{{ .Key }}</h2>
+  {{ range .Pages.ByDate.Reverse }}<p><time>{{ .Date.Format "02 Jan" }}</time> <a href="{{ .RelPermalink }}">{{ .Title }}</a></p>{{ end }}
+  </section>
+{{ end }}
+{{ end }}

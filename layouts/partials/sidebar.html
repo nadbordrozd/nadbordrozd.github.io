@@ -1,0 +1,15 @@
+<aside class="sidebar">
+  <section>
+    <h2>Recent Posts</h2>
+    <ul>
+      {{ range first 5 (where site.RegularPages.ByDate.Reverse "Section" "posts") }}
+      <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+      {{ end }}
+    </ul>
+  </section>
+  <section>
+    <h2>Elsewhere</h2>
+    <p><a href="https://github.com/nadbordrozd">@nadbordrozd on GitHub</a></p>
+    <p><a href="/atom.xml">Subscribe via RSS</a></p>
+  </section>
+</aside>

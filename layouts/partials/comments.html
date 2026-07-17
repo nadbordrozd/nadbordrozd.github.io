@@ -1,0 +1,17 @@
+<section class="comments">
+  <h2>Comments</h2>
+  <div id="disqus_thread"><noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = {{ printf "http://nadbordrozd.github.io%s" .RelPermalink | jsonify | safeJS }};
+      this.page.identifier = {{ printf "http://nadbordrozd.github.io%s" .RelPermalink | jsonify | safeJS }};
+      this.page.title = {{ .Title | jsonify | safeJS }};
+    };
+    (function () {
+      var script = document.createElement("script");
+      script.src = "https://{{ site.Config.Services.Disqus.Shortname }}.disqus.com/embed.js";
+      script.setAttribute("data-timestamp", String(+new Date()));
+      (document.head || document.body).appendChild(script);
+    }());
+  </script>
+</section>
