@@ -1,0 +1,10 @@
+{{ define "main" }}
+<article>
+  <header class="article-header">
+    <h1>{{ .Title }}</h1>
+    {{ if eq .Section "posts" }}<time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 January 2006" }}</time>{{ end }}
+  </header>
+  <div class="content">{{ .Content }}</div>
+  {{ if and (eq .Section "posts") (ne .Params.comments false) }}{{ partial "comments.html" . }}{{ end }}
+</article>
+{{ end }}

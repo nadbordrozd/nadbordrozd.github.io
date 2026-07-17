@@ -1,0 +1,31 @@
+baseURL = "https://nadbordrozd.github.io/"
+languageCode = "en-gb"
+title = "DS lore"
+copyright = "nadbor"
+enableRobotsTXT = true
+disqusShortname = "ds-lore"
+
+[params]
+  subtitle = "words about stuff"
+  author = "nadbor"
+  description = "Data science, machine learning, and software engineering"
+
+[permalinks]
+  posts = "/blog/:year/:month/:day/:slug/"
+
+[pagination]
+  pagerSize = 10
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
+  [markup.highlight]
+    style = "solarized-light"
+    lineNos = false
+
+[outputs]
+  home = ["HTML", "RSS"]
+
+[outputFormats.RSS]
+  baseName = "atom"

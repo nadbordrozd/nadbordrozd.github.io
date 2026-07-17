@@ -1,0 +1,17 @@
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ .Title }} · {{ site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{ site.Params.description }}{{ end }}">
+  <link rel="icon" href="/favicon.png">
+  <link rel="alternate" type="application/rss+xml" title="{{ site.Title }}" href="/atom.xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  {{ with .Params.bokeh }}
+  <link rel="stylesheet" href="/vendor/bokeh-{{ . }}.min.css">
+  <script src="/vendor/bokeh-{{ . }}.min.js"></script>
+  <script>Bokeh.set_log_level("info");</script>
+  {{ end }}
+</head>

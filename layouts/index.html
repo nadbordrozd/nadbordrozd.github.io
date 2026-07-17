@@ -1,0 +1,12 @@
+{{ define "main" }}
+{{ $pages := where site.RegularPages "Section" "posts" }}
+{{ range (.Paginate $pages.ByDate.Reverse).Pages }}
+  <article class="summary">
+    <h1><a href="{{ .RelPermalink }}">{{ .Title }}</a></h1>
+    <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 January 2006" }}</time>
+    <p>{{ .Summary | plainify | truncate 420 }}</p>
+    <a class="read-more" href="{{ .RelPermalink }}">Read on →</a>
+  </article>
+{{ end }}
+{{ template "_internal/pagination.html" . }}
+{{ end }}

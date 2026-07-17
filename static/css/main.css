@@ -1,0 +1,66 @@
+:root { --ink:#222; --link:#1863a1; --hover:#0181eb; --muted:#aaa; --rule:#ddd; }
+* { box-sizing:border-box; }
+html { background:#252525 url('/images/line-tile.png') top left; }
+body { max-width:1200px; margin:0 auto; color:var(--ink); background:#f2f2f2 url('/images/noise.png'); font:18px/1.5 "PT Serif",Georgia,serif; }
+a { color:var(--link); transition:color .25s; }
+a:visited { color:#751590; }
+a:hover { color:var(--hover); }
+.site-header { padding:1.45rem 3.4rem; background:#333; }
+.brand { color:#f2f2f2 !important; font-size:2.8rem; line-height:1.2; text-decoration:none; }
+.site-header p { margin:.2rem 0 0; color:#aaa; font-family:"PT Sans",sans-serif; }
+.site-nav { padding:.4rem 3.4rem; border-top:1px solid #f2f2f2; border-bottom:1px solid #8c8c8c; background:#ccc url('/images/noise.png'); background:url('/images/noise.png'),linear-gradient(#e0e0e0,#ccc,#b0b0b0); }
+.nav-inner { min-height:1.65rem; }
+nav { display:flex; align-items:center; font-family:"PT Sans",sans-serif; }
+nav a { padding:0 .85rem; color:#6b6b6b !important; border-left:1px solid #aaa; text-decoration:none; text-shadow:#ebebeb 0 1px; }
+nav a:first-child { padding-left:0; border-left:0; }
+nav a:hover { color:#222 !important; }
+.page-shell { display:grid; grid-template-columns:minmax(0,1fr) 300px; align-items:start; background:#f8f8f8 url('/images/noise.png'); border-bottom:1px solid #bfbfbf; }
+main { min-width:0; padding:1.7rem 3.4rem 3.5rem; border-right:1px solid #e0e0e0; background:rgba(255,255,255,.32); }
+.sidebar { padding:2rem 1.4rem; color:#4b4b4b; font: .88rem/1.45 "PT Sans",sans-serif; }
+.sidebar section { padding:0 0 1.2rem; margin:0 0 1.35rem; border-bottom:1px solid #ddd; }
+.sidebar h2 { margin:0 0 .8rem; color:#666; font-size:1rem; text-transform:uppercase; letter-spacing:.04em; }
+.sidebar ul { padding:0; margin:0; list-style:none; }
+.sidebar li { padding:.45rem 0; border-bottom:1px dotted #ddd; }
+.sidebar li:last-child { border:0; }
+.sidebar a { color:#222; text-decoration:none; }
+.sidebar a:hover { color:var(--hover); }
+h1,h2,h3,h4,h5,h6 { font-family:"PT Serif",Georgia,serif; line-height:1.2; }
+p,blockquote,ul,ol { margin-top:0; margin-bottom:1.5rem; }
+ul,ol { padding-left:1.35rem; }
+.article-header { position:relative; padding:2rem 0 1rem; margin-bottom:1.5rem; border-bottom:1px dashed #ccc; }
+.article-header h1 { margin:0; font-size:2.55rem; }
+.article-header time { position:absolute; top:.45rem; left:0; color:var(--muted); font: .78rem "PT Sans",sans-serif; text-transform:uppercase; }
+.content h2 { padding-top:.8rem; border-top:1px dashed #ccc; }
+.content img { max-width:100%; height:auto; padding:.45rem; border-radius:.3rem; border:1px solid #fff; box-shadow:rgba(0,0,0,.15) 0 1px 4px; }
+.content iframe { max-width:100%; border:0; }
+.content blockquote { padding-left:1.2rem; border-left:4px solid #ccc; font-style:italic; }
+.content pre { overflow:auto; padding:1rem; color:#586e75; background:#f5f5f5; border:1px solid #ddd; font: .78rem/1.45 Menlo,Monaco,monospace; }
+.content code { font-size:.85em; }
+.content table { display:block; max-width:100%; overflow-x:auto; margin-bottom:1.5rem; border-collapse:collapse; }
+.content td,.content th { padding:.4rem .6rem; border:1px solid #ccc; }
+.content th { font-weight:bold; }
+.plotdiv { max-width:100%; overflow-x:auto; margin:1.5rem 0; }
+.comments { margin-top:4rem; padding-top:2rem; border-top:1px dashed #ccc; }
+.summary { padding:1.8rem 0 2.6rem; border-bottom:1px dashed #ccc; }
+.summary:first-child { padding-top:.5rem; }
+.summary h1,.summary h2 { margin:.2rem 0; font-size:2.2rem; }
+.summary h1 a,.summary h2 a { color:var(--ink); text-decoration:none; }
+.summary time,time { color:var(--muted); font: .78rem "PT Sans",sans-serif; text-transform:uppercase; }
+.read-more { display:inline-block; padding:.4rem .8rem; color:#666 !important; background:#ebebeb; font-family:"PT Sans",sans-serif; text-decoration:none; }
+.read-more:hover { color:#fff !important; background:var(--hover); }
+.archive h2 { margin-top:2.5rem; border-bottom:1px dashed #ccc; }
+.archive p { margin:.35rem 0; }
+.archive time { display:inline-block; width:4.5rem; }
+.pagination { display:flex; gap:.5rem; padding:1.5rem 0; list-style:none; }
+.page-link { padding:.3rem .6rem; border:1px solid #ccc; }
+.site-footer { padding:1.2rem 3.4rem 2.5rem; color:#888; background:#252525 url('/images/line-tile.png'); font: .75rem "PT Sans",sans-serif; text-shadow:#000 0 1px; }
+@media (max-width:767px) {
+  body { font-size:16px; }
+  .site-header,.site-nav,main,.site-footer { padding-left:1.2rem; padding-right:1.2rem; }
+  .brand { font-size:2.1rem; }
+  .page-shell { display:block; }
+  main { border-right:0; }
+  .sidebar { padding:1.6rem 1.2rem; border-top:1px solid #ddd; }
+  .article-header h1 { font-size:2rem; }
+  .summary h1,.summary h2 { font-size:1.7rem; }
+}
