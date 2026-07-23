@@ -1,0 +1,31 @@
+{{ define "main" }}
+<article>
+  <header class="article-header"><h1>{{ .Title }}</h1></header>
+  <div class="content projects-intro">{{ .Content }}</div>
+  <div class="project-grid">
+    {{ range hugo.Data.projects }}
+    {{ $project := . }}
+    <article class="project-card">
+      {{ with .images }}
+      <div class="project-gallery">
+        {{ range . }}
+        <a class="project-image" href="{{ $project.url }}" target="_blank" rel="noopener">
+          <img src="{{ .src }}" alt="{{ .alt }}" loading="lazy">
+        </a>
+        {{ end }}
+      </div>
+      {{ else }}
+      <a class="project-image" href="{{ .url }}" target="_blank" rel="noopener">
+        <img src="{{ .image }}" alt="{{ .image_alt }}" loading="lazy">
+      </a>
+      {{ end }}
+      <div class="project-copy">
+        <h2><a href="{{ .url }}" target="_blank" rel="noopener">{{ .title }}</a></h2>
+        <p>{{ .description }}</p>
+        <a class="project-link" href="{{ .url }}" target="_blank" rel="noopener">Play {{ .title }} →</a>
+      </div>
+    </article>
+    {{ end }}
+  </div>
+</article>
+{{ end }}

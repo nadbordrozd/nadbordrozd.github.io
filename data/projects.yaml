@@ -1,0 +1,32 @@
+- title: "Turing Game"
+  url: "https://turing-game.pl/"
+  image: "/images/projects/turing-game.png"
+  image_alt: "Turing Game interface showing a programmable robot in a purple maze"
+  description: "A programming puzzle game where you assemble instructions for a robot and help it escape a series of mazes. The levels introduce control flow concepts such as loops and conditional instructions."
+
+- title: "Death at the Frontier"
+  url: "https://nadbordrozd.github.io/death_at_the_frontier/"
+  image: "/images/projects/death-at-the-frontier.png"
+  image_alt: "Death at the Frontier interrogation screen with five AI lab murder suspects"
+  description: "An LLM-powered murder mystery set at Frontier AI, where a researcher has died under suspicious circumstances. Interrogate five suspects, compare their stories, and identify the killer."
+
+- title: "Murder Monetised"
+  url: "https://nadbordrozd.github.io/murder_monetized/"
+  image: "/images/projects/murder-monetised.png"
+  image_alt: "Murder Monetised interrogation screen with five internet influencer suspects"
+  description: "An LLM-powered murder mystery populated by five very different internet influencers. Question the suspects, uncover their motives, and decide who turned content creation into a crime scene."
+
+- title: "Vibe Crawler"
+  url: "https://nadbordrozd.github.io/crawl/"
+  image: "/images/projects/vibe-crawler.png"
+  image_alt: "Vibe Crawler showing a dark pixel-art dungeon with monsters and an exploration log"
+  description: "A classic browser-based roguelike dungeon crawler. Explore dark procedural corridors, fight monsters, collect loot, and survive long enough to descend deeper."
+
+- title: "Eleven Plus Maths"
+  url: "https://nadbordrozd.github.io/eleven_plus/"
+  images:
+    - src: "/images/projects/eleven-plus-exercise.png"
+      alt: "Eleven Plus Maths geometry exercise about packing shapes into a grid"
+    - src: "/images/projects/eleven-plus-learning-plan.png"
+      alt: "Eleven Plus Maths learning plan showing topics, skill assessments, and practice recommendations"
+  description: "A diagnostic maths practice site for UK Eleven Plus preparation, covering more than 100 skills across 14 topics. It identifies what each student needs to practise and generates targeted exercises for every skill."
