@@ -1,5 +1,5 @@
 - title: "Turing Game"
-  url: "https://turing-game.pl/"
+  url: "https://nadbordrozd.github.io/turing-game/"
   image: "/images/projects/turing-game.png"
   image_alt: "Turing Game interface showing a programmable robot in a purple maze"
   description: "A programming puzzle game where you assemble instructions for a robot and help it escape a series of mazes. The levels introduce control flow concepts such as loops and conditional instructions."
