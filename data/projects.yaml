@@ -2,7 +2,7 @@
   url: "https://nadbordrozd.github.io/pulp_wars/"
   image: "/images/projects/pulp-wars.png"
   image_alt: "Pulp Wars board with Human, Cultist, Dinosaur and Goblin cities, units and ships on a forested island"
-  description: "A turn-based strategy game in the spirit of Polytopia, with nine pulp factions: Humans, Goblins, Undead, Dinosaurs, Martians, Ice Folk, Dwarves, Candy and the Cultists of the Ancient Ones, each with its own units, tech tree and tricks. Play skirmishes against up to three AI rivals in the browser, or work through the ten-mission campaign."
+  description: "A turn-based strategy game in the spirit of Polytopia, with nine pulp factions: Humans, Goblins, Undead, Dinosaurs, Martians, Ice Folk, Dwarves, Candy and the Cultists of the Ancient Ones, each with its own units, tech tree and tricks. Play skirmishes against AI rivals in the browser, or work through the ten-mission campaign."
 
 - title: "Turing Game"
   url: "https://turing-game.pl/"
