@@ -1,3 +1,9 @@
+- title: "Lightline"
+  url: "https://nadbordrozd.github.io/lightline/"
+  image: "/images/projects/lightline.png"
+  image_alt: "Lightline arena with six neon light trails weaving between bonus pickups"
+  description: "A neon light-cycle game for up to eight players. Steer with two keys, leave a glowing trail and be the last one standing. Play on one keyboard, against bots, or online with friends straight from the browser, in arenas full of bombs, walls, teleports and speed-ups."
+
 - title: "Pulp Wars"
   url: "https://nadbordrozd.github.io/pulp_wars/"
   image: "/images/projects/pulp-wars.png"
