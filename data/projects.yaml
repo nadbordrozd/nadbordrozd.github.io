@@ -11,9 +11,9 @@
   description: "A turn-based strategy game in the spirit of Polytopia, with nine pulp factions: Humans, Goblins, Undead, Dinosaurs, Martians, Ice Folk, Dwarves, Candy and the Cultists of the Ancient Ones, each with its own units, tech tree and tricks. Play skirmishes against AI rivals in the browser, or work through the ten-mission campaign."
 
 - title: "Turing Game"
-  url: "https://turing-game.pl/"
+  url: "https://nadbordrozd.github.io/turing-game/"
   image: "/images/projects/turing-game.png"
-  image_alt: "Turing Game interface showing a programmable robot in a purple maze"
+  image_alt: "Turing Game screen with a program of conveyor belts and turn tiles steering a robot through a maze"
   description: "A programming puzzle game where you assemble instructions for a robot and help it escape a series of mazes. The levels introduce control flow concepts such as loops and conditional instructions."
 
 - title: "Death at the Frontier"
